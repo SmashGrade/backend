@@ -6,10 +6,11 @@ WORKDIR /app
 
 COPY app .
 
-# maybe cgo is needed for sqlite
-RUN go mod download && CGO_ENABLED=0 GOOS=linux go build -o backend
+# cgo is needed for sqlite
+RUN go mod download && CGO_ENABLED=1 GOOS=linux go build -o backend
 
-FROM scratch
+# we need a base image for dynamic linked libs and can't work from scratch
+FROM docker.io/debian:bookworm-slim
 
 WORKDIR /app
 
