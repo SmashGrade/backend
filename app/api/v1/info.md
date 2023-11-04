@@ -1,0 +1,2 @@
+# api
+The api folder contains the API-related files and code. It typically includes routing and controllers responsible for handling HTTP requests and responses. This folder is the entry point for external interactions with the application.
