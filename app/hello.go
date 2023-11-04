@@ -12,7 +12,7 @@ type Test struct {
 }
 
 func main() {
-	fmt.Println("Hello world!")
+	fmt.Println("Hello world!2")
 
 	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
 	if err != nil {
