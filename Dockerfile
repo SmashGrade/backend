@@ -12,6 +12,9 @@ RUN go mod download && CGO_ENABLED=1 GOOS=linux go build -o backend
 # we need a base image for dynamic linked libs and can't work from scratch
 FROM docker.io/debian:bookworm-slim
 
+EXPOSE 9000
+VOLUME ["/app/data"]
+
 WORKDIR /app
 
 COPY --from=build /app/backend backend
