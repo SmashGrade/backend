@@ -29,3 +29,11 @@ func (ctx *SetupContext) Run(port int) error {
 	}
 	return nil
 }
+
+func (ctx *SetupContext) Stop() error {
+	err := ctx.Stop()
+	if err != nil {
+		return err
+	}
+	return nil
+}
