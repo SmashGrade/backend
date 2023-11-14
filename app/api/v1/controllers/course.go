@@ -2,8 +2,10 @@ package controllers
 
 import (
 	"fmt"
+	"net/http"
 
 	s "github.com/SmashGrade/backend/app/api/v1/schemas"
+	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 )
 
@@ -19,6 +21,14 @@ func GetCourses(c echo.Context) error {
 
 func PostCourse(c echo.Context) error {
 	var req s.CourseReqPost
+
+	if err := c.Bind(req); err != nil {
+		return c.String(http.StatusBadRequest, err.Error())
+	}
+
+	if err := validator.New().Struct(req); err != nil {
+		return c.String(http.StatusBadRequest, err.Error())
+	}
 
 	// todelete
 	fmt.Printf(`%v`, req)
@@ -45,6 +55,14 @@ func PutCourse(c echo.Context) error {
 	id := c.Param("id")
 
 	var req s.CourseReqPut
+
+	if err := c.Bind(req); err != nil {
+		return c.String(http.StatusBadRequest, err.Error())
+	}
+
+	if err := validator.New().Struct(req); err != nil {
+		return c.String(http.StatusBadRequest, err.Error())
+	}
 
 	// todelete
 	fmt.Printf(`%v %v`, id, req)

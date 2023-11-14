@@ -31,7 +31,7 @@ type CourseReqPut struct {
 }
 
 type CourseReqPost struct {
-	Description string `json:"description"`
+	Description string `json:"description" validate:"required"`
 	Number      string `json:"number"`
 	ModuleRef   int64  `json:"moduleRef"`
 }

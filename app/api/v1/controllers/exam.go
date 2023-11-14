@@ -2,8 +2,10 @@ package controllers
 
 import (
 	"fmt"
+	"net/http"
 
 	s "github.com/SmashGrade/backend/app/api/v1/schemas"
+	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 )
 
@@ -18,6 +20,15 @@ func GetExams(c echo.Context) error {
 
 func PostExam(c echo.Context) error {
 	var req s.ExamReq
+
+	if err := c.Bind(req); err != nil {
+		return c.String(http.StatusBadRequest, err.Error())
+	}
+
+	if err := validator.New().Struct(req); err != nil {
+		return c.String(http.StatusBadRequest, err.Error())
+	}
+
 	// todelete
 	fmt.Printf(`%v`, req)
 
@@ -68,6 +79,14 @@ func PostExamGradeStudent(c echo.Context) error {
 
 	var req s.ExamReqStudent
 
+	if err := c.Bind(req); err != nil {
+		return c.String(http.StatusBadRequest, err.Error())
+	}
+
+	if err := validator.New().Struct(req); err != nil {
+		return c.String(http.StatusBadRequest, err.Error())
+	}
+
 	// todelete
 	fmt.Printf(`%v %v`, id, req)
 
@@ -80,6 +99,14 @@ func PostExamGradeTeacher(c echo.Context) error {
 	id := c.Param("id")
 
 	var req s.ExamReqStudent
+
+	if err := c.Bind(req); err != nil {
+		return c.String(http.StatusBadRequest, err.Error())
+	}
+
+	if err := validator.New().Struct(req); err != nil {
+		return c.String(http.StatusBadRequest, err.Error())
+	}
 
 	// todelete
 	fmt.Printf(`%v %v`, id, req)
