@@ -1,0 +1,7 @@
+package entity
+
+type Role struct {
+	basemodel
+	Description string
+	Users       []*User `gorm:"many2many:user_has_role;"`
+}
