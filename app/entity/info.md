@@ -1,2 +1,0 @@
-# entity
-The entity folder holds entity classes that represent the data model of the application. These classes define the structure and properties of the data objects used in the application. They are often mapped to database tables.
