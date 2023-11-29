@@ -1,6 +1,6 @@
 package schemas
 
 type StudyStage struct {
-	Id          int64  `json:"id"`
+	Id          int    `json:"id"`
 	Description string `json:"description"`
 }

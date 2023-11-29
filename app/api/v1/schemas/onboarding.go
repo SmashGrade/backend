@@ -1,8 +1,8 @@
 package schemas
 
 type OnboardingReq struct {
-	CurriculumRef int64 `json:"curriculumRef"`
-	StartYear     int64 `json:"startYear"`
+	CurriculumRef int `json:"curriculumRef"`
+	StartYear     int `json:"startYear"`
 }
 
 type OnboardingFilter struct {
