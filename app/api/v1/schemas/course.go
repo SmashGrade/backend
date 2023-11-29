@@ -1,10 +1,22 @@
 package schemas
 
-type CourseRes struct {
+type CoursesRes struct {
 	Id          int    `json:"id"`
 	Version     int    `json:"version"`
 	Description string `json:"description"`
 	Number      string `json:"number"`
+	Versions    []int  `json:"versions"`
+}
+
+type CourseRes struct {
+	Id          int       `json:"id"`
+	Version     int       `json:"version"`
+	Description string    `json:"description"`
+	Number      string    `json:"number"`
+	Versions    []int     `json:"versions"`
+	Modules     []Module  `json:"modules"`
+	Exams       []ExamRes `json:"exams"`
+	Teachers    []Teacher `json:"teacher"`
 }
 
 type CourseResStudent struct {
@@ -24,19 +36,23 @@ type CourseResTeacher struct {
 }
 
 type CourseReqPut struct {
-	Version     int    `json:"version"`
-	Description string `json:"description"`
-	Number      string `json:"number"`
-	ModuleRef   int    `json:"integer"`
+	Version     int       `json:"version"`
+	Description string    `json:"description"`
+	Number      string    `json:"number"`
+	ModuleRef   []int     `json:"moduleRef"`
+	TeacherRef  []int     `json:"teacherRef"`
+	Exams       []ExamRes `json:"exams"`
 }
 
 type CourseReqPost struct {
-	Description string `json:"description" validate:"required"`
-	Number      string `json:"number"`
-	ModuleRef   int    `json:"moduleRef"`
+	Description string    `json:"description" validate:"required"`
+	Number      string    `json:"number"`
+	ModuleRef   []int     `json:"moduleRef"`
+	TeacherRef  []int     `json:"teacherRef"`
+	Exams       []ExamRes `json:"exams"`
 }
 
 type CourseFilter struct {
-	Modules  []Module `json:"modules"`
-	Versions []int    `json:"versions"`
+	Modules  []Module  `json:"modules"`
+	Teachers []Teacher `json:"teachers"`
 }
