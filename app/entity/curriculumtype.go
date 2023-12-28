@@ -1,7 +1,7 @@
 package entity
 
 type Curriculumtype struct {
-	basemodel
+	Basemodel
 	Description   string
 	DurationYears uint
 }

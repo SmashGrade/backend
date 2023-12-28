@@ -1,6 +1,6 @@
 package entity
 
 type Examtype struct {
-	basemodel
+	Basemodel
 	Description string
 }

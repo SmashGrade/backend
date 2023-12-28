@@ -1,6 +1,6 @@
 package entity
 
 type Gradetype struct {
-	basemodel
+	Basemodel
 	Description string
 }

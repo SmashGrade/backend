@@ -1,7 +1,7 @@
 package entity
 
 type Course struct {
-	basemodel
+	Basemodel
 	Version         uint `gorm:"primarykey"`
 	Description     string
 	Number          string    // this is a short identifier

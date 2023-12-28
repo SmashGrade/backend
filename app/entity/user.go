@@ -3,7 +3,7 @@ package entity
 import "time"
 
 type User struct {
-	basemodel
+	Basemodel
 	ClassStartyear  time.Time
 	Name            string
 	Email           string

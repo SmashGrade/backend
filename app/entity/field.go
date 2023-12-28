@@ -1,7 +1,7 @@
 package entity
 
 type Field struct {
-	basemodel
+	Basemodel
 	Description string
 	Users       []*User `gorm:"many2many:fieldmanager;"`
 }

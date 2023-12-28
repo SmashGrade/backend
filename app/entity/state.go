@@ -1,7 +1,7 @@
 package entity
 
 type State struct {
-	basemodel
+	Basemodel
 	Description string
 	ModuleID    uint // used for has one association
 }

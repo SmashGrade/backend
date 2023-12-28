@@ -1,7 +1,7 @@
 package entity
 
 type Evaluationtype struct {
-	basemodel
+	Basemodel
 	Description string
 	Code        string // short identifier?
 }

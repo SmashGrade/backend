@@ -1,7 +1,7 @@
 package entity
 
 type Module struct {
-	basemodel
+	Basemodel
 	Version          uint `gorm:"primarykey"`
 	State            State
 	EvaluationTypeID uint

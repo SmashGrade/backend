@@ -1,8 +1,8 @@
 package entity
 
 type Focus struct {
-	basemodel
+	Basemodel
 	FieldID     uint
-	Field       Field `gorm:"foreignKey:FieldID;references:ID"`
+	Field       Field
 	Description string
 }
