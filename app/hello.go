@@ -13,10 +13,10 @@ type Test struct {
 }
 
 func main() {
-	ctx := api.Setup()
+	ctx := api.NewServer()
 
 	// add all versions
-	v1.RoutesV1(&ctx)
+	v1.RoutesV1(ctx)
 	// v2...
 	// v3...
 	// v4...
