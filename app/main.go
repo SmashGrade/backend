@@ -5,12 +5,7 @@ import (
 
 	"github.com/SmashGrade/backend/app/api"
 	v1 "github.com/SmashGrade/backend/app/api/v1"
-	"gorm.io/gorm"
 )
-
-type Test struct {
-	gorm.Model
-}
 
 func main() {
 
