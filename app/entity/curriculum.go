@@ -5,6 +5,7 @@ import "time"
 type Curriculum struct {
 	basemodel
 	StartValidity  time.Time `gorm:"primarykey"`
+	FocusID        uint      // belongs to
 	Focus          Focus
 	Curriculumtype Curriculumtype
 	State          State
