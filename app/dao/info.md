@@ -1,0 +1,2 @@
+# Data Access Object
+The dao (Data Access Object) folder houses database-related code. It includes methods and classes responsible for interacting with the database, such as querying and updating data.
