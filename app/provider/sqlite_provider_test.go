@@ -7,5 +7,4 @@ import (
 func TestProvider(t *testing.T) {
 	prov := &SqliteProvider{}
 	prov.Connect()
-	t.Fatalf("Hello")
 }
