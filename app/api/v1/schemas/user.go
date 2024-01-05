@@ -1,7 +1,7 @@
 package schemas
 
 type User struct {
-	Id                  int    `json:"id"`
+	Id                  uint   `json:"id"`
 	CurriculumStartYear int    `json:"curriculumStartYear"`
 	Name                string `json:"name"`
 	Email               string `json:"email"`

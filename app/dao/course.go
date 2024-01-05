@@ -48,6 +48,7 @@ func (db *Database) PostCourse(courseReq *schemas.CourseReqPost) error {
 	// create course
 	course.Modules = modules
 	course.TeachedBy = teachers
+	course.Version = 1
 	db.Db.Create(&course)
 
 	// Create Exams

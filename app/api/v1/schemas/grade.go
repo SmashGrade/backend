@@ -1,13 +1,13 @@
 package schemas
 
 type GradType struct {
-	Id          int     `json:"id"`
+	Id          uint8   `json:"id"`
 	Description string  `json:"description"`
 	Grade       float64 `json:"grade"`
 }
 
 type GradeRes struct {
-	Id            int        `json:"id"`
+	Id            uint       `json:"id"`
 	Date          string     `json:"date"`
 	GradesPerType []GradType `json:"gradesPerType"`
 }

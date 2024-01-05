@@ -1,7 +1,7 @@
 package schemas
 
 type Curriculum struct {
-	Id             int    `json:"id"`
+	Id             uint   `json:"id"`
 	Focus          string `json:"focus"`
 	Field          string `json:"field"`
 	CurriculumType string `json:"curriculumType"`
@@ -11,7 +11,7 @@ type Curriculum struct {
 }
 
 type CurriculumRes struct {
-	Id             int            `json:"id"`
+	Id             uint           `json:"id"`
 	Focus          string         `json:"focus"`
 	Field          string         `json:"field"`
 	CurriculumType string         `json:"curriculumType"`
@@ -30,8 +30,8 @@ type CurriculumReq struct {
 	IsActive        bool   `json:"isActive"`
 	StartDate       string `json:"startDate"`
 	EndDate         string `json:"endDate"`
-	FieldmanagerRef []int  `json:"fieldmanagerRef"`
-	MoulesRef       []int  `json:"modulesRef"`
+	FieldmanagerRef []uint `json:"fieldmanagerRef"`
+	MoulesRef       []uint `json:"modulesRef"`
 }
 
 type CurriculumFilter struct {
@@ -41,18 +41,18 @@ type CurriculumFilter struct {
 }
 
 type CurriculumType struct {
-	Id            int    `json:"id"`
+	Id            uint   `json:"id"`
 	Description   string `json:"description"`
 	DurationYears int    `json:"durationYears"`
 }
 
 type Focus struct {
-	Id          int    `json:"id"`
+	Id          uint   `json:"id"`
 	Description string `json:"description"`
-	FieldRef    int    `json:"fieldRef"`
+	FieldRef    uint   `json:"fieldRef"`
 }
 
 type Field struct {
-	Id          int    `json:"id"`
+	Id          uint   `json:"id"`
 	Description string `json:"description"`
 }

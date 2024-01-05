@@ -1,16 +1,16 @@
 package schemas
 
 type Module struct {
-	Id          int64  `json:"id"`
-	Version     int64  `json:"version"`
+	Id          uint   `json:"id"`
+	Version     uint   `json:"version"`
 	Description string `json:"description"`
 	Number      string `json:"number"`
 	IsActiv     bool   `json:"isActive"`
 }
 
 type ModuleRes struct {
-	Id                int64             `json:"id"`
-	Version           int64             `json:"version"`
+	Id                uint              `json:"id"`
+	Version           uint              `json:"version"`
 	Description       string            `json:"description"`
 	Number            string            `json:"number"`
 	IsActiv           bool              `json:"isActive"`
@@ -20,8 +20,8 @@ type ModuleRes struct {
 }
 
 type ModuleResStudent struct {
-	Id                int                `json:"id"`
-	Version           int                `json:"version"`
+	Id                uint               `json:"id"`
+	Version           uint               `json:"version"`
 	Description       string             `json:"description"`
 	Number            string             `json:"number"`
 	IsActiv           bool               `json:"isActive"`
@@ -32,8 +32,8 @@ type ModuleResStudent struct {
 }
 
 type ModuleResTeacher struct {
-	Id                int                `json:"id"`
-	Version           int                `json:"version"`
+	Id                uint               `json:"id"`
+	Version           uint               `json:"version"`
 	Description       string             `json:"description"`
 	Number            string             `json:"number"`
 	IsActiv           bool               `json:"isActive"`
@@ -48,7 +48,7 @@ type ModuleReq struct {
 	Number            string            `json:"number"`
 	IsActiv           bool              `json:"isActive"`
 	ValuationCategory ValuationCategory `json:"valuationCategory"`
-	CoursesRef        []int             `json:"coursesRef"`
+	CoursesRef        []uint            `json:"coursesRef"`
 }
 
 type ModuleFilter struct {

@@ -28,7 +28,7 @@ func TestPostCourse(t *testing.T) {
 	var courseReq schemas.CourseReqPost
 	courseReq.Description = "Neuer Kurs"
 	courseReq.Number = "Course123"
-	courseReq.TeacherRef = []int{1}
+	courseReq.TeacherRef = []uint{1}
 	courseReq.ModuleRef = []schemas.ModuleRef{
 		{Id: 2, Version: 1},
 		{Id: 3, Version: 1},
