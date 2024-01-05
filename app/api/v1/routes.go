@@ -5,10 +5,14 @@ import (
 
 	"github.com/SmashGrade/backend/app/api"
 	c "github.com/SmashGrade/backend/app/api/v1/controllers"
+	"github.com/SmashGrade/backend/app/provider"
 	"github.com/labstack/echo/v4"
 )
 
 func RoutesV1(ctx *api.SetupContext) {
+	prov := &provider.SqliteProvider{}
+	prov.Connect()
+
 	v1 := ctx.Echo.Group("/api/v1")
 	v1.GET("/apples", apples)
 

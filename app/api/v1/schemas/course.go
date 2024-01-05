@@ -45,11 +45,11 @@ type CourseReqPut struct {
 }
 
 type CourseReqPost struct {
-	Description string    `json:"description" validate:"required"`
-	Number      string    `json:"number"`
-	ModuleRef   []int     `json:"moduleRef"`
-	TeacherRef  []int     `json:"teacherRef"`
-	Exams       []ExamRes `json:"exams"`
+	Description string      `json:"description" validate:"required"`
+	Number      string      `json:"number"`
+	ModuleRef   []ModuleRef `json:"moduleRef"`
+	TeacherRef  []int       `json:"teacherRef"`
+	Exams       []ExamRes   `json:"exams"`
 }
 
 type CourseFilter struct {

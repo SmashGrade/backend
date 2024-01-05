@@ -5,17 +5,24 @@ import (
 	"net/http"
 
 	s "github.com/SmashGrade/backend/app/api/v1/schemas"
+	"github.com/SmashGrade/backend/app/dao"
+	"github.com/SmashGrade/backend/app/provider"
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 )
 
 func GetExams(c echo.Context) error {
 	var res []s.ExamRes
-	// todelete
-	fmt.Printf(`%v`, res)
+
+	prov := &provider.SqliteProvider{}
+	prov.Connect()
+
+	db := &dao.Database{}
+	db.Db = prov.Db
+	db.ListExams(&res)
 
 	// TODO
-	return nil
+	return c.JSON(http.StatusAccepted, res)
 }
 
 func PostExam(c echo.Context) error {

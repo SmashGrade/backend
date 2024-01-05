@@ -54,3 +54,8 @@ type ModuleReq struct {
 type ModuleFilter struct {
 	StudyStages []StudyStage `json:"studyStages"`
 }
+
+type ModuleRef struct {
+	Id      uint `json:"id"`
+	Version uint `json:"version"`
+}

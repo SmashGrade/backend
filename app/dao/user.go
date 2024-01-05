@@ -1,0 +1,45 @@
+package dao
+
+import (
+	"github.com/SmashGrade/backend/app/api/v1/schemas"
+	"github.com/SmashGrade/backend/app/entity"
+)
+
+func (db *Database) ListUsers(usersRes *[]schemas.User) error {
+	var users []entity.User
+	db.Db.Find(&users)
+
+	err := ParseEntityToSchema(&users, &usersRes)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (db *Database) PostUser(userReq *schemas.User) error {
+	var user entity.User
+
+	// User Id has to be set to 0 so the User can not set it
+	userReq.Id = 0
+
+	// The Role of the User has to be extracted and added after it got parsed
+	role := userReq.Role
+	var roles []*entity.Role
+	db.ListRoles(&roles, role)
+
+	err := ParseSchemaToEntity(&userReq, &user)
+	if err != nil {
+		return err
+	}
+
+	user.Roles = roles
+
+	db.Db.Create(&user)
+	return nil
+}
+
+func (db *Database) GetUser(user *entity.User, id uint) error {
+	db.Db.Where("id = ?", id).Find(&user)
+	return nil
+}
