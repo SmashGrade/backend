@@ -5,7 +5,7 @@ type Module struct {
 	Version     int64  `json:"version"`
 	Description string `json:"description"`
 	Number      string `json:"number"`
-	IsActiv     bool   `json:"isActiv"`
+	IsActiv     bool   `json:"isActive"`
 }
 
 type ModuleRes struct {
@@ -13,7 +13,7 @@ type ModuleRes struct {
 	Version           int64             `json:"version"`
 	Description       string            `json:"description"`
 	Number            string            `json:"number"`
-	IsActiv           bool              `json:"isActiv"`
+	IsActiv           bool              `json:"isActive"`
 	StudyStage        StudyStage        `json:"studyStage"`
 	ValuationCategory ValuationCategory `json:"valuationCategory"`
 	Courses           []CourseRes       `json:"courses"`
@@ -24,7 +24,7 @@ type ModuleResStudent struct {
 	Version           int                `json:"version"`
 	Description       string             `json:"description"`
 	Number            string             `json:"number"`
-	IsActiv           bool               `json:"isActiv"`
+	IsActiv           bool               `json:"isActive"`
 	GradesPerType     []GradType         `json:"gradesPerType"`
 	StudyStage        StudyStage         `json:"studyStage"`
 	ValuationCategory ValuationCategory  `json:"valuationCategory"`
@@ -36,7 +36,7 @@ type ModuleResTeacher struct {
 	Version           int                `json:"version"`
 	Description       string             `json:"description"`
 	Number            string             `json:"number"`
-	IsActiv           bool               `json:"isActiv"`
+	IsActiv           bool               `json:"isActive"`
 	AvgGradesPerType  []GradType         `json:"avgGradesPerType"`
 	StudyStage        StudyStage         `json:"studyStage"`
 	ValuationCategory ValuationCategory  `json:"valuationCategory"`
@@ -46,7 +46,7 @@ type ModuleResTeacher struct {
 type ModuleReq struct {
 	Description       string            `json:"description"`
 	Number            string            `json:"number"`
-	IsActiv           bool              `json:"isActiv"`
+	IsActiv           bool              `json:"isActive"`
 	ValuationCategory ValuationCategory `json:"valuationCategory"`
 	CoursesRef        []int             `json:"coursesRef"`
 }

@@ -5,7 +5,7 @@ type Curriculum struct {
 	Focus          string `json:"focus"`
 	Field          string `json:"field"`
 	CurriculumType string `json:"curriculumType"`
-	IsActive       bool   `json:"isActiv"`
+	IsActive       bool   `json:"isActive"`
 	StartDate      string `json:"startDate"`
 	EndDate        string `json:"endDate"`
 }
@@ -15,9 +15,10 @@ type CurriculumRes struct {
 	Focus          string         `json:"focus"`
 	Field          string         `json:"field"`
 	CurriculumType string         `json:"curriculumType"`
-	IsActive       bool           `json:"isActiv"`
+	IsActive       bool           `json:"isActive"`
 	StartDate      string         `json:"startDate"`
 	EndDate        string         `json:"endDate"`
+	Description    string         `json:"description"`
 	Fieldmanager   []Fieldmanager `json:"fieldmanager"`
 	Moules         []ModuleRes    `json:"modules"`
 }
@@ -26,7 +27,7 @@ type CurriculumReq struct {
 	Focus           string `json:"focus"`
 	Field           string `json:"field"`
 	CurriculumType  string `json:"curriculumType"`
-	IsActive        bool   `json:"isActiv"`
+	IsActive        bool   `json:"isActive"`
 	StartDate       string `json:"startDate"`
 	EndDate         string `json:"endDate"`
 	FieldmanagerRef []int  `json:"fieldmanagerRef"`
