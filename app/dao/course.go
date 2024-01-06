@@ -61,3 +61,43 @@ func (db *Database) PostCourse(courseReq *schemas.CourseReqPost) error {
 
 	return nil
 }
+
+func (db *Database) GetCourse(courseRes *schemas.CourseRes, id uint, version uint) error {
+	var course entity.Course
+
+	if version != 0 {
+		db.Db.Where("id = ? AND version = ?", id, version).Find(&course)
+	} else {
+		db.Db.Preload("Modules").Preload("TeachedBy").Where("id = ?", id).Order("version desc").First(&course)
+	}
+
+	err := ParseEntityToSchema(&course, &courseRes)
+	if err != nil {
+		return err
+	}
+
+	// Add Teachers
+	var teachers []schemas.Teacher
+	err = ParseEntityToSchema(&course.TeachedBy, &teachers)
+	if err != nil {
+		return err
+	}
+	courseRes.Teachers = teachers
+
+	// Get all Versions
+	var versions []uint
+	db.Db.Model(&entity.Course{}).Where("id = ?", id).Pluck("version", &versions)
+	courseRes.Versions = versions
+
+	// Get all Exams
+	var exams []entity.Exam
+	var examsRes []schemas.ExamRes
+	db.Db.Where("course_id = ?", id).Find(&exams)
+	err = ParseEntityToSchema(&exams, &examsRes)
+	if err != nil {
+		return err
+	}
+	courseRes.Exams = examsRes
+
+	return nil
+}

@@ -3,6 +3,7 @@ package controllers
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	s "github.com/SmashGrade/backend/app/api/v1/schemas"
 	"github.com/go-playground/validator/v10"
@@ -23,31 +24,45 @@ func PostCourse(c echo.Context) error {
 	var req s.CourseReqPost
 
 	if err := c.Bind(req); err != nil {
-		return c.String(http.StatusBadRequest, err.Error())
+		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
 	if err := validator.New().Struct(req); err != nil {
-		return c.String(http.StatusBadRequest, err.Error())
+		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
-	// todelete
-	fmt.Printf(`%v`, req)
+	if err := db.PostCourse(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
 
-	// TODO
-	return nil
+	return c.JSON(http.StatusCreated, "Success")
 }
 
 func GetCourse(c echo.Context) error {
 	// Parameters
-	id := c.Param("id")
+	idStr := c.Param("id")
+	id, err := strconv.ParseUint(idStr, 10, 32)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	versionStr := c.QueryParam("version")
+	var version uint64 = 0
+	if versionStr != "" {
+		version, err = strconv.ParseUint(versionStr, 10, 32)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, err.Error())
+		}
+	}
 
 	var res s.CourseRes
 
-	// todelete
-	fmt.Printf(`%v %v`, id, res)
+	if err := db.GetCourse(&res, uint(id), uint(version)); err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
 
 	// TODO
-	return nil
+	return c.JSON(http.StatusAccepted, res)
 }
 
 func PutCourse(c echo.Context) error {

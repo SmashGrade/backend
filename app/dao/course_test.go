@@ -36,3 +36,13 @@ func TestPostCourse(t *testing.T) {
 	courseReq.Exams = []schemas.ExamRes{{Description: "Projektarbeit", Weight: 3, Type: "Schriftliche Arbeit"}}
 	db.PostCourse(&courseReq)
 }
+
+func TestGetCourse(t *testing.T) {
+	prov := &provider.SqliteProvider{}
+	prov.Connect()
+	db := Database{Db: prov.Db}
+
+	var courseRes schemas.CourseRes
+	db.GetCourse(&courseRes, 4, 0)
+
+}
