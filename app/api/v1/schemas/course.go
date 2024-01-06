@@ -36,12 +36,12 @@ type CourseResTeacher struct {
 }
 
 type CourseReqPut struct {
-	Version     uint      `json:"version"`
-	Description string    `json:"description"`
-	Number      string    `json:"number"`
-	ModuleRef   []uint    `json:"moduleRef"`
-	TeacherRef  []uint    `json:"teacherRef"`
-	Exams       []ExamRes `json:"exams"`
+	Version     uint        `json:"version"`
+	Description string      `json:"description"`
+	Number      string      `json:"number"`
+	ModuleRef   []ModuleRef `json:"moduleRef"`
+	TeacherRef  []uint      `json:"teacherRef"`
+	Exams       []ExamRes   `json:"exams"`
 }
 
 type CourseReqPost struct {

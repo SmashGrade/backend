@@ -34,7 +34,7 @@ func TestPostCourse(t *testing.T) {
 		{Id: 3, Version: 1},
 	}
 	courseReq.Exams = []schemas.ExamRes{{Description: "Projektarbeit", Weight: 3, Type: "Schriftliche Arbeit"}}
-	db.PostCourse(&courseReq)
+	db.PostCourse(&courseReq, 1, 0)
 }
 
 func TestGetCourse(t *testing.T) {
@@ -44,5 +44,22 @@ func TestGetCourse(t *testing.T) {
 
 	var courseRes schemas.CourseRes
 	db.GetCourse(&courseRes, 4, 0)
+}
 
+func TestPutCourse(t *testing.T) {
+	prov := &provider.SqliteProvider{}
+	prov.Connect()
+	db := Database{Db: prov.Db}
+
+	var courseReq schemas.CourseReqPut
+	courseReq.Description = "Angepasster Kurs 2"
+	courseReq.Number = "Course123_2"
+	courseReq.Version = 1
+	courseReq.TeacherRef = []uint{1}
+	courseReq.ModuleRef = []schemas.ModuleRef{
+		{Id: 2, Version: 1},
+		{Id: 3, Version: 1},
+	}
+
+	db.PutCourse(&courseReq, 2)
 }

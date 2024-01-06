@@ -31,7 +31,7 @@ func PostCourse(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
-	if err := db.PostCourse(&req); err != nil {
+	if err := db.PostCourse(&req, 1, 0); err != nil {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
@@ -67,23 +67,27 @@ func GetCourse(c echo.Context) error {
 
 func PutCourse(c echo.Context) error {
 	// Parameters
-	id := c.Param("id")
+	idStr := c.Param("id")
+	id, err := strconv.ParseUint(idStr, 10, 32)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
 
 	var req s.CourseReqPut
 
 	if err := c.Bind(req); err != nil {
-		return c.String(http.StatusBadRequest, err.Error())
+		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
 	if err := validator.New().Struct(req); err != nil {
-		return c.String(http.StatusBadRequest, err.Error())
+		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
-	// todelete
-	fmt.Printf(`%v %v`, id, req)
+	if err := db.PutCourse(&req, uint(id)); err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
 
-	// TODO
-	return nil
+	return c.JSON(http.StatusOK, "Success")
 }
 
 func DeleteCourse(c echo.Context) error {
