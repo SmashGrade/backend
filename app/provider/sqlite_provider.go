@@ -25,6 +25,7 @@ func (s *SqliteProvider) migrate() {
 	s.Db.AutoMigrate(&entity.Role{})
 	s.Db.AutoMigrate(&entity.State{})
 	s.Db.AutoMigrate(&entity.Gradetype{})
+	s.Db.AutoMigrate(&entity.StudyStage{})
 	// Migrate secondary structs second
 	s.Db.AutoMigrate(&entity.Focus{})
 	s.Db.AutoMigrate(&entity.Module{})
