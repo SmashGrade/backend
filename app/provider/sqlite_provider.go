@@ -8,7 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
-const defaultDbPath string = "data.Db"
+const defaultDbPath string = "data.db"
 const autoMigrateAtConnect bool = true
 
 type SqliteProvider struct {

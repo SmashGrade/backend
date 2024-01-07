@@ -1,7 +1,11 @@
 package entity
 
+import "time"
+
 type Module struct {
-	Basemodel
+	ID               uint `gorm:"primarykey;autoIncrement:false"`
+	CreatedAt        time.Time
+	UpdatedAt        time.Time
 	Version          uint `gorm:"primarykey"`
 	State            State
 	EvaluationTypeID uint
