@@ -92,13 +92,26 @@ func PutCourse(c echo.Context) error {
 
 func DeleteCourse(c echo.Context) error {
 	// Parameters
-	id := c.Param("id")
+	idStr := c.Param("id")
+	id, err := strconv.ParseUint(idStr, 10, 32)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
 
-	// todelete
-	fmt.Printf(`%v`, id)
+	versionStr := c.QueryParam("version")
+	var version uint64 = 0
+	if versionStr != "" {
+		version, err = strconv.ParseUint(versionStr, 10, 32)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, err.Error())
+		}
+	}
 
-	// TODO
-	return nil
+	if err := db.DeleteCourse(uint(id), uint(version)); err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	return c.JSON(http.StatusNoContent, nil)
 }
 
 func GetCourseStudent(c echo.Context) error {
@@ -130,9 +143,9 @@ func GetCourseTeacher(c echo.Context) error {
 func GetCourseFilter(c echo.Context) error {
 	var res s.CourseFilter
 
-	// todelete
-	fmt.Printf(`%v`, res)
+	if err := db.FilterCourse(&res); err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
 
-	// TODO
-	return nil
+	return c.JSON(http.StatusOK, res)
 }

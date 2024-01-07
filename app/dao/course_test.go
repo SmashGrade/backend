@@ -63,3 +63,20 @@ func TestPutCourse(t *testing.T) {
 
 	db.PutCourse(&courseReq, 2)
 }
+
+func TestDeleteCourse(t *testing.T) {
+	prov := &provider.SqliteProvider{}
+	prov.Connect()
+	db := Database{Db: prov.Db}
+
+	db.DeleteCourse(0, 0)
+}
+
+func TestFilterCourse(t *testing.T) {
+	prov := &provider.SqliteProvider{}
+	prov.Connect()
+	db := Database{Db: prov.Db}
+
+	var courseFilter schemas.CourseFilter
+	db.FilterCourse(&courseFilter)
+}

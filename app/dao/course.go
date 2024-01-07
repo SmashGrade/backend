@@ -173,3 +173,44 @@ func (db *Database) PutCourse(courseReq *schemas.CourseReqPut, id uint) error {
 
 	return nil
 }
+
+func (db *Database) DeleteCourse(id uint, version uint) error {
+
+	if version != 0 {
+		db.Db.Where("id = ? AND version = ?", id, version).Delete(entity.Course{})
+	} else {
+		db.Db.Where("id = ?", id, version).Delete(entity.Course{})
+	}
+
+	return nil
+}
+
+func (db *Database) FilterCourse(courseFilter *schemas.CourseFilter) error {
+	var modules []entity.Module
+	var users []entity.User
+	var teachers []*entity.User
+
+	var moduleFilter []schemas.Module
+	var teacherFilter []schemas.Teacher
+
+	// get all Modules
+	db.Db.Find(&modules)
+
+	// get all Teachers
+	db.Db.Preload("Roles").Find(&users)
+
+	for _, user := range users {
+		for _, role := range user.Roles {
+			if role.Description == "teacher" {
+				teachers = append(teachers, &user)
+			}
+		}
+	}
+
+	ParseEntityToSchema(&modules, &moduleFilter)
+	ParseEntityToSchema(&teachers, &teacherFilter)
+	courseFilter.Modules = moduleFilter
+	courseFilter.Teachers = teacherFilter
+
+	return nil
+}
