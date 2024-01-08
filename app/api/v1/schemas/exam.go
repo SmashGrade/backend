@@ -1,10 +1,10 @@
 package schemas
 
 type ExamRes struct {
-	Id          uint   `json:"id"`
-	Description string `json:"description"`
-	Weight      int    `json:"weight"`
-	Type        string `json:"string"`
+	Id          uint    `json:"id"`
+	Description string  `json:"description"`
+	Weight      float64 `json:"weight"`
+	Type        string  `json:"string"`
 }
 
 type ExamReq struct {
@@ -22,7 +22,7 @@ type ExamReqStudent struct {
 type CourseExamTeacher struct {
 	Id          uint       `json:"id"`
 	Description string     `json:"description"`
-	Weight      int        `json:"weight"`
+	Weight      float64    `json:"weight"`
 	Type        string     `json:"type"`
 	AvgGrades   []GradType `json:"avgGrades"`
 }
@@ -30,7 +30,7 @@ type CourseExamTeacher struct {
 type CourseExamStudent struct {
 	Id          uint     `json:"id"`
 	Description string   `json:"description"`
-	Weight      int      `json:"weight"`
+	Weight      float64  `json:"weight"`
 	Type        string   `json:"type"`
 	Grade       GradeRes `json:"grade"`
 }

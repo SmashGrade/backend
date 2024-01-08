@@ -10,6 +10,35 @@ func (db *Database) GetModuleEntity(module *entity.Module, id uint, version uint
 	return nil
 }
 
+func (db *Database) ListModules(modulesRes *[]schemas.ModuleRes) error {
+	var modules []entity.Module
+
+	db.Db.Preload("Courses").Find(&modules)
+
+	for _, module := range modules {
+		// TODO: Get evaluationType with EvaluationID
+		var evaluationType entity.Evaluationtype
+		var valuationCategory schemas.ValuationCategory
+
+		db.Db.Where("id = ?", module.EvaluationTypeID).First(&evaluationType)
+		ParseEntityToSchema(&evaluationType, &valuationCategory)
+
+		// TODO: Get studyStage ????
+
+		// Get Courses
+		var courseRes []schemas.CourseRes
+		db.ListCourses(&courseRes)
+
+		var moduleRes schemas.ModuleRes
+		ParseEntityToSchema(&module, &moduleRes)
+		moduleRes.ValuationCategory = valuationCategory
+
+		*modulesRes = append(*modulesRes, moduleRes)
+	}
+
+	return nil
+}
+
 func (db *Database) PostModule(moduleReq *schemas.ModuleReq) error {
 	var module entity.Module
 

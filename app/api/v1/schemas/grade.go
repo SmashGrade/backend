@@ -1,7 +1,7 @@
 package schemas
 
 type GradType struct {
-	Id          uint8   `json:"id"`
+	Id          uint    `json:"id"`
 	Description string  `json:"description"`
 	Grade       float64 `json:"grade"`
 }

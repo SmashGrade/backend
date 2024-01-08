@@ -12,11 +12,12 @@ func (db *Database) GetCourseEntity(course *entity.Course, id uint) error {
 
 func (db *Database) ListCourses(coursesRes *[]schemas.CourseRes) error {
 	var courses []entity.Course
-	db.Db.Find(&courses)
+	db.Db.Preload("Modules").Find(&courses)
 	err := ParseEntityToSchema(&courses, &coursesRes)
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 

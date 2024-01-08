@@ -1,16 +1,17 @@
-package dao
+package dao_test
 
 import (
 	"testing"
 
 	"github.com/SmashGrade/backend/app/api/v1/schemas"
+	"github.com/SmashGrade/backend/app/dao"
 	"github.com/SmashGrade/backend/app/provider"
 )
 
 func TestPostCourse(t *testing.T) {
 	prov := &provider.SqliteProvider{}
 	prov.Connect()
-	db := Database{Db: prov.Db}
+	db := dao.Database{Db: prov.Db}
 
 	// Post Module
 	var moduleReq schemas.ModuleReq
@@ -40,16 +41,25 @@ func TestPostCourse(t *testing.T) {
 func TestGetCourse(t *testing.T) {
 	prov := &provider.SqliteProvider{}
 	prov.Connect()
-	db := Database{Db: prov.Db}
+	db := dao.Database{Db: prov.Db}
 
 	var courseRes schemas.CourseRes
 	db.GetCourse(&courseRes, 4, 0)
 }
 
+func TestGetCourses(t *testing.T) {
+	prov := &provider.SqliteProvider{}
+	prov.Connect()
+	db := dao.Database{Db: prov.Db}
+
+	var courseRes []schemas.CourseRes
+	db.ListCourses(&courseRes)
+}
+
 func TestPutCourse(t *testing.T) {
 	prov := &provider.SqliteProvider{}
 	prov.Connect()
-	db := Database{Db: prov.Db}
+	db := dao.Database{Db: prov.Db}
 
 	var courseReq schemas.CourseReqPut
 	courseReq.Description = "Angepasster Kurs 2"
@@ -67,7 +77,7 @@ func TestPutCourse(t *testing.T) {
 func TestDeleteCourse(t *testing.T) {
 	prov := &provider.SqliteProvider{}
 	prov.Connect()
-	db := Database{Db: prov.Db}
+	db := dao.Database{Db: prov.Db}
 
 	db.DeleteCourse(0, 0)
 }
@@ -75,7 +85,7 @@ func TestDeleteCourse(t *testing.T) {
 func TestFilterCourse(t *testing.T) {
 	prov := &provider.SqliteProvider{}
 	prov.Connect()
-	db := Database{Db: prov.Db}
+	db := dao.Database{Db: prov.Db}
 
 	var courseFilter schemas.CourseFilter
 	db.FilterCourse(&courseFilter)
