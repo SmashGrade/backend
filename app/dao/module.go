@@ -26,7 +26,7 @@ func (db *Database) ListModules(modulesRes *[]schemas.ModuleRes) error {
 		// TODO: Get studyStage ????
 
 		// Get Courses
-		var courseRes []schemas.CourseRes
+		var courseRes []schemas.CoursesRes
 		db.ListCourses(&courseRes)
 
 		var moduleRes schemas.ModuleRes

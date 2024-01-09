@@ -52,7 +52,7 @@ func TestGetCourses(t *testing.T) {
 	prov.Connect()
 	db := dao.Database{Db: prov.Db}
 
-	var courseRes []schemas.CourseRes
+	var courseRes []schemas.CoursesRes
 	db.ListCourses(&courseRes)
 }
 
@@ -74,19 +74,11 @@ func TestPutCourse(t *testing.T) {
 	db.PutCourse(&courseReq, 2)
 }
 
-func TestDeleteCourse(t *testing.T) {
-	prov := &provider.SqliteProvider{}
-	prov.Connect()
-	db := dao.Database{Db: prov.Db}
-
-	db.DeleteCourse(0, 0)
-}
-
 func TestFilterCourse(t *testing.T) {
 	prov := &provider.SqliteProvider{}
 	prov.Connect()
 	db := dao.Database{Db: prov.Db}
 
 	var courseFilter schemas.CourseFilter
-	db.FilterCourse(&courseFilter)
+	db.GetCourseFilter(&courseFilter)
 }

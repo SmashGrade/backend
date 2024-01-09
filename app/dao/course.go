@@ -10,12 +10,46 @@ func (db *Database) GetCourseEntity(course *entity.Course, id uint) error {
 	return nil
 }
 
-func (db *Database) ListCourses(coursesRes *[]schemas.CourseRes) error {
-	var courses []entity.Course
-	db.Db.Preload("Modules").Find(&courses)
-	err := ParseEntityToSchema(&courses, &coursesRes)
+func (db *Database) ListCourses(coursesRes *[]schemas.CoursesRes) error {
+	err := db.listCourseRes(coursesRes)
 	if err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func (db *Database) GetCourse(courseRes *schemas.CourseRes, courseId uint, version uint) error {
+	err := db.getCourseRes(courseRes, courseId, version)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (db *Database) GetCourseResStudent(courseResStudent *schemas.CourseResStudent, courseId uint, version uint, userId uint) error {
+	err := db.getCourseResStudent(courseResStudent, courseId, version, userId)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (db *Database) GetCourseResTeacher(courseResTeacher *schemas.CourseResTeacher, courseId uint, version uint, userId uint) error {
+	err := db.getCourseResTeacher(courseResTeacher, courseId, version)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (db *Database) GetCourseFilter(courseFilter *schemas.CourseFilter) error {
+	err := db.getCourseFilter(courseFilter)
+	if err != nil {
+		return nil
 	}
 
 	return nil
@@ -66,46 +100,6 @@ func (db *Database) PostCourse(courseReq *schemas.CourseReqPost, version uint, i
 		exam.Course = course
 		db.PostExam(exam)
 	}
-
-	return nil
-}
-
-func (db *Database) GetCourse(courseRes *schemas.CourseRes, id uint, version uint) error {
-	var course entity.Course
-
-	if version != 0 {
-		db.Db.Where("id = ? AND version = ?", id, version).Find(&course)
-	} else {
-		db.Db.Preload("Modules").Preload("TeachedBy").Where("id = ?", id).Order("version desc").First(&course)
-	}
-
-	err := ParseEntityToSchema(&course, &courseRes)
-	if err != nil {
-		return err
-	}
-
-	// Add Teachers
-	var teachers []schemas.Teacher
-	err = ParseEntityToSchema(&course.TeachedBy, &teachers)
-	if err != nil {
-		return err
-	}
-	courseRes.Teachers = teachers
-
-	// Get all Versions
-	var versions []uint
-	db.Db.Model(&entity.Course{}).Where("id = ?", id).Pluck("version", &versions)
-	courseRes.Versions = versions
-
-	// Get all Exams
-	var exams []entity.Exam
-	var examsRes []schemas.ExamRes
-	db.Db.Where("course_id = ?", id).Find(&exams)
-	err = ParseEntityToSchema(&exams, &examsRes)
-	if err != nil {
-		return err
-	}
-	courseRes.Exams = examsRes
 
 	return nil
 }
@@ -171,47 +165,6 @@ func (db *Database) PutCourse(courseReq *schemas.CourseReqPut, id uint) error {
 			db.Db.Model(&exam).Updates(&exam)
 		}
 	}
-
-	return nil
-}
-
-func (db *Database) DeleteCourse(id uint, version uint) error {
-
-	if version != 0 {
-		db.Db.Where("id = ? AND version = ?", id, version).Delete(entity.Course{})
-	} else {
-		db.Db.Where("id = ?", id, version).Delete(entity.Course{})
-	}
-
-	return nil
-}
-
-func (db *Database) FilterCourse(courseFilter *schemas.CourseFilter) error {
-	var modules []entity.Module
-	var users []entity.User
-	var teachers []*entity.User
-
-	var moduleFilter []schemas.Module
-	var teacherFilter []schemas.Teacher
-
-	// get all Modules
-	db.Db.Find(&modules)
-
-	// get all Teachers
-	db.Db.Preload("Roles").Find(&users)
-
-	for _, user := range users {
-		for _, role := range user.Roles {
-			if role.Description == "teacher" {
-				teachers = append(teachers, &user)
-			}
-		}
-	}
-
-	ParseEntityToSchema(&modules, &moduleFilter)
-	ParseEntityToSchema(&teachers, &teacherFilter)
-	courseFilter.Modules = moduleFilter
-	courseFilter.Teachers = teacherFilter
 
 	return nil
 }

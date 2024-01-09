@@ -33,3 +33,18 @@ func ParseSchemaToEntity[T any, U any](fromSchema T, fromEntity U) error {
 
 	return nil
 }
+
+func findMax(arr []uint) uint {
+	if len(arr) == 0 {
+		return 0
+	}
+
+	max := arr[0]
+	for _, value := range arr {
+		if value > max {
+			max = value
+		}
+	}
+
+	return max
+}

@@ -24,9 +24,9 @@ func (db *Database) PostUser(userReq *schemas.User) error {
 	userReq.Id = 0
 
 	// The Role of the User has to be extracted and added after it got parsed
-	role := userReq.Role
+	rolesRef := userReq.Roles
 	var roles []*entity.Role
-	db.ListRoles(&roles, role)
+	db.ListRoles(&roles, rolesRef)
 
 	err := ParseSchemaToEntity(&userReq, &user)
 	if err != nil {

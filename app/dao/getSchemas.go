@@ -137,7 +137,7 @@ func (db *Database) getStudyStage(studyStage *schemas.StudyStage, id uint) error
 	return nil
 }
 
-func (db *Database) getStudyStages(studyStage *[]schemas.StudyStage) error {
+func (db *Database) listStudyStages(studyStage *[]schemas.StudyStage) error {
 	var eStudyStages []entity.StudyStage
 
 	result := db.Db.Find(&eStudyStages)
@@ -194,26 +194,29 @@ func (db *Database) getCourseVersions(versions *[]uint, id uint) error {
 	return nil
 }
 
-// TODO:
-func (db *Database) getCourseRes(courseRes *schemas.CourseRes, id uint) error {
+func (db *Database) getCourseRes(courseRes *schemas.CourseRes, id uint, version uint) error {
 	var eCourse entity.Course
-
-	result := db.Db.First(&eCourse, id)
-	if result.Error != nil {
-		return result.Error
-	}
-
-	err := ParseEntityToSchema(&eCourse, &courseRes)
-	if err != nil {
-		return err
-	}
-
 	var versions []uint
-	err = db.getCourseVersions(&versions, id)
+
+	err := db.getCourseVersions(&versions, id)
 	if err != nil {
 		return nil
 	}
 	courseRes.Versions = versions
+
+	if version == 0 {
+		version = findMax(versions)
+	}
+
+	result := db.Db.Where("id = ? AND version = ?", id, version).First(&eCourse)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	err = ParseEntityToSchema(&eCourse, &courseRes)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -440,6 +443,26 @@ func (db *Database) getExamRes(examRes *schemas.ExamRes, examId uint) error {
 	return nil
 }
 
+func (db *Database) ListExamRes(examsRes *[]schemas.ExamRes) error {
+	var eExams []entity.Exam
+	result := db.Db.Preload("ExamType").Find(&eExams)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	for _, eExam := range eExams {
+		var examRes schemas.ExamRes
+		err := ParseEntityToSchema(&eExam, &examRes)
+		if err != nil {
+			return err
+		}
+		examRes.Type = eExam.Examtype.Description
+		*examsRes = append(*examsRes, examRes)
+	}
+
+	return nil
+}
+
 func (db *Database) getCourseExamStudent(courseExamStudent *schemas.CourseExamStudent, examId uint, userId uint, courseVersion uint, courseId uint) error {
 	var examRes schemas.ExamRes
 	err := db.getExamRes(&examRes, examId)
@@ -523,6 +546,113 @@ func (db *Database) getCourseExamTeacher(courseExamTeacher *schemas.CourseExamTe
 	courseExamTeacher.Type = examRes.Type
 	courseExamTeacher.Weight = examRes.Weight
 	courseExamTeacher.AvgGrades = gradeTypes
+
+	return nil
+}
+
+func (db *Database) getCourseFilter(courseFilter *schemas.CourseFilter) error {
+	var modules []schemas.Module
+	var teachers []schemas.Teacher
+
+	err := db.listModules(&modules)
+	if err != nil {
+		return err
+	}
+
+	err = db.listTeachers(&teachers)
+	if err != nil {
+		return err
+	}
+
+	courseFilter.Modules = modules
+	courseFilter.Teachers = teachers
+
+	return nil
+}
+
+func (db *Database) listExams(exams *[]entity.Exam, courseId uint, courseVersion uint) error {
+	result := db.Db.Where("course_id = ? AND course_version = ?").Find(&exams)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
+
+func (db *Database) listCourses(courses *entity.Course, courseId uint, courseVersion uint) error {
+	result := db.Db.Where("id = ? AND version = ?", courseId, courseVersion).First(&courses)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
+func (db *Database) getCourseResTeacher(courseResTeacher *schemas.CourseResTeacher, courseId uint, version uint) error {
+	var eCourse entity.Course
+	var eExams []entity.Exam
+	var courseExamTeachers []schemas.CourseExamTeacher
+
+	err := db.listCourses(&eCourse, courseId, version)
+	if err != nil {
+		return err
+	}
+
+	err = db.listExams(&eExams, courseId, version)
+	if err != nil {
+		return nil
+	}
+
+	for _, exam := range eExams {
+		var courseExamTeacher schemas.CourseExamTeacher
+
+		err = db.getCourseExamTeacher(&courseExamTeacher, exam.ID)
+		if err != nil {
+			return err
+		}
+
+		courseExamTeachers = append(courseExamTeachers, courseExamTeacher)
+	}
+
+	courseResTeacher.Id = eCourse.ID
+	courseResTeacher.Version = eCourse.Version
+	courseResTeacher.Description = eCourse.Description
+	courseResTeacher.Number = eCourse.Number
+	courseResTeacher.Exams = courseExamTeachers
+
+	return nil
+}
+
+func (db *Database) getCourseResStudent(courseResStudent *schemas.CourseResStudent, courseId uint, version uint, userId uint) error {
+	var eCourse entity.Course
+	var eExams []entity.Exam
+	var courseExamStudents []schemas.CourseExamStudent
+
+	err := db.listCourses(&eCourse, courseId, version)
+	if err != nil {
+		return err
+	}
+
+	err = db.listExams(&eExams, courseId, version)
+	if err != nil {
+		return err
+	}
+
+	for _, exam := range eExams {
+		var courseExamStudent schemas.CourseExamStudent
+
+		err = db.getCourseExamStudent(&courseExamStudent, exam.ID, userId, version, courseId)
+		if err != nil {
+			return nil
+		}
+
+		courseExamStudents = append(courseExamStudents, courseExamStudent)
+	}
+
+	courseResStudent.Id = eCourse.ID
+	courseResStudent.Version = eCourse.Version
+	courseResStudent.Description = eCourse.Description
+	courseResStudent.Number = eCourse.Number
+	courseResStudent.Exams = courseExamStudents
 
 	return nil
 }
