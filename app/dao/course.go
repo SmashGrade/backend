@@ -11,7 +11,7 @@ func (db *Database) GetCourseEntity(course *entity.Course, id uint) error {
 }
 
 func (db *Database) ListCourses(coursesRes *[]schemas.CoursesRes) error {
-	err := db.listCourseRes(coursesRes)
+	err := db.listCoursesRes(coursesRes)
 	if err != nil {
 		return err
 	}
