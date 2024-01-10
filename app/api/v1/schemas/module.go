@@ -16,7 +16,7 @@ type ModuleRes struct {
 	IsActiv           bool              `json:"isActive"`
 	StudyStage        StudyStage        `json:"studyStage"`
 	ValuationCategory ValuationCategory `json:"valuationCategory"`
-	Courses           []CourseRes       `json:"courses"`
+	Courses           []CoursesRes      `json:"courses"`
 }
 
 type ModuleResStudent struct {

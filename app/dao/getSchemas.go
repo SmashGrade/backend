@@ -68,9 +68,9 @@ func (db *Database) listFields(fields *[]schemas.Field) error {
 	return nil
 }
 
-func (db *Database) getModule(module *schemas.Module, id uint) error {
+func (db *Database) getModule(module *schemas.Module, id uint, version uint) error {
 	var eModule entity.Module
-	result := db.Db.Preload("State").First(&eModule, id)
+	result := db.Db.Preload("State").Where("id = ? AND version = ?").First(&eModule)
 	if result.Error != nil {
 		return result.Error
 	}
@@ -115,8 +115,14 @@ func (db *Database) listModules(modules *[]schemas.Module) error {
 	return nil
 }
 
-// TODO:
 func (db *Database) getModuleFilter(moduleFilter *schemas.ModuleFilter) error {
+	var studyStages []schemas.StudyStage
+	err := db.listStudyStages(&studyStages)
+	if err != nil {
+		return err
+	}
+
+	moduleFilter.StudyStages = studyStages
 
 	return nil
 }
@@ -221,7 +227,7 @@ func (db *Database) getCourseRes(courseRes *schemas.CourseRes, id uint, version 
 	return nil
 }
 
-func (db *Database) listCourseRes(coursesRes *[]schemas.CoursesRes) error {
+func (db *Database) listCoursesRes(coursesRes *[]schemas.CoursesRes) error {
 	var eCourses []entity.Course
 
 	result := db.Db.Find(&eCourses)
@@ -653,6 +659,251 @@ func (db *Database) getCourseResStudent(courseResStudent *schemas.CourseResStude
 	courseResStudent.Description = eCourse.Description
 	courseResStudent.Number = eCourse.Number
 	courseResStudent.Exams = courseExamStudents
+
+	return nil
+}
+
+// TODO:
+func (db *Database) getModuleRes(moduleRes *schemas.ModuleRes, moduleId uint, version uint) error {
+	var module entity.Module
+	var studyStage schemas.StudyStage
+	var valuationCategory schemas.ValuationCategory
+	var coursesRes []schemas.CoursesRes
+
+	err := db.GetModuleEntity(&module, moduleId, version)
+	if err != nil {
+		return nil
+	}
+
+	err = ParseEntityToSchema(&module.StudyStage, &studyStage)
+	if err != nil {
+		return err
+	}
+
+	err = db.getValuationCategory(&valuationCategory, module.EvaluationTypeID)
+	if err != nil {
+		return err
+	}
+
+	err = db.listCoursesRes(&coursesRes)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (db *Database) listModuleRes(modulesRes *[]schemas.ModuleRes) error {
+	var eModuls []entity.Module
+
+	result := db.Db.Find(&eModuls)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	for _, eModule := range eModuls {
+		var moduleRes schemas.ModuleRes
+		var coursesRes []schemas.CoursesRes
+		err := db.listCoursesFromModule(&coursesRes, eModule.ID, eModule.Version)
+		if err != nil {
+			return err
+		}
+
+		err = ParseEntityToSchema(&eModule, &moduleRes)
+		if err != nil {
+			return err
+		}
+
+		moduleRes.Courses = coursesRes
+		*modulesRes = append(*modulesRes, moduleRes)
+	}
+
+	return nil
+}
+
+func (db *Database) listCoursesFromModule(coursesRes *[]schemas.CoursesRes, moduleId uint, moduleVersion uint) error {
+	var eCourses []entity.Course
+
+	result := db.Db.Preload("Modules").Find(&eCourses)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	for _, eCourse := range eCourses {
+		for _, eModule := range eCourse.Modules {
+			if eModule.ID == moduleId && eModule.Version == moduleVersion {
+				var courseRes schemas.CoursesRes
+				err := ParseEntityToSchema(&eCourse, &courseRes)
+				if err != nil {
+					return err
+				}
+				*coursesRes = append(*coursesRes, courseRes)
+			}
+		}
+	}
+
+	return nil
+}
+
+func (db *Database) getCurriculumType(curriculumType *schemas.CurriculumType, id uint) error {
+	var eCurriculumType entity.Curriculumtype
+
+	result := db.Db.First(&eCurriculumType, id)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	err := ParseEntityToSchema(&eCurriculumType, &curriculumType)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (db *Database) listCurriculumType(curriculumTypes *[]schemas.CurriculumType) error {
+	var eCurriculumType []entity.Curriculumtype
+
+	result := db.Db.Find(&eCurriculumType)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	err := ParseEntityToSchema(&eCurriculumType, &curriculumTypes)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (db *Database) getCurriculumFilter(curriculumFilter *schemas.CurriculumFilter) error {
+	var curriculumTypes []schemas.CurriculumType
+	var fields []schemas.Field
+	var focuses []schemas.Focus
+
+	err := db.listCurriculumType(&curriculumTypes)
+	if err != nil {
+		return err
+	}
+
+	err = db.listFields(&fields)
+	if err != nil {
+		return err
+	}
+
+	err = db.listFocus(&focuses)
+	if err != nil {
+		return err
+	}
+
+	curriculumFilter.CurriculumTypes = curriculumTypes
+	curriculumFilter.Fields = fields
+	curriculumFilter.Focuses = focuses
+
+	return nil
+}
+
+func (db *Database) getCurriculumRes(curriculumRes *schemas.CurriculumRes, id uint) error {
+	var eCurriculum entity.Curriculum
+	var fieldmanagers []schemas.Fieldmanager
+	var modulesRes []schemas.ModuleRes
+
+	result := db.Db.Preload(clause.Associations).First(&eCurriculum, id)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	eFieldManagers := eCurriculum.Focus.Field.Users
+	err := ParseEntityToSchema(&eFieldManagers, &fieldmanagers)
+	if err != nil {
+		return err
+	}
+
+	for _, eModule := range eCurriculum.Modules {
+		var moduleRes schemas.ModuleRes
+		err = db.getModuleRes(&moduleRes, eModule.ID, eModule.Version)
+		if err != nil {
+			return err
+		}
+		modulesRes = append(modulesRes, moduleRes)
+	}
+
+	err = ParseEntityToSchema(&eCurriculum, &curriculumRes)
+	if err != nil {
+		return err
+	}
+
+	curriculumRes.Fieldmanager = fieldmanagers
+	curriculumRes.Moules = modulesRes
+
+	return nil
+}
+
+func (db *Database) listCurriculumRes(curriculumsRes *[]schemas.CurriculumRes) error {
+	var ids []uint
+	result := db.Db.Model(&entity.Curriculum{}).Pluck("id", &ids)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	for _, id := range ids {
+		var curriculumRes schemas.CurriculumRes
+		err := db.getCurriculumRes(&curriculumRes, id)
+		if err != nil {
+			return err
+		}
+
+		*curriculumsRes = append(*curriculumsRes, curriculumRes)
+	}
+
+	return nil
+}
+
+func (db *Database) listCurriculums(curriculums *[]schemas.Curriculum) error {
+	var eCurriculums []entity.Curriculum
+	result := db.Db.Preload(clause.Associations).Find(&eCurriculums)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	for _, eCurriculum := range eCurriculums {
+		var curriculum schemas.Curriculum
+		err := ParseEntityToSchema(&eCurriculum, &curriculum)
+		if err != nil {
+			return err
+		}
+
+		curriculum.Focus = eCurriculum.Focus.Description
+		curriculum.Field = eCurriculum.Focus.Field.Description
+		curriculum.CurriculumType = eCurriculum.Curriculumtype.Description
+		// TODO: What States are there?
+		curriculum.IsActive = false
+		if eCurriculum.State.Description == "active" {
+			curriculum.IsActive = true
+		}
+		curriculum.StartDate = eCurriculum.StartValidity.String()
+		curriculum.EndDate = eCurriculum.EndValidity.String()
+
+		*curriculums = append(*curriculums, curriculum)
+	}
+
+	return nil
+}
+
+func (db *Database) getOnboardingFilter(onboardingFilter *schemas.OnboardingFilter) error {
+	var curriculumsType []schemas.CurriculumType
+	var curriculums []schemas.Curriculum
+
+	err := db.listCurriculumType(&curriculumsType)
+	if err != nil {
+		return err
+	}
+
+	err = db.listCurriculums(&curriculums)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

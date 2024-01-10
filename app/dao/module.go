@@ -3,10 +3,11 @@ package dao
 import (
 	"github.com/SmashGrade/backend/app/api/v1/schemas"
 	"github.com/SmashGrade/backend/app/entity"
+	"gorm.io/gorm/clause"
 )
 
 func (db *Database) GetModuleEntity(module *entity.Module, id uint, version uint) error {
-	db.Db.Where("id = ? AND version = ?", id, version).Find(&module)
+	db.Db.Preload(clause.Associations).Where("id = ? AND version = ?", id, version).Find(&module)
 	return nil
 }
 
