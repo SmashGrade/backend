@@ -28,7 +28,7 @@ func RoutesV1(ctx *api.SetupContext) {
 	v1.POST("/module", c.PostModule)
 	v1.GET("/module/:id", c.GetModule)
 	v1.PUT("/module/:id", c.PutModule)
-	v1.DELETE("/module/:id", c.DeleteModule)
+	/* v1.DELETE("/module/:id", c.DeleteModule) */
 	v1.GET("/module/student/:studyStageId", c.GetModuleStudent)
 	v1.GET("/module/teacher/:studyStageId", c.GetModuleTeacher)
 	v1.GET("/module/filter", c.GetModuleFilter)
@@ -37,7 +37,7 @@ func RoutesV1(ctx *api.SetupContext) {
 	v1.POST("/course", c.PostCourse)
 	v1.GET("/course/:id", c.GetCourse)
 	v1.PUT("/course/:id", c.PutCourse)
-	v1.DELETE("/course/:id", c.DeleteCourse)
+	/* v1.DELETE("/course/:id", c.DeleteCourse) */
 	v1.GET("/course/:id/student", c.GetCourseStudent)
 	v1.GET("/course/:id/teacher", c.GetCourseTeacher)
 	v1.GET("/course/filter", c.GetCourseFilter)

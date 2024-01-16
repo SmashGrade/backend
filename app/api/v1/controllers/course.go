@@ -90,6 +90,7 @@ func PutCourse(c echo.Context) error {
 	return c.JSON(http.StatusOK, "Success")
 }
 
+/*
 func DeleteCourse(c echo.Context) error {
 	// Parameters
 	idStr := c.Param("id")
@@ -113,6 +114,7 @@ func DeleteCourse(c echo.Context) error {
 
 	return c.JSON(http.StatusNoContent, nil)
 }
+*/
 
 func GetCourseStudent(c echo.Context) error {
 	// Parameters
@@ -143,7 +145,7 @@ func GetCourseTeacher(c echo.Context) error {
 func GetCourseFilter(c echo.Context) error {
 	var res s.CourseFilter
 
-	if err := db.FilterCourse(&res); err != nil {
+	if err := db.GetCourseFilter(&res); err != nil {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 

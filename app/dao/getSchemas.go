@@ -200,13 +200,22 @@ func (db *Database) getCourseVersions(versions *[]uint, id uint) error {
 	return nil
 }
 
+func (db *Database) getModuleVersions(versions *[]uint, id uint) error {
+	result := db.Db.Model(&entity.Module{}).Where("id = ?", id).Pluck("version", &versions)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
+
 func (db *Database) getCourseRes(courseRes *schemas.CourseRes, id uint, version uint) error {
 	var eCourse entity.Course
 	var versions []uint
 
 	err := db.getCourseVersions(&versions, id)
 	if err != nil {
-		return nil
+		return err
 	}
 	courseRes.Versions = versions
 
@@ -669,8 +678,18 @@ func (db *Database) getModuleRes(moduleRes *schemas.ModuleRes, moduleId uint, ve
 	var studyStage schemas.StudyStage
 	var valuationCategory schemas.ValuationCategory
 	var coursesRes []schemas.CoursesRes
+	var versions []uint
 
-	err := db.GetModuleEntity(&module, moduleId, version)
+	err := db.getModuleVersions(&versions, moduleId)
+	if err != nil {
+		return nil
+	}
+
+	if version == 0 {
+		version = findMax(versions)
+	}
+
+	err = db.GetModuleEntity(&module, moduleId, version)
 	if err != nil {
 		return nil
 	}

@@ -11,30 +11,36 @@ func (db *Database) GetModuleEntity(module *entity.Module, id uint, version uint
 	return nil
 }
 
-func (db *Database) ListModules(modulesRes *[]schemas.ModuleRes) error {
-	var modules []entity.Module
+func (db *Database) ListModule(modulesRes *[]schemas.ModuleRes) error {
+	err := db.listModuleRes(modulesRes)
+	if err != nil {
+		return err
+	}
 
-	db.Db.Preload("Courses").Find(&modules)
+	return nil
+}
 
-	for _, module := range modules {
-		// TODO: Get evaluationType with EvaluationID
-		var evaluationType entity.Evaluationtype
-		var valuationCategory schemas.ValuationCategory
+func (db *Database) GetModule(moduleRes *schemas.ModuleRes, moduleId uint, version uint) error {
+	err := db.getModuleRes(moduleRes, moduleId, version)
+	if err != nil {
+		return err
+	}
 
-		db.Db.Where("id = ?", module.EvaluationTypeID).First(&evaluationType)
-		ParseEntityToSchema(&evaluationType, &valuationCategory)
+	return nil
+}
 
-		// TODO: Get studyStage ????
+// TODO:
+func (db *Database) GetModuleStudent(modulesRes *[]schemas.ModuleRes, studyStage uint, userId uint) error {
+	var allModules []schemas.ModuleRes
+	err := db.listModuleRes(&allModules)
+	if err != nil {
+		return err
+	}
 
-		// Get Courses
-		var courseRes []schemas.CoursesRes
-		db.ListCourses(&courseRes)
-
-		var moduleRes schemas.ModuleRes
-		ParseEntityToSchema(&module, &moduleRes)
-		moduleRes.ValuationCategory = valuationCategory
-
-		*modulesRes = append(*modulesRes, moduleRes)
+	for _, module := range allModules {
+		if module.StudyStage.Id == studyStage {
+			*modulesRes = append(*modulesRes, module)
+		}
 	}
 
 	return nil
