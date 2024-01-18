@@ -29,18 +29,28 @@ func (db *Database) GetModule(moduleRes *schemas.ModuleRes, moduleId uint, versi
 	return nil
 }
 
-// TODO:
-func (db *Database) GetModuleStudent(modulesRes *[]schemas.ModuleRes, studyStage uint, userId uint) error {
-	var allModules []schemas.ModuleRes
-	err := db.listModuleRes(&allModules)
+func (db *Database) listCoursesModuleStudent(modulesRes *[]schemas.ModuleRes, studyStage uint, userId uint) error {
+	err := db.listModulesStudent(modulesRes, userId, studyStage)
 	if err != nil {
 		return err
 	}
 
-	for _, module := range allModules {
-		if module.StudyStage.Id == studyStage {
-			*modulesRes = append(*modulesRes, module)
-		}
+	return nil
+}
+
+func (db *Database) ListModuleTeacher(modulesRes *[]schemas.ModuleRes, userId uint, studyStage uint) error {
+	err := db.listTeacherModules(modulesRes, userId, studyStage)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (db *Database) GetModuleFilter(moduleFilter *schemas.ModuleFilter) error {
+	err := db.getModuleFilter(moduleFilter)
+	if err != nil {
+		return err
 	}
 
 	return nil

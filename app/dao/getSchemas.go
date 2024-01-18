@@ -89,6 +89,111 @@ func (db *Database) getModule(module *schemas.Module, id uint, version uint) err
 	return nil
 }
 
+type teacherCourse struct {
+	CourseId      uint
+	CourseVersion uint
+}
+
+func (db *Database) getTeacherCourses(teacherAssignment *[]teacherCourse, userId uint) error {
+	result := db.Db.Table("course_teacher").
+		Select("course_id, course_version").
+		Where("user_id = ?", userId).
+		Find(&teacherAssignment)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
+
+func (db *Database) getSelectedCourses(selectedCourses *[]entity.SelectedCourse, userId uint) error {
+	result := db.Db.Where("user_id = ?", userId).Find(&selectedCourses)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
+
+type moduleAssignment struct {
+	ModuleId      uint
+	ModuleVersion uint
+}
+
+func (db *Database) listModulesStudent(modulesRes *[]schemas.ModuleRes, userId uint, studyStage uint) error {
+	var selectedCourses []entity.SelectedCourse
+	var moduleAssignments []moduleAssignment
+	err := db.getSelectedCourses(&selectedCourses, userId)
+	if err != nil {
+		return err
+	}
+
+	for _, selectedCourse := range selectedCourses {
+		var moduleAssignments_2 moduleAssignment
+
+		result := db.Db.Table("module_course_assignment").
+			Select("module_id, module_version").
+			Where("course_id = ? AND course_version = ?", selectedCourse.CourseID, selectedCourse.CourseVersion).
+			Find(&moduleAssignments_2)
+		if result.Error != nil {
+			return result.Error
+		}
+
+		moduleAssignments = append(moduleAssignments, moduleAssignments_2)
+	}
+
+	for _, moduleAssignment := range moduleAssignments {
+		var moduleRes schemas.ModuleRes
+		err := db.getModuleRes(&moduleRes, moduleAssignment.ModuleId, moduleAssignment.ModuleVersion)
+		if err != nil {
+			return err
+		}
+
+		if moduleRes.StudyStage.Id == studyStage {
+			*modulesRes = append(*modulesRes, moduleRes)
+		}
+	}
+
+	return nil
+}
+
+func (db *Database) listTeacherModules(modulesRes *[]schemas.ModuleRes, userId uint, studyStage uint) error {
+	var teacherCourses []teacherCourse
+	var moduleAssignments []moduleAssignment
+	err := db.getTeacherCourses(&teacherCourses, userId)
+	if err != nil {
+		return err
+	}
+
+	for _, teacherCours := range teacherCourses {
+		var moduleAssignments_2 moduleAssignment
+
+		result := db.Db.Table("module_course_assignment").
+			Select("module_id, module_version").
+			Where("course_id = ? AND course_version = ?", teacherCours.CourseId, teacherCours.CourseVersion).
+			Find(&moduleAssignments_2)
+		if result.Error != nil {
+			return result.Error
+		}
+
+		moduleAssignments = append(moduleAssignments, moduleAssignments_2)
+	}
+
+	for _, moduleAssignment := range moduleAssignments {
+		var moduleRes schemas.ModuleRes
+		err := db.getModuleRes(&moduleRes, moduleAssignment.ModuleId, moduleAssignment.ModuleVersion)
+		if err != nil {
+			return err
+		}
+
+		if moduleRes.StudyStage.Id == studyStage {
+			*modulesRes = append(*modulesRes, moduleRes)
+		}
+	}
+
+	return nil
+}
+
 func (db *Database) listModules(modules *[]schemas.Module) error {
 	var eModules []entity.Module
 	result := db.Db.Preload("State").Find(&eModules)
@@ -739,6 +844,34 @@ func (db *Database) listModuleRes(modulesRes *[]schemas.ModuleRes) error {
 
 	return nil
 }
+
+// func (db *Database) listModunrdndrleResWithStudyStage(modulesRes *[]schemas.ModuleRes, studyStage uint) error {
+// 	var eModuls []entity.Module
+
+// 	result := db.Db.Find(&eModuls)
+// 	if result.Error != nil {
+// 		return result.Error
+// 	}
+
+// 	for _, eModule := range eModuls {
+// 		var moduleRes schemas.ModuleRes
+// 		var coursesRes []schemas.CoursesRes
+// 		err := db.listCoursesFromModule(&coursesRes, eModule.ID, eModule.Version)
+// 		if err != nil {
+// 			return err
+// 		}
+
+// 		err = ParseEntityToSchema(&eModule, &moduleRes)
+// 		if err != nil {
+// 			return err
+// 		}
+
+// 		moduleRes.Courses = coursesRes
+// 		*modulesRes = append(*modulesRes, moduleRes)
+// 	}
+
+// 	return nil
+// }
 
 func (db *Database) listCoursesFromModule(coursesRes *[]schemas.CoursesRes, moduleId uint, moduleVersion uint) error {
 	var eCourses []entity.Course
