@@ -6,10 +6,7 @@ import (
 )
 
 func (db *Database) ListUsers(usersRes *[]schemas.User) error {
-	var users []entity.User
-	db.Db.Find(&users)
-
-	err := ParseEntityToSchema(&users, &usersRes)
+	err := db.listUsers(usersRes)
 	if err != nil {
 		return err
 	}
@@ -39,7 +36,11 @@ func (db *Database) PostUser(userReq *schemas.User) error {
 	return nil
 }
 
-func (db *Database) GetUser(user *entity.User, id uint) error {
-	db.Db.Where("id = ?", id).Find(&user)
+func (db *Database) GetUser(user *schemas.User, id uint) error {
+	err := db.getUser(user, id)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

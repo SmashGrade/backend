@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -11,13 +10,13 @@ import (
 )
 
 func GetCourses(c echo.Context) error {
-	var res []s.CourseRes
+	var res []s.CoursesRes
 
-	// todelete
-	fmt.Printf(`%v`, res)
+	if err := db.ListCourses(&res); err != nil {
+		return c.JSON(http.StatusBadGateway, err.Error())
+	}
 
-	// TODO
-	return nil
+	return c.JSON(http.StatusOK, res)
 }
 
 func PostCourse(c echo.Context) error {
@@ -61,7 +60,6 @@ func GetCourse(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
-	// TODO
 	return c.JSON(http.StatusAccepted, res)
 }
 
@@ -117,29 +115,58 @@ func DeleteCourse(c echo.Context) error {
 */
 
 func GetCourseStudent(c echo.Context) error {
-	// Parameters
-	id := c.Param("id")
-
 	var res s.CourseResStudent
+	// Parameters
+	idStr := c.Param("id")
+	id, err := strconv.ParseUint(idStr, 10, 32)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
 
-	// todelete
-	fmt.Printf(`%v %v`, id, res)
+	versionStr := c.QueryParam("version")
+	var version uint64 = 0
+	if versionStr != "" {
+		version, err = strconv.ParseUint(versionStr, 10, 32)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, err.Error())
+		}
+	}
 
-	// TODO
-	return nil
+	// TODO: where do i get the UserId
+	err = db.GetCourseResStudent(&res, uint(id), uint(version), 8)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	return c.JSON(http.StatusAccepted, res)
 }
 
 func GetCourseTeacher(c echo.Context) error {
-	// Parameters
-	id := c.Param("id")
-
 	var res s.CourseResTeacher
 
-	// todelete
-	fmt.Printf(`%v %v`, id, res)
+	// Parameters
+	idStr := c.Param("id")
+	id, err := strconv.ParseUint(idStr, 10, 32)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
 
-	// TODO
-	return nil
+	versionStr := c.QueryParam("version")
+	var version uint64 = 0
+	if versionStr != "" {
+		version, err = strconv.ParseUint(versionStr, 10, 32)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, err.Error())
+		}
+	}
+
+	// TODO: where do i get the UserId
+	err = db.GetCourseResTeacher(&res, uint(id), uint(version), 8)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	return c.JSON(http.StatusAccepted, res)
 }
 
 func GetCourseFilter(c echo.Context) error {

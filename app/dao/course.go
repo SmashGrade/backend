@@ -57,114 +57,13 @@ func (db *Database) GetCourseFilter(courseFilter *schemas.CourseFilter) error {
 
 // Post Course is always a new Course with Version 1.
 func (db *Database) PostCourse(courseReq *schemas.CourseReqPost, version uint, id uint) error {
-	var course entity.Course
-
-	// If Id is not set, increment by 1
-	if id == 0 {
-		db.Db.Model(&entity.Course{}).Select("COALESCE(MAX(id), 0)").Scan(&id)
-		id += 1
-	}
-
-	// Get List of Modules
-	var modules []*entity.Module
-	for _, moduleRef := range courseReq.ModuleRef {
-		var module entity.Module
-		db.GetModuleEntity(&module, moduleRef.Id, moduleRef.Version)
-		modules = append(modules, &module)
-	}
-
-	// Get List of Teachers
-	var teachers []*entity.User
-	for _, teacherRef := range courseReq.TeacherRef {
-		var teacher entity.User
-		db.GetUser(&teacher, teacherRef)
-		teachers = append(teachers, &teacher)
-	}
-
-	err := ParseSchemaToEntity(&courseReq, &course)
-	if err != nil {
-		return err
-	}
-
-	// create course
-	course.Modules = modules
-	course.TeachedBy = teachers
-	course.Version = version
-	course.ID = id
-	db.Db.Create(&course)
-
-	// Create Exams
-	var exams []*entity.Exam
-	ParseSchemaToEntity(&courseReq.Exams, &exams)
-	for _, exam := range exams {
-		exam.Course = course
-		db.PostExam(exam)
-	}
+	//var course entity.Course
 
 	return nil
 }
 
 func (db *Database) PutCourse(courseReq *schemas.CourseReqPut, id uint) error {
-	var course entity.Course
-
-	// check if entry exist
-	result := db.Db.Where("id = ? AND version = ?", id, courseReq.Version).Find(&entity.Course{})
-	if result.RowsAffected == 0 {
-		// Create New (All Exams are created New)
-		var courseReqPost schemas.CourseReqPost
-		ParseSchemaToEntity(&courseReq, &courseReqPost)
-		db.PostCourse(&courseReqPost, courseReq.Version, id)
-
-		// Create Exams
-		var exams []*entity.Exam
-		ParseSchemaToEntity(&courseReq.Exams, &exams)
-		for _, exam := range exams {
-			exam.Course = course
-			db.PostExam(exam)
-		}
-
-		return nil
-	}
-
-	// Get List of Modules
-	var modules []*entity.Module
-	for _, moduleRef := range courseReq.ModuleRef {
-		var module entity.Module
-		db.GetModuleEntity(&module, moduleRef.Id, moduleRef.Version)
-		modules = append(modules, &module)
-	}
-
-	// Get List of Teachers
-	var teachers []*entity.User
-	for _, teacherRef := range courseReq.TeacherRef {
-		var teacher entity.User
-		db.GetUser(&teacher, teacherRef)
-		teachers = append(teachers, &teacher)
-	}
-
-	err := ParseSchemaToEntity(&courseReq, &course)
-	if err != nil {
-		return err
-	}
-
-	course.ID = id
-	course.Modules = modules
-	course.TeachedBy = teachers
-
-	// Update (Only Exams with ID=0 created New)
-	db.Db.Model(&course).Updates(&course)
-
-	for _, examReq := range courseReq.Exams {
-		var exam *entity.Exam
-		ParseSchemaToEntity(&examReq, &exam)
-		exam.Course = course
-
-		if examReq.Id == 0 {
-			db.PostExam(exam)
-		} else {
-			db.Db.Model(&exam).Updates(&exam)
-		}
-	}
+	//var course entity.Course
 
 	return nil
 }
