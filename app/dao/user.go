@@ -44,3 +44,33 @@ func (db *Database) GetUser(user *schemas.User, id uint) error {
 
 	return nil
 }
+
+// creates a new user and returns id
+func (db *Database) CreateUser(user *schemas.User) (uint, error) {
+	// TODO: is the user.CurriculumStartYear = ClassStartyear???
+
+	newUser := &entity.User{
+		Name:  user.Name,
+		Email: user.Email,
+	}
+
+	// map roles by searching them by name
+	newRoles := make([]*entity.Role, len(user.Roles))
+	for _, role := range user.Roles {
+		newRole := &entity.Role{}
+		err := db.GetRoleByName(newRole, role)
+		if err != nil {
+			return 0, err
+		}
+		newRoles = append(newRoles, newRole)
+	}
+
+	newUser.Roles = newRoles
+
+	err := db.Db.Create(newUser).Error
+	if err != nil {
+		return 0, err
+	}
+
+	return newUser.ID, nil
+}

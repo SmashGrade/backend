@@ -56,26 +56,68 @@ func (db *Database) GetModuleFilter(moduleFilter *schemas.ModuleFilter) error {
 	return nil
 }
 
-func (db *Database) PostModule(moduleReq *schemas.ModuleReq) error {
-	var module entity.Module
-
+// base parsing module schema to entity
+func (db *Database) ParseModuleRefToEnt(moduleReq *schemas.ModuleReq, moduleEnt *entity.Module) error {
 	// Get List of Courses
 	var courses []*entity.Course
-	for _, courseRef := range moduleReq.CoursesRef {
-		var course entity.Course
-		db.GetCourseEntity(&course, uint(courseRef))
-		courses = append(courses, &course)
-	}
-
-	err := ParseSchemaToEntity(&moduleReq, &module)
+	err := db.GetCourseListFromCourseRefList(moduleReq.CoursesRef, courses)
 	if err != nil {
 		return err
 	}
 
-	module.Courses = courses
+	err = ParseSchemaToEntity(&moduleReq, &moduleEnt)
+	if err != nil {
+		return err
+	}
+
+	moduleEnt.Courses = courses
+	return nil
+}
+
+// creates new module, returns id if successful
+func (db *Database) CreateModule(moduleReq *schemas.ModuleReq) (uint, error) {
+	var module entity.Module
+
+	err := db.ParseModuleRefToEnt(moduleReq, &module)
+	if err != nil {
+		return 0, err
+	}
 	module.Version = 1
 
-	db.Db.Create(&module)
+	err = db.Db.Create(&module).Error
+	if err != nil {
+		return 0, err
+	}
+
+	return module.ID, nil
+}
+
+// updates existing module
+func (db *Database) UpdateModule(id uint, version uint, moduleReq *schemas.ModuleReq) error {
+	var module entity.Module
+
+	err := db.ParseModuleRefToEnt(moduleReq, &module)
+	if err != nil {
+		return err
+	}
+
+	module.ID = id
+	module.Version = version
+
+	err = db.Db.Save(&module).Error
+	if err != nil {
+		return err
+	}
 
 	return nil
+}
+
+// deletes an existing module
+func (db *Database) DeleteModule(id uint, version uint) error {
+	var module entity.Module
+
+	module.ID = id
+	module.Version = version
+
+	return db.Db.Delete(&module).Error
 }

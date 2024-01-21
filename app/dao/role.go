@@ -15,3 +15,8 @@ func (db *Database) ListRoles(roles *[]*entity.Role, searchstrings []string) err
 	db.Db.Find(&roles)
 	return nil
 }
+
+// returns role by description
+func (db *Database) GetRoleByName(role *entity.Role, description string) error {
+	return db.Db.First(&role, "description = ?", description).Error
+}

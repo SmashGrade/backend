@@ -5,8 +5,8 @@ import (
 	"github.com/SmashGrade/backend/app/entity"
 )
 
-func (db *Database) GetCourseEntity(course *entity.Course, id uint) error {
-	db.Db.Where("id = ?", id).Find(&course)
+func (db *Database) GetCourseEntity(course *entity.Course, id uint, version uint) error {
+	db.Db.Where("id = ?", id).Where("version = ?", version).Find(&course)
 	return nil
 }
 
@@ -65,5 +65,18 @@ func (db *Database) PostCourse(courseReq *schemas.CourseReqPost, version uint, i
 func (db *Database) PutCourse(courseReq *schemas.CourseReqPut, id uint) error {
 	//var course entity.Course
 
+	return nil
+}
+
+// selects all matching courses entities from courseRef, saves in outCourseEnt, throws if one is not found
+func (db *Database) GetCourseListFromCourseRefList(inCourseRef []schemas.CourseRef, outCourseEnt []*entity.Course) error {
+	for _, courseRef := range inCourseRef {
+		var course entity.Course
+		err := db.GetCourseEntity(&course, courseRef.Id, courseRef.Version)
+		if err != nil {
+			return err
+		}
+		outCourseEnt = append(outCourseEnt, &course)
+	}
 	return nil
 }

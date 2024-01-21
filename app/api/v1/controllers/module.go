@@ -21,6 +21,7 @@ func GetModules(c echo.Context) error {
 	return c.JSON(http.StatusOK, res)
 }
 
+// create new module
 func PostModule(c echo.Context) error {
 	var req s.ModuleReq
 
@@ -34,6 +35,11 @@ func PostModule(c echo.Context) error {
 
 	// todelete
 	fmt.Printf(`%v`, req)
+
+	_, err := db.CreateModule(&req)
+	if err != nil {
+		return c.String(http.StatusBadRequest, err.Error())
+	}
 
 	// TODO
 	return nil

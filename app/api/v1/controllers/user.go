@@ -46,8 +46,13 @@ func PostUser(c echo.Context) error {
 	// todelete
 	fmt.Printf(`%v`, req)
 
-	// TODO
-	return nil
+	_, err := db.CreateUser(&req) // currently we do not return id back
+
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	} else {
+		return c.JSON(http.StatusOK, "")
+	}
 }
 
 func GetUser(c echo.Context) error {

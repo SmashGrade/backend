@@ -48,7 +48,7 @@ type ModuleReq struct {
 	Number            string            `json:"number"`
 	IsActiv           bool              `json:"isActive"`
 	ValuationCategory ValuationCategory `json:"valuationCategory"`
-	CoursesRef        []uint            `json:"coursesRef"`
+	CoursesRef        []CourseRef       `json:"coursesRef"`
 }
 
 type ModuleFilter struct {
@@ -56,6 +56,11 @@ type ModuleFilter struct {
 }
 
 type ModuleRef struct {
+	Id      uint `json:"id"`
+	Version uint `json:"version"`
+}
+
+type CourseRef struct {
 	Id      uint `json:"id"`
 	Version uint `json:"version"`
 }
