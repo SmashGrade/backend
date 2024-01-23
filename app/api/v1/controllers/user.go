@@ -3,6 +3,7 @@ package controllers
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	s "github.com/SmashGrade/backend/app/api/v1/schemas"
 	"github.com/SmashGrade/backend/app/dao"
@@ -50,16 +51,21 @@ func PostUser(c echo.Context) error {
 }
 
 func GetUser(c echo.Context) error {
-	// Parameters
-	id := c.Param("id")
-
 	var res s.User
 
-	// todelete
-	fmt.Printf(`%v %v`, id, res)
+	// Parameters
+	idStr := c.Param("id")
+	id, err := strconv.ParseUint(idStr, 10, 32)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
 
-	// TODO
-	return nil
+	err = db.GetUser(&res, uint(id))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, res)
 }
 
 func PutUser(c echo.Context) error {

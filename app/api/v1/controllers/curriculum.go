@@ -3,6 +3,7 @@ package controllers
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	s "github.com/SmashGrade/backend/app/api/v1/schemas"
 	"github.com/go-playground/validator/v10"
@@ -12,11 +13,12 @@ import (
 func GetCurriculums(c echo.Context) error {
 	var res []s.CurriculumRes
 
-	// todelete
-	fmt.Printf(`%v`, res)
+	err := db.ListCurriculum(&res)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
 
-	// TODO
-	return nil
+	return c.JSON(http.StatusOK, res)
 }
 
 func PostCurriculum(c echo.Context) error {
@@ -38,16 +40,21 @@ func PostCurriculum(c echo.Context) error {
 }
 
 func GetCurriculum(c echo.Context) error {
-	// Parameters
-	id := c.Param("id")
-
 	var res s.CurriculumRes
 
-	// todelete
-	fmt.Printf(`%v %v`, id, res)
+	// Parameters
+	idStr := c.Param("id")
+	id, err := strconv.ParseUint(idStr, 10, 32)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
 
-	// TODO
-	return nil
+	err = db.GetCurriculum(&res, uint(id))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, res)
 }
 
 func PutCurriculum(c echo.Context) error {
@@ -85,9 +92,10 @@ func DeleteCurriculum(c echo.Context) error {
 func GetCurriculumFilter(c echo.Context) error {
 	var res s.CurriculumFilter
 
-	// todelete
-	fmt.Printf(`%v`, res)
+	err := db.GetCurriculumFilter(&res)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
 
-	// TODO
-	return nil
+	return c.JSON(http.StatusOK, res)
 }

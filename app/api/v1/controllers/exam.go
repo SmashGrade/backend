@@ -3,10 +3,9 @@ package controllers
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	s "github.com/SmashGrade/backend/app/api/v1/schemas"
-	"github.com/SmashGrade/backend/app/dao"
-	"github.com/SmashGrade/backend/app/provider"
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 )
@@ -14,14 +13,11 @@ import (
 func GetExams(c echo.Context) error {
 	var res []s.ExamRes
 
-	prov := &provider.SqliteProvider{}
-	prov.Connect()
+	err := db.ListExams(&res)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
 
-	db := &dao.Database{}
-	db.Db = prov.Db
-	db.ListExams(&res)
-
-	// TODO
 	return c.JSON(http.StatusAccepted, res)
 }
 
@@ -44,16 +40,21 @@ func PostExam(c echo.Context) error {
 }
 
 func GetExam(c echo.Context) error {
-	// Parameters
-	id := c.Param("id")
-
 	var res s.ExamRes
 
-	// todelete
-	fmt.Printf(`%v %v`, id, res)
+	// Parameters
+	idStr := c.Param("id")
+	id, err := strconv.ParseUint(idStr, 10, 32)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
 
-	// TODO
-	return nil
+	err = db.GetExam(&res, uint(id))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, res)
 }
 
 func PutExam(c echo.Context) error {

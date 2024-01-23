@@ -29,7 +29,7 @@ func (db *Database) GetModule(moduleRes *schemas.ModuleRes, moduleId uint, versi
 	return nil
 }
 
-func (db *Database) listCoursesModuleStudent(modulesRes *[]schemas.ModuleRes, studyStage uint, userId uint) error {
+func (db *Database) ListCoursesModuleStudent(modulesRes *[]schemas.ModuleRes, studyStage uint, userId uint) error {
 	err := db.listModulesStudent(modulesRes, userId, studyStage)
 	if err != nil {
 		return err

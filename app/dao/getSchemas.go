@@ -637,7 +637,7 @@ func (db *Database) getAvgGradeTypes(gradeTypes *[]schemas.GradType, examId uint
 		description[conversion.GradetypeID] = conversion.Gradetype.Description
 	}
 
-	for key, _ := range sumsMap {
+	for key := range sumsMap {
 		var gradeType schemas.GradType
 		gradeType.Grade = sumsMap[key] / float64(countMap[key])
 		gradeType.Id = key
