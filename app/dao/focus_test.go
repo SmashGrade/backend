@@ -12,27 +12,35 @@ func TestSelectFocusByName(t *testing.T) {
 	prov.Connect()
 	db := dao.Database{Db: prov.Db}
 
+	// create a dummy field first
+	dummyField, err := db.CreateField("dummy")
+	if err != nil {
+		t.Fatalf("Dummy field creation threw error %v\n", err.Error())
+	}
+	defer db.Db.Delete(dummyField)
+
 	focusDesc := "abc"
 
-	focus, err := db.CreateFocus(focusDesc, 1)
+	focus, err := db.CreateFocus(focusDesc, dummyField.ID)
 	if err != nil {
 		t.Fatalf("Creation threw error %v\n", err.Error())
 	}
+	defer db.Db.Delete(focus)
 
 	if focus.ID < 1 {
 		t.Fatalf("Impossible record id returned %v\n", focus.ID)
 	}
 
-	selectedField, err := db.GetFocusByDescription(focusDesc)
+	selectedFocus, err := db.GetFocusByDescription(focusDesc)
 	if err != nil {
 		t.Fatalf("Selection threw error %v\n", err.Error())
 	}
 
-	if selectedField.Description != focusDesc {
+	if selectedFocus.Description != focusDesc {
 		t.Fatalf("Wrong description returned %v\n", focus.Description)
 	}
 
-	if selectedField.ID != focus.ID {
-		t.Logf("IDs differ from created %v and returned %v probably old data in DB", selectedField.ID, focus.ID)
+	if selectedFocus.ID != focus.ID {
+		t.Logf("IDs differ from created %v and returned %v probably old data in DB", selectedFocus.ID, focus.ID)
 	}
 }

@@ -9,10 +9,22 @@ func (db *Database) GetFocusByDescription(name string) (focus *entity.Focus, err
 	return
 }
 
+// returns a focus by id
+func (db *Database) GetFocusById(id uint) (focus *entity.Focus, err error) {
+	focus = &entity.Focus{}
+	err = db.Db.First(&focus, id).Error
+	return
+}
+
 // used for testing create focus
 func (db *Database) CreateFocus(description string, fieldId uint) (focus *entity.Focus, err error) {
 	focus = &entity.Focus{}
-	focus.FieldID = fieldId
+	tempField, subErr := db.GetFieldById(fieldId)
+	if subErr != nil {
+		err = subErr
+		return
+	}
+	focus.Field = *tempField
 	focus.Description = description
 	err = db.Db.Create(&focus).Error
 	return

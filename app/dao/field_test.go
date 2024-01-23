@@ -18,6 +18,7 @@ func TestSelectFieldByName(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Creation threw error %v\n", err.Error())
 	}
+	defer db.Db.Delete(field) // cleanup
 
 	if field.ID < 1 {
 		t.Fatalf("Impossible record id returned %v\n", field.ID)
