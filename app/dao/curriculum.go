@@ -38,6 +38,15 @@ func (db *Database) GetCurriculumFilter(curriculumFilter *schemas.CurriculumFilt
 // Returns id of newly created curriculum
 func (db *Database) CreateCurriculum(curriculum *schemas.CurriculumReq) (uint, error) {
 
+	// init entity struct
+	curriculumEntity := &entity.Curriculum{}
+
+	// do an autoparse
+	err := ParseSchemaToEntity(&curriculum, &curriculumEntity)
+	if err != nil {
+		return 0, err
+	}
+
 	// get our in between ids of field and focus from the strings
 	focus, err := db.GetFocusByDescription(curriculum.Focus)
 	if err != nil {
@@ -47,6 +56,12 @@ func (db *Database) CreateCurriculum(curriculum *schemas.CurriculumReq) (uint, e
 	field, err := db.GetFieldByDescription(curriculum.Field)
 	if err != nil {
 		return 0, err // probably no field with that desc
+	}
+
+	// get curriculum type from description
+	curriculumType, err := db.GetCurriculumTypeByDescription(curriculum.CurriculumType)
+	if err != nil {
+		return 0, err // probably no curriculum type with that desc
 	}
 
 	// check if those assigned field managers exist
@@ -63,16 +78,17 @@ func (db *Database) CreateCurriculum(curriculum *schemas.CurriculumReq) (uint, e
 		}
 	}
 
-	// TODO: get modules
-
-	curriculumEntity := &entity.Curriculum{}
-
-	err = ParseSchemaToEntity(&curriculum, &curriculumEntity)
-	if err != nil {
-		return 0, err
+	// get modules
+	for _, modId := range curriculum.ModulesRef {
+		modEnt, err := db.GetLatestModuleById(modId)
+		if err != nil {
+			return 0, fmt.Errorf("no module with id '%v' found", modId)
+		}
+		curriculumEntity.Modules = append(curriculumEntity.Modules, modEnt)
 	}
 
 	curriculumEntity.Focus = *focus // add found focus to the autocasted curriculum
+	curriculumEntity.Curriculumtype = *curriculumType
 
 	err = db.Db.Create(&curriculumEntity).Error
 	if err != nil {
@@ -80,4 +96,18 @@ func (db *Database) CreateCurriculum(curriculum *schemas.CurriculumReq) (uint, e
 	}
 
 	return curriculumEntity.ID, nil
+}
+
+func (db *Database) GetCurriculumTypeByDescription(description string) (curriculumtype *entity.Curriculumtype, err error) {
+	curriculumtype = &entity.Curriculumtype{}
+	err = db.Db.Model(&entity.Curriculumtype{}).Where("description = ?", description).First(&curriculumtype).Error
+	return
+}
+
+func (db *Database) CreateCurriculumType(description string, durationYears uint) (curriculumtype *entity.Curriculumtype, err error) {
+	curriculumtype = &entity.Curriculumtype{}
+	curriculumtype.Description = description
+	curriculumtype.DurationYears = durationYears
+	err = db.Db.Create(&curriculumtype).Error
+	return
 }

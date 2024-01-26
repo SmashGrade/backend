@@ -13,10 +13,25 @@ func TestCreateCurriculum(t *testing.T) {
 	prov.Connect()
 	db := dao.Database{Db: prov.Db}
 
+	field, err := db.CreateField("a")
+	if err != nil {
+		t.Fatalf("Field creation threw error %v\n", err.Error())
+	}
+
+	focus, err := db.CreateFocus("A", field.ID)
+	if err != nil {
+		t.Fatalf("Focus creation threw error %v\n", err.Error())
+	}
+
+	curType, err := db.CreateCurriculumType("x", 3)
+	if err != nil {
+		t.Fatalf("CurriculumType creation threw error %v\n", err.Error())
+	}
+
 	curriculumRef := &schemas.CurriculumReq{
-		Focus:           "A",
-		Field:           "a",
-		CurriculumType:  "x",
+		Focus:           focus.Description,
+		Field:           field.Description,
+		CurriculumType:  curType.Description,
 		IsActive:        true,
 		StartDate:       "01.01.2025",
 		EndDate:         "01.01.2028",
