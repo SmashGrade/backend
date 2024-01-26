@@ -41,11 +41,11 @@ func (db *Database) CreateCurriculum(curriculum *schemas.CurriculumReq) (uint, e
 	// init entity struct
 	curriculumEntity := &entity.Curriculum{}
 
-	// do an autoparse
+	/*// do an autoparse
 	err := ParseSchemaToEntity(&curriculum, &curriculumEntity)
 	if err != nil {
 		return 0, err
-	}
+	}*/
 
 	// get our in between ids of field and focus from the strings
 	focus, err := db.GetFocusByDescription(curriculum.Focus)
