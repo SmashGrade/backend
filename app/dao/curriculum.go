@@ -41,6 +41,7 @@ func (db *Database) CreateCurriculum(curriculum *schemas.CurriculumReq) (uint, e
 	// init entity struct
 	curriculumEntity := &entity.Curriculum{}
 
+	// TODO: fix autoparse
 	/*// do an autoparse
 	err := ParseSchemaToEntity(&curriculum, &curriculumEntity)
 	if err != nil {
