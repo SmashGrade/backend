@@ -5,9 +5,32 @@ import (
 
 	"github.com/SmashGrade/backend/app/api"
 	v1 "github.com/SmashGrade/backend/app/api/v1"
+	"github.com/SmashGrade/backend/app/api/v1/schemas"
 	"github.com/SmashGrade/backend/app/dao"
 	"github.com/SmashGrade/backend/app/provider"
 )
+
+// generates minimal testdata at startup for checking
+func generateTestdata(db *dao.Database) {
+	field, _ := db.CreateField("xField")
+
+	focus, _ := db.CreateFocus("focus", field.ID)
+
+	curriculumType, _ := db.CreateCurriculumType("type", 3) // number of years not relevant
+
+	curriculumRef := &schemas.CurriculumReq{
+		Focus:           focus.Description,
+		Field:           field.Description,
+		CurriculumType:  curriculumType.Description,
+		IsActive:        true,
+		StartDate:       "01.01.2025",
+		EndDate:         "01.01.2028",
+		FieldmanagerRef: []uint{},
+		ModulesRef:      []uint{},
+	}
+
+	_, _ = db.CreateCurriculum(curriculumRef)
+}
 
 func main() {
 
@@ -23,6 +46,9 @@ func main() {
 	prov.Connect()
 	stuff := &dao.Database{}
 	stuff.Db = prov.Db
+
+	generateTestdata(stuff)
+
 	/*
 			user := schemas.User{}
 			user.Name = "User5"
