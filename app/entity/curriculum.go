@@ -6,9 +6,9 @@ type Curriculum struct {
 	Basemodel
 	StartValidity    time.Time `gorm:"primarykey"`
 	FocusID          uint      // belongs to
-	Focus            Focus
+	Focus            Focus     `json:"-"`
 	CurriculumtypeID uint
-	Curriculumtype   Curriculumtype
+	Curriculumtype   Curriculumtype `json:"-"`
 	StateID          uint
 	State            State
 	EndValidity      time.Time

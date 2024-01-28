@@ -986,6 +986,8 @@ func (db *Database) getCurriculumRes(curriculumRes *schemas.CurriculumRes, id ui
 		return err
 	}
 
+	curriculumRes.Focus = eCurriculum.Focus.Description
+	curriculumRes.CurriculumType = eCurriculum.Curriculumtype.Description
 	curriculumRes.Fieldmanager = fieldmanagers
 	curriculumRes.Modules = modulesRes
 
