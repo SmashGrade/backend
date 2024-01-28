@@ -35,8 +35,13 @@ func PostCurriculum(c echo.Context) error {
 	// todelete
 	fmt.Printf(`%v`, req)
 
+	ent, err := db.CreateCurriculum(&req)
+	if err != nil {
+		return c.String(http.StatusBadRequest, err.Error())
+	}
+
 	// TODO
-	return nil
+	return c.JSON(http.StatusOK, ent)
 }
 
 func GetCurriculum(c echo.Context) error {
