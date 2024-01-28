@@ -35,8 +35,8 @@ func (db *Database) GetCurriculumFilter(curriculumFilter *schemas.CurriculumFilt
 }
 
 // creates new curriculum out of req struct, all linked ressources must be existing
-// Returns id of newly created curriculum
-func (db *Database) CreateCurriculum(curriculum *schemas.CurriculumReq) (uint, error) {
+// Returns entity of newly created curriculum
+func (db *Database) CreateCurriculum(curriculum *schemas.CurriculumReq) (*entity.Curriculum, error) {
 
 	// init entity struct
 	curriculumEntity := &entity.Curriculum{}
@@ -45,24 +45,24 @@ func (db *Database) CreateCurriculum(curriculum *schemas.CurriculumReq) (uint, e
 	// do an autoparse
 	err := ParseSchemaToEntity(&curriculum, &curriculumEntity)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 
 	// get our in between ids of field and focus from the strings
 	focus, err := db.GetFocusByDescription(curriculum.Focus)
 	if err != nil {
-		return 0, err // probably no focus with that desc
+		return nil, err // probably no focus with that desc
 	}
 
 	field, err := db.GetFieldByDescription(curriculum.Field)
 	if err != nil {
-		return 0, err // probably no field with that desc
+		return nil, err // probably no field with that desc
 	}
 
 	// get curriculum type from description
 	curriculumType, err := db.GetCurriculumTypeByDescription(curriculum.CurriculumType)
 	if err != nil {
-		return 0, err // probably no curriculum type with that desc
+		return nil, err // probably no curriculum type with that desc
 	}
 
 	// check if those assigned field managers exist
@@ -75,7 +75,7 @@ func (db *Database) CreateCurriculum(curriculum *schemas.CurriculumReq) (uint, e
 			}
 		}
 		if !user_found {
-			return 0, fmt.Errorf("no user with id '%v' found", uid)
+			return nil, fmt.Errorf("no user with id '%v' found", uid)
 		}
 	}
 
@@ -83,7 +83,7 @@ func (db *Database) CreateCurriculum(curriculum *schemas.CurriculumReq) (uint, e
 	for _, modId := range curriculum.ModulesRef {
 		modEnt, err := db.GetLatestModuleById(modId)
 		if err != nil {
-			return 0, fmt.Errorf("no module with id '%v' found", modId)
+			return nil, fmt.Errorf("no module with id '%v' found", modId)
 		}
 		curriculumEntity.Modules = append(curriculumEntity.Modules, modEnt)
 	}
@@ -93,10 +93,10 @@ func (db *Database) CreateCurriculum(curriculum *schemas.CurriculumReq) (uint, e
 
 	err = db.Db.Create(&curriculumEntity).Error
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 
-	return curriculumEntity.ID, nil
+	return curriculumEntity, nil
 }
 
 func (db *Database) GetCurriculumTypeByDescription(description string) (curriculumtype *entity.Curriculumtype, err error) {

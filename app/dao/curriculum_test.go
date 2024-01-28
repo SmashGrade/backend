@@ -5,28 +5,36 @@ import (
 
 	"github.com/SmashGrade/backend/app/api/v1/schemas"
 	"github.com/SmashGrade/backend/app/dao"
+	"github.com/SmashGrade/backend/app/entity"
 	"github.com/SmashGrade/backend/app/provider"
 )
 
+// creates a curriculumtype, field and focus
+func PrepareMinimalDataCurriculum(typeDesc, fieldDesc, focusDesc string, t *testing.T, db *dao.Database) (field *entity.Field, focus *entity.Focus, curriculumType *entity.Curriculumtype) {
+	field, err := db.CreateField(fieldDesc)
+	if err != nil {
+		t.Fatalf("Field creation threw error %v\n", err.Error())
+	}
+
+	focus, err = db.CreateFocus(focusDesc, field.ID)
+	if err != nil {
+		t.Fatalf("Focus creation threw error %v\n", err.Error())
+	}
+
+	curriculumType, err = db.CreateCurriculumType(typeDesc, 3) // number of years not relevant
+	if err != nil {
+		t.Fatalf("CurriculumType creation threw error %v\n", err.Error())
+	}
+	return
+}
+
+// check if a curriculum can be created with minimal data
 func TestCreateCurriculum(t *testing.T) {
 	prov := &provider.SqliteProvider{}
 	prov.Connect()
 	db := dao.Database{Db: prov.Db}
 
-	field, err := db.CreateField("a")
-	if err != nil {
-		t.Fatalf("Field creation threw error %v\n", err.Error())
-	}
-
-	focus, err := db.CreateFocus("A", field.ID)
-	if err != nil {
-		t.Fatalf("Focus creation threw error %v\n", err.Error())
-	}
-
-	curType, err := db.CreateCurriculumType("x", 3)
-	if err != nil {
-		t.Fatalf("CurriculumType creation threw error %v\n", err.Error())
-	}
+	field, focus, curType := PrepareMinimalDataCurriculum("x", "a", "A", t, &db)
 
 	curriculumRef := &schemas.CurriculumReq{
 		Focus:           focus.Description,
@@ -39,12 +47,12 @@ func TestCreateCurriculum(t *testing.T) {
 		ModulesRef:      []uint{},
 	}
 
-	id, err := db.CreateCurriculum(curriculumRef)
+	ent, err := db.CreateCurriculum(curriculumRef)
 	if err != nil {
 		t.Fatalf("Creation threw error %v\n", err.Error())
 	}
 
-	if id < 1 {
-		t.Fatalf("Impossible record id returned %v\n", id)
+	if ent.ID < 1 {
+		t.Fatalf("Impossible record id returned %v\n", ent.ID)
 	}
 }
