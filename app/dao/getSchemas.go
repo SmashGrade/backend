@@ -987,7 +987,7 @@ func (db *Database) getCurriculumRes(curriculumRes *schemas.CurriculumRes, id ui
 	}
 
 	curriculumRes.Fieldmanager = fieldmanagers
-	curriculumRes.Moules = modulesRes
+	curriculumRes.Modules = modulesRes
 
 	return nil
 }

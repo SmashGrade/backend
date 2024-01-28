@@ -11,6 +11,13 @@ func (db *Database) GetModuleEntity(module *entity.Module, id uint, version uint
 	return nil
 }
 
+// returns module by id with maximum available version
+func (db *Database) GetLatestModuleById(id uint) (module *entity.Module, err error) {
+	module = &entity.Module{}
+	err = db.Db.Preload(clause.Associations).Where("id = ? AND max(version)", id).Find(&module).Error
+	return
+}
+
 func (db *Database) ListModule(modulesRes *[]schemas.ModuleRes) error {
 	err := db.listModuleRes(modulesRes)
 	if err != nil {

@@ -1,5 +1,6 @@
 package schemas
 
+// the minimal ressource to get in the api without any connections
 type Curriculum struct {
 	Id             uint   `json:"id"`
 	Focus          string `json:"focus"`
@@ -10,6 +11,7 @@ type Curriculum struct {
 	EndDate        string `json:"endDate"`
 }
 
+// the ressource to return will all connections in the api
 type CurriculumRes struct {
 	Id             uint           `json:"id"`
 	Focus          string         `json:"focus"`
@@ -20,18 +22,19 @@ type CurriculumRes struct {
 	EndDate        string         `json:"endDate"`
 	Description    string         `json:"description"`
 	Fieldmanager   []Fieldmanager `json:"fieldmanager"`
-	Moules         []ModuleRes    `json:"modules"`
+	Modules        []ModuleRes    `json:"modules"`
 }
 
+// the ressource used for a post or update and has only minimal required connections via id
 type CurriculumReq struct {
-	Focus           string `json:"focus"`
-	Field           string `json:"field"`
-	CurriculumType  string `json:"curriculumType"`
+	Focus           string `json:"-"`
+	Field           string `json:"-"`
+	CurriculumType  string `json:"-"`
 	IsActive        bool   `json:"isActive"`
 	StartDate       string `json:"startDate"`
 	EndDate         string `json:"endDate"`
 	FieldmanagerRef []uint `json:"fieldmanagerRef"`
-	MoulesRef       []uint `json:"modulesRef"`
+	ModulesRef      []uint `json:"modulesRef"`
 }
 
 type CurriculumFilter struct {
