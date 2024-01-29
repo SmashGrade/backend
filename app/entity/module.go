@@ -3,7 +3,7 @@ package entity
 import "time"
 
 type Module struct {
-	ID               uint `gorm:"primarykey;autoIncrement:false"`
+	ID               uint `gorm:"primarykey;autoIncrement:false"` // cant autoincrement else update with version wont work
 	CreatedAt        time.Time
 	UpdatedAt        time.Time
 	Version          uint `gorm:"primarykey"`

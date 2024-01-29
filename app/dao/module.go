@@ -85,6 +85,10 @@ func (db *Database) ParseModuleRefToEnt(moduleReq *schemas.ModuleReq, moduleEnt 
 func (db *Database) CreateModule(moduleReq *schemas.ModuleReq) (*entity.Module, error) {
 	module := &entity.Module{}
 
+	// manual increment by one
+	db.Db.Last(&module)
+	module.ID += 1
+
 	err := db.ParseModuleRefToEnt(moduleReq, module)
 	if err != nil {
 		return nil, err
@@ -100,12 +104,12 @@ func (db *Database) CreateModule(moduleReq *schemas.ModuleReq) (*entity.Module, 
 }
 
 // updates existing module
-func (db *Database) UpdateModule(id uint, version uint, moduleReq *schemas.ModuleReq) error {
-	var module entity.Module
+func (db *Database) UpdateModule(id uint, version uint, moduleReq *schemas.ModuleReq) (*entity.Module, error) {
+	module := &entity.Module{}
 
-	err := db.ParseModuleRefToEnt(moduleReq, &module)
+	err := db.ParseModuleRefToEnt(moduleReq, module)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	module.ID = id
@@ -113,10 +117,10 @@ func (db *Database) UpdateModule(id uint, version uint, moduleReq *schemas.Modul
 
 	err = db.Db.Save(&module).Error
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return module, nil
 }
 
 // deletes an existing module
