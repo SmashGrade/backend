@@ -988,6 +988,7 @@ func (db *Database) getCurriculumRes(curriculumRes *schemas.CurriculumRes, id ui
 
 	curriculumRes.Focus = eCurriculum.Focus.Description
 	curriculumRes.CurriculumType = eCurriculum.Curriculumtype.Description
+	curriculumRes.Field = eCurriculum.Focus.Field.Description
 	curriculumRes.Fieldmanager = fieldmanagers
 	curriculumRes.Modules = modulesRes
 
