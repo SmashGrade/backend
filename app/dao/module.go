@@ -81,22 +81,22 @@ func (db *Database) ParseModuleRefToEnt(moduleReq *schemas.ModuleReq, moduleEnt 
 	return nil
 }
 
-// creates new module, returns id if successful
-func (db *Database) CreateModule(moduleReq *schemas.ModuleReq) (uint, error) {
-	var module entity.Module
+// creates new module, returns module if successful
+func (db *Database) CreateModule(moduleReq *schemas.ModuleReq) (*entity.Module, error) {
+	module := &entity.Module{}
 
-	err := db.ParseModuleRefToEnt(moduleReq, &module)
+	err := db.ParseModuleRefToEnt(moduleReq, module)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 	module.Version = 1
 
 	err = db.Db.Create(&module).Error
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 
-	return module.ID, nil
+	return module, nil
 }
 
 // updates existing module
