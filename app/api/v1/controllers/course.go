@@ -30,11 +30,12 @@ func PostCourse(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
-	if err := db.PostCourse(&req, 1, 0); err != nil {
+	course, err := db.CreateCourse(&req)
+	if err != nil {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
-	return c.JSON(http.StatusCreated, "Success")
+	return c.JSON(http.StatusOK, course)
 }
 
 func GetCourse(c echo.Context) error {
