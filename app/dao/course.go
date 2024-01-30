@@ -56,10 +56,17 @@ func (db *Database) GetCourseFilter(courseFilter *schemas.CourseFilter) error {
 }
 
 // Post Course is always a new Course with Version 1.
-func (db *Database) PostCourse(courseReq *schemas.CourseReqPost, version uint, id uint) error {
-	//var course entity.Course
+func (db *Database) CreateCourse(courseReq *schemas.CourseReqPost) (*entity.Course, error) {
+	course := &entity.Course{}
 
-	return nil
+	course.Version = 1
+
+	err := db.Db.Create(course).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return course, nil
 }
 
 func (db *Database) PutCourse(courseReq *schemas.CourseReqPut, id uint) error {
