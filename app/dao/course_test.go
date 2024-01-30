@@ -35,7 +35,18 @@ func TestPostCourse(t *testing.T) {
 		{Id: 3, Version: 1},
 	}
 	courseReq.Exams = []schemas.ExamRes{{Description: "Projektarbeit", Weight: 3, Type: "Schriftliche Arbeit"}}
-	db.PostCourse(&courseReq, 1, 0)
+	course, err := db.CreateCourse(&courseReq)
+	if err != nil {
+		t.Fatalf("Course creation error %v", err.Error())
+	}
+
+	if course.Version != 1 {
+		t.Fatalf("Created course; Unexpected course version '%v'", course.Version)
+	}
+
+	if courseReq.Description != course.Description {
+		t.Fatalf("Created course; expected description '%v' got '%v'", courseReq.Description, course.Description)
+	}
 }
 
 func TestGetCourse(t *testing.T) {
