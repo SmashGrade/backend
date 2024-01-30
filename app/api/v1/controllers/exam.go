@@ -21,6 +21,7 @@ func GetExams(c echo.Context) error {
 	return c.JSON(http.StatusAccepted, res)
 }
 
+// creates new exam post resulting entity back
 func PostExam(c echo.Context) error {
 	var req s.ExamReq
 
@@ -32,11 +33,13 @@ func PostExam(c echo.Context) error {
 		return c.String(http.StatusBadRequest, err.Error())
 	}
 
-	// todelete
-	fmt.Printf(`%v`, req)
+	exam, err := db.CreateExam(&req)
+	if err != nil {
+		return c.String(http.StatusBadRequest, err.Error())
+	}
 
 	// TODO
-	return nil
+	return c.JSON(http.StatusOK, exam)
 }
 
 func GetExam(c echo.Context) error {
