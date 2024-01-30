@@ -59,9 +59,14 @@ func (db *Database) GetCourseFilter(courseFilter *schemas.CourseFilter) error {
 func (db *Database) CreateCourse(courseReq *schemas.CourseReqPost) (*entity.Course, error) {
 	course := &entity.Course{}
 
+	err := ParseSchemaToEntity(courseReq, course)
+	if err != nil {
+		return nil, err
+	}
+
 	course.Version = 1
 
-	err := db.Db.Create(course).Error
+	err = db.Db.Create(course).Error
 	if err != nil {
 		return nil, err
 	}
