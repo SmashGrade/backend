@@ -5,9 +5,9 @@ import (
 	"github.com/SmashGrade/backend/app/entity"
 )
 
+// fills first matching id version course into course
 func (db *Database) GetCourseEntity(course *entity.Course, id uint, version uint) error {
-	db.Db.Where("id = ?", id).Where("version = ?", version).Find(&course)
-	return nil
+	return db.Db.Where("id = ?", id).Where("version = ?", version).First(&course).Error
 }
 
 func (db *Database) ListCourses(coursesRes *[]schemas.CoursesRes) error {

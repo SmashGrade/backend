@@ -1,16 +1,20 @@
 package schemas
 
 type ExamRes struct {
-	Id          uint    `json:"id"`
-	Description string  `json:"description"`
-	Weight      float64 `json:"weight"`
-	Type        string  `json:"string"`
+	Id            uint    `json:"id"`
+	Description   string  `json:"description"`
+	Weight        float64 `json:"weight"`
+	Type          string  `json:"string"`
+	CourseID      uint    `json:"courseId"`
+	CourseVersion uint    `json:"courseVersion"`
 }
 
 type ExamReq struct {
-	Description string `json:"description"`
-	Weight      int    `json:"weight"`
-	Type        string `json:"type"`
+	Description   string `json:"description"`
+	Weight        int    `json:"weight"`
+	Type          string `json:"type"`
+	CourseID      uint   `json:"courseId"`
+	CourseVersion uint   `json:"courseVersion"`
 }
 
 type ExamReqStudent struct {
