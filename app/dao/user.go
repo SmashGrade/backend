@@ -74,3 +74,13 @@ func (db *Database) CreateUser(user *schemas.User) (uint, error) {
 
 	return newUser.ID, nil
 }
+
+// returns user entity by id with full preload
+func (db *Database) GetUserEntityById(id uint) (*entity.User, error) {
+	var user *entity.User
+	err := db.Db.Preload("Roles").Preload("Fields").Preload("TeachesCourses").Preload("SelectedCourses").First(user, id).Error
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
+}
