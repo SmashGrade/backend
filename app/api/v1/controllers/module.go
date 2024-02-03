@@ -3,6 +3,7 @@ package controllers
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	s "github.com/SmashGrade/backend/app/api/v1/schemas"
 	"github.com/go-playground/validator/v10"
@@ -12,13 +13,15 @@ import (
 func GetModules(c echo.Context) error {
 	var res []s.ModuleRes
 
-	// todelete
-	fmt.Printf(`%v`, res)
+	err := db.ListModule(&res)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
 
-	// TODO
-	return nil
+	return c.JSON(http.StatusOK, res)
 }
 
+// create new module
 func PostModule(c echo.Context) error {
 	var req s.ModuleReq
 
@@ -30,24 +33,39 @@ func PostModule(c echo.Context) error {
 		return c.String(http.StatusBadRequest, err.Error())
 	}
 
-	// todelete
-	fmt.Printf(`%v`, req)
+	module, err := db.CreateModule(&req)
+	if err != nil {
+		return c.String(http.StatusBadRequest, err.Error())
+	}
 
-	// TODO
-	return nil
+	return c.JSON(http.StatusOK, module)
 }
 
 func GetModule(c echo.Context) error {
-	// Parameters
-	id := c.Param("id")
-
 	var res s.ModuleRes
 
-	// todelete
-	fmt.Printf(`%v %v`, id, res)
+	// Parameters
+	idStr := c.Param("id")
+	id, err := strconv.ParseUint(idStr, 10, 32)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
 
-	// TODO
-	return nil
+	versionStr := c.QueryParam("version")
+	var version uint64 = 0
+	if versionStr != "" {
+		version, err = strconv.ParseUint(versionStr, 10, 32)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, err.Error())
+		}
+	}
+
+	err = db.GetModule(&res, uint(id), uint(version))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, res)
 }
 
 func PutModule(c echo.Context) error {
@@ -83,37 +101,68 @@ func DeleteModule(c echo.Context) error {
 }
 
 func GetModuleStudent(c echo.Context) error {
+	var res []s.ModuleRes
+
 	// Parameters
-	studyStageId := c.Param("studyStageId")
+	idStr := c.Param("id")
+	id, err := strconv.ParseUint(idStr, 10, 32)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
 
-	var res []s.ModuleResStudent
+	studyStageIdStr := c.QueryParam("studyStageId")
+	var studyStageId uint64 = 0
+	if studyStageIdStr != "" {
+		studyStageId, err = strconv.ParseUint(studyStageIdStr, 10, 32)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, err.Error())
+		}
+	}
 
-	// todelete
-	fmt.Printf(`%v %v`, studyStageId, res)
+	// TODO: where do i get the UserId
+	err = db.ListCoursesModuleStudent(&res, uint(id), uint(studyStageId))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
 
-	// TODO
-	return nil
+	return c.JSON(http.StatusOK, res)
 }
 
 func GetModuleTeacher(c echo.Context) error {
+	var res []s.ModuleRes
+
 	// Parameters
-	studyStageId := c.Param("studyStageId")
+	idStr := c.Param("id")
+	id, err := strconv.ParseUint(idStr, 10, 32)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
 
-	var res []s.ModuleResTeacher
+	studyStageIdStr := c.QueryParam("studyStageId")
+	var studyStageId uint64 = 0
+	if studyStageIdStr != "" {
+		studyStageId, err = strconv.ParseUint(studyStageIdStr, 10, 32)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, err.Error())
+		}
+	}
 
-	// todelete
-	fmt.Printf(`%v %v`, studyStageId, res)
+	// TODO: where do i get the UserId
+	err = db.ListModuleTeacher(&res, uint(id), uint(studyStageId))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
 
-	// TODO
-	return nil
+	return c.JSON(http.StatusOK, res)
 }
 
 func GetModuleFilter(c echo.Context) error {
 	var res s.ModuleFilter
 
-	// todelete
-	fmt.Printf(`%v`, res)
+	err := db.GetModuleFilter(&res)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
 
-	// TODO
-	return nil
+	return c.JSON(http.StatusOK, res)
 }

@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
+	"strconv"
 
 	s "github.com/SmashGrade/backend/app/api/v1/schemas"
 	"github.com/go-playground/validator/v10"
@@ -10,110 +10,172 @@ import (
 )
 
 func GetCourses(c echo.Context) error {
-	var res []s.CourseRes
+	var res []s.CoursesRes
 
-	// todelete
-	fmt.Printf(`%v`, res)
+	if err := db.ListCourses(&res); err != nil {
+		return c.JSON(http.StatusBadGateway, err.Error())
+	}
 
-	// TODO
-	return nil
+	return c.JSON(http.StatusOK, res)
 }
 
 func PostCourse(c echo.Context) error {
 	var req s.CourseReqPost
 
 	if err := c.Bind(req); err != nil {
-		return c.String(http.StatusBadRequest, err.Error())
+		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
 	if err := validator.New().Struct(req); err != nil {
-		return c.String(http.StatusBadRequest, err.Error())
+		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
-	// todelete
-	fmt.Printf(`%v`, req)
+	course, err := db.CreateCourse(&req)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
 
-	// TODO
-	return nil
+	return c.JSON(http.StatusOK, course)
 }
 
 func GetCourse(c echo.Context) error {
 	// Parameters
-	id := c.Param("id")
+	idStr := c.Param("id")
+	id, err := strconv.ParseUint(idStr, 10, 32)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	versionStr := c.QueryParam("version")
+	var version uint64 = 0
+	if versionStr != "" {
+		version, err = strconv.ParseUint(versionStr, 10, 32)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, err.Error())
+		}
+	}
 
 	var res s.CourseRes
 
-	// todelete
-	fmt.Printf(`%v %v`, id, res)
+	if err := db.GetCourse(&res, uint(id), uint(version)); err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
 
-	// TODO
-	return nil
+	return c.JSON(http.StatusAccepted, res)
 }
 
 func PutCourse(c echo.Context) error {
 	// Parameters
-	id := c.Param("id")
+	idStr := c.Param("id")
+	id, err := strconv.ParseUint(idStr, 10, 32)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
 
 	var req s.CourseReqPut
 
 	if err := c.Bind(req); err != nil {
-		return c.String(http.StatusBadRequest, err.Error())
+		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
 	if err := validator.New().Struct(req); err != nil {
-		return c.String(http.StatusBadRequest, err.Error())
+		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
-	// todelete
-	fmt.Printf(`%v %v`, id, req)
+	if err := db.PutCourse(&req, uint(id)); err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
 
-	// TODO
-	return nil
+	return c.JSON(http.StatusOK, "Success")
 }
 
+/*
 func DeleteCourse(c echo.Context) error {
 	// Parameters
-	id := c.Param("id")
+	idStr := c.Param("id")
+	id, err := strconv.ParseUint(idStr, 10, 32)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
 
-	// todelete
-	fmt.Printf(`%v`, id)
+	versionStr := c.QueryParam("version")
+	var version uint64 = 0
+	if versionStr != "" {
+		version, err = strconv.ParseUint(versionStr, 10, 32)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, err.Error())
+		}
+	}
 
-	// TODO
-	return nil
+	if err := db.DeleteCourse(uint(id), uint(version)); err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	return c.JSON(http.StatusNoContent, nil)
 }
+*/
 
 func GetCourseStudent(c echo.Context) error {
-	// Parameters
-	id := c.Param("id")
-
 	var res s.CourseResStudent
+	// Parameters
+	idStr := c.Param("id")
+	id, err := strconv.ParseUint(idStr, 10, 32)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
 
-	// todelete
-	fmt.Printf(`%v %v`, id, res)
+	versionStr := c.QueryParam("version")
+	var version uint64 = 0
+	if versionStr != "" {
+		version, err = strconv.ParseUint(versionStr, 10, 32)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, err.Error())
+		}
+	}
 
-	// TODO
-	return nil
+	// TODO: where do i get the UserId
+	err = db.GetCourseResStudent(&res, uint(id), uint(version), 8)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	return c.JSON(http.StatusAccepted, res)
 }
 
 func GetCourseTeacher(c echo.Context) error {
-	// Parameters
-	id := c.Param("id")
-
 	var res s.CourseResTeacher
 
-	// todelete
-	fmt.Printf(`%v %v`, id, res)
+	// Parameters
+	idStr := c.Param("id")
+	id, err := strconv.ParseUint(idStr, 10, 32)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
 
-	// TODO
-	return nil
+	versionStr := c.QueryParam("version")
+	var version uint64 = 0
+	if versionStr != "" {
+		version, err = strconv.ParseUint(versionStr, 10, 32)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, err.Error())
+		}
+	}
+
+	// TODO: where do i get the UserId
+	err = db.GetCourseResTeacher(&res, uint(id), uint(version), 8)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	return c.JSON(http.StatusAccepted, res)
 }
 
 func GetCourseFilter(c echo.Context) error {
 	var res s.CourseFilter
 
-	// todelete
-	fmt.Printf(`%v`, res)
+	if err := db.GetCourseFilter(&res); err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
 
-	// TODO
-	return nil
+	return c.JSON(http.StatusOK, res)
 }

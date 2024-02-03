@@ -1,6 +1,6 @@
 package schemas
 
 type Fieldmanager struct {
-	Id   int    `json:"id"`
+	Id   uint   `json:"id"`
 	Name string `json:"name"`
 }

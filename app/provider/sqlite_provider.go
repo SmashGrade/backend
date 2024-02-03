@@ -12,30 +12,31 @@ const defaultDbPath string = "data.db"
 const autoMigrateAtConnect bool = true
 
 type SqliteProvider struct {
-	db *gorm.DB
+	Db *gorm.DB
 }
 
 // automigrates all entities
-func (s *SqliteProvider) Migrate() {
+func (s *SqliteProvider) migrate() {
 	// Migrate all free standing structs first
-	s.db.AutoMigrate(&entity.Curriculumtype{})
-	s.db.AutoMigrate(&entity.Field{})
-	s.db.AutoMigrate(&entity.Evaluationtype{})
-	s.db.AutoMigrate(&entity.Examtype{})
-	s.db.AutoMigrate(&entity.Role{})
-	s.db.AutoMigrate(&entity.State{})
-	s.db.AutoMigrate(&entity.Gradetype{})
+	s.Db.AutoMigrate(&entity.Curriculumtype{})
+	s.Db.AutoMigrate(&entity.Field{})
+	s.Db.AutoMigrate(&entity.Evaluationtype{})
+	s.Db.AutoMigrate(&entity.Examtype{})
+	s.Db.AutoMigrate(&entity.Role{})
+	s.Db.AutoMigrate(&entity.State{})
+	s.Db.AutoMigrate(&entity.Gradetype{})
+	s.Db.AutoMigrate(&entity.StudyStage{})
 	// Migrate secondary structs second
-	s.db.AutoMigrate(&entity.Focus{})
-	s.db.AutoMigrate(&entity.Module{})
-	s.db.AutoMigrate(&entity.Curriculum{})
-	s.db.AutoMigrate(&entity.Course{})
-	s.db.AutoMigrate(&entity.User{})
+	s.Db.AutoMigrate(&entity.Focus{})
+	s.Db.AutoMigrate(&entity.Module{})
+	s.Db.AutoMigrate(&entity.Curriculum{})
+	s.Db.AutoMigrate(&entity.Course{})
+	s.Db.AutoMigrate(&entity.User{})
 	// Migrate convoluted stuff last
-	s.db.AutoMigrate(&entity.SelectedCourse{})
-	s.db.AutoMigrate(&entity.Exam{})
-	s.db.AutoMigrate(&entity.ExamEvaluation{})
-	s.db.AutoMigrate(&entity.Conversion{})
+	s.Db.AutoMigrate(&entity.SelectedCourse{})
+	s.Db.AutoMigrate(&entity.Exam{})
+	s.Db.AutoMigrate(&entity.ExamEvaluation{})
+	s.Db.AutoMigrate(&entity.Conversion{})
 }
 
 // connect to the defaultDbPath sqlite
@@ -45,9 +46,9 @@ func (s *SqliteProvider) Connect() {
 		log.Fatal(err)
 	}
 
-	s.db = db
+	s.Db = db
 
 	if autoMigrateAtConnect {
-		s.Migrate()
+		s.migrate()
 	}
 }

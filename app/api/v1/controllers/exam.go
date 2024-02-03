@@ -3,6 +3,8 @@ package controllers
 import (
 	"fmt"
 	"net/http"
+	"strconv"
+	"time"
 
 	s "github.com/SmashGrade/backend/app/api/v1/schemas"
 	"github.com/go-playground/validator/v10"
@@ -11,13 +13,16 @@ import (
 
 func GetExams(c echo.Context) error {
 	var res []s.ExamRes
-	// todelete
-	fmt.Printf(`%v`, res)
 
-	// TODO
-	return nil
+	err := db.ListExams(&res)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	return c.JSON(http.StatusAccepted, res)
 }
 
+// creates new exam post resulting entity back
 func PostExam(c echo.Context) error {
 	var req s.ExamReq
 
@@ -29,24 +34,30 @@ func PostExam(c echo.Context) error {
 		return c.String(http.StatusBadRequest, err.Error())
 	}
 
-	// todelete
-	fmt.Printf(`%v`, req)
+	exam, err := db.CreateExam(&req)
+	if err != nil {
+		return c.String(http.StatusBadRequest, err.Error())
+	}
 
-	// TODO
-	return nil
+	return c.JSON(http.StatusOK, exam)
 }
 
 func GetExam(c echo.Context) error {
-	// Parameters
-	id := c.Param("id")
-
 	var res s.ExamRes
 
-	// todelete
-	fmt.Printf(`%v %v`, id, res)
+	// Parameters
+	idStr := c.Param("id")
+	id, err := strconv.ParseUint(idStr, 10, 32)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
 
-	// TODO
-	return nil
+	err = db.GetExam(&res, uint(id))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, res)
 }
 
 func PutExam(c echo.Context) error {
@@ -73,9 +84,42 @@ func DeleteExam(c echo.Context) error {
 	return nil
 }
 
+// converts a path param into an uint
+func GetUintParam(c echo.Context, paramName string) (uint, error) {
+	paramStr := c.Param(paramName)
+	paramUint64, err := strconv.ParseUint(paramStr, 10, 32)
+	if err != nil {
+		return 0, err
+	}
+	return uint(paramUint64), nil
+}
+
+// converts a query param into an uint
+func GetUintQueryParam(c echo.Context, paramName string) (uint, error) {
+	paramStr := c.QueryParam(paramName)
+	paramUint64, err := strconv.ParseUint(paramStr, 10, 32)
+	if err != nil {
+		return 0, err
+	}
+	return uint(paramUint64), nil
+}
+
 func PostExamGradeStudent(c echo.Context) error {
 	// Parameters
-	id := c.Param("id")
+	courseId, err := GetUintParam(c, "id")
+	if err != nil {
+		return c.String(http.StatusBadRequest, err.Error())
+	}
+
+	courseVersion, err := GetUintQueryParam(c, "course-version")
+	if err != nil {
+		return c.String(http.StatusBadRequest, err.Error())
+	}
+
+	startYear, err := time.Parse("2006", c.QueryParam("class-start-year"))
+	if err != nil {
+		return c.String(http.StatusBadRequest, err.Error())
+	}
 
 	var req s.ExamReqStudent
 
@@ -87,11 +131,12 @@ func PostExamGradeStudent(c echo.Context) error {
 		return c.String(http.StatusBadRequest, err.Error())
 	}
 
-	// todelete
-	fmt.Printf(`%v %v`, id, req)
+	examEvaluation, err := db.CreateExamEvaluation(courseId, courseVersion, startYear, &req)
+	if err != nil {
+		return c.String(http.StatusBadRequest, err.Error())
+	}
 
-	// TODO
-	return nil
+	return c.JSON(http.StatusOK, examEvaluation)
 }
 
 func PostExamGradeTeacher(c echo.Context) error {

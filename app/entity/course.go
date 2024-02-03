@@ -1,8 +1,12 @@
 package entity
 
+import "time"
+
 type Course struct {
-	Basemodel
-	Version         uint `gorm:"primarykey"`
+	ID              uint `gorm:"primarykey;autoIncrement:false"`
+	CreatedAt       time.Time
+	UpdatedAt       time.Time
+	Version         uint `gorm:"primarykey"` //;autoIncrement:false"`
 	Description     string
 	Number          string    // this is a short identifier
 	Modules         []*Module `gorm:"many2many:module_course_assignment;"`
