@@ -86,10 +86,14 @@ func (db *Database) CreateModule(moduleReq *schemas.ModuleReq) (*entity.Module, 
 	module := &entity.Module{}
 
 	// manual increment by one
-	db.Db.Last(&module)
-	module.ID += 1
+	err := db.Db.Last(&module).Error
+	if err != nil {
+		module.ID = 1 // this is the first entry set id to 1
+	} else {
+		module.ID += 1
+	}
 
-	err := db.ParseModuleRefToEnt(moduleReq, module)
+	err = db.ParseModuleRefToEnt(moduleReq, module)
 	if err != nil {
 		return nil, err
 	}

@@ -59,7 +59,15 @@ func (db *Database) GetCourseFilter(courseFilter *schemas.CourseFilter) error {
 func (db *Database) CreateCourse(courseReq *schemas.CourseReqPost) (*entity.Course, error) {
 	course := &entity.Course{}
 
-	err := ParseSchemaToEntity(courseReq, course)
+	// manual increment by one
+	err := db.Db.Last(&course).Error
+	if err != nil {
+		course.ID = 1 // this is the first entry set id to 1
+	} else {
+		course.ID += 1
+	}
+
+	err = ParseSchemaToEntity(courseReq, course)
 	if err != nil {
 		return nil, err
 	}
