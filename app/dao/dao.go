@@ -12,6 +12,11 @@ import (
 type CurriculumTypeDao struct {
 }
 
+// Creates new dao with required repositories
+func NewCurriculumTypeDao(curriculumTypeRepository *interface{}) (dao *CurriculumTypeDao, err e.DaoError) {
+	return nil, e.DAOUnimplemented
+}
+
 func (c *CurriculumTypeDao) GetAll() (entities []models.Curriculumtype, err e.DaoError) {
 	return nil, e.DAOUnimplemented
 }
@@ -33,6 +38,11 @@ func (c *CurriculumDao) Create(entity *models.Curriculum) e.DaoError {
 // Module / Modul
 // A collection of multiple courses
 type ModuleDao struct{}
+
+// Creates a new dao with required repositories
+func NewModuleDao(moduleRepository *interface{}) (dao *ModuleDao, err e.DaoError) {
+	return nil, e.DAOUnimplemented
+}
 
 // Returns module identified by id and version
 func (m *ModuleDao) Get(id, version uint) (entity *models.Module, err e.DaoError) {
@@ -62,6 +72,7 @@ func (m *ModuleDao) Delete(id, version uint) e.DaoError {
 
 type CourseDao struct{}
 
+// Create new dao with required repositories
 func NewCourseDao(courseRepository *interface{}) (dao *CourseDao, err e.DaoError) {
 	return nil, e.DAOUnimplemented
 }
@@ -126,7 +137,19 @@ func (ex *ExamDao) Delete(courseId, courseVersion, examId uint) e.DaoError {
 
 type UserDao struct{}
 
-// Returns a list of courses a
-func (u *UserDao) GetCourses(id uint, startYear time.Time) (courses []models.SelectedCourse, err e.DaoError) {
+// Creates new dao from required repositories
+func NewUserDao(userRepository *interface{}) (dao *UserDao, err e.DaoError) {
 	return nil, e.DAOUnimplemented
 }
+
+// Returns a list of courses a user has assigned
+func (u *UserDao) GetCourses(uid uint) (courses []models.SelectedCourse, err e.DaoError) {
+	return nil, e.DAOUnimplemented
+}
+
+// Returns a list of courses a user has assigned in a specific start year
+func (u *UserDao) GetCoursesForYear(uid uint, startYear time.Time) (courses []models.SelectedCourse, err e.DaoError) {
+	return nil, e.DAOUnimplemented
+}
+
+func (u *UserDao) GetExamEvaluations()
