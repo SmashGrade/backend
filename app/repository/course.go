@@ -7,10 +7,10 @@ import (
 )
 
 type CourseRepository struct {
-	Provider *db.BaseProvider
+	Provider db.Provider
 }
 
-func NewCourseRepository(provider *db.BaseProvider) *CourseRepository {
+func NewCourseRepository(provider db.Provider) *CourseRepository {
 	return &CourseRepository{
 		Provider: provider,
 	}

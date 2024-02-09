@@ -5,6 +5,7 @@ import (
 
 	e "github.com/SmashGrade/backend/app/error"
 	"github.com/SmashGrade/backend/app/models"
+	"github.com/SmashGrade/backend/app/repository"
 )
 
 // curriculum type / Studiengang art
@@ -70,11 +71,15 @@ func (m *ModuleDao) Delete(id, version uint) e.DaoError {
 	return e.DAOUnimplemented
 }
 
-type CourseDao struct{}
+type CourseDao struct {
+	Repo repository.CourseRepository
+}
 
 // Create new dao with required repositories
-func NewCourseDao(courseRepository *interface{}) (dao *CourseDao, err e.DaoError) {
-	return nil, e.DAOUnimplemented
+func NewCourseDao(courseRepository *repository.CourseRepository) *CourseDao {
+	return &CourseDao{
+		Repo: *courseRepository,
+	}
 }
 
 // Returns course by id and version
