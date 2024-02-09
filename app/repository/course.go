@@ -3,6 +3,7 @@ package repository
 import (
 	"github.com/SmashGrade/backend/app/db"
 	"github.com/SmashGrade/backend/app/models"
+	"gorm.io/gorm/clause"
 )
 
 type CourseRepository struct {
@@ -24,7 +25,7 @@ func (r *CourseRepository) Create(course models.Course) error {
 }
 
 func (r *CourseRepository) Update(course models.Course) error {
-	result := r.Provider.DB().Model(course).Updates(course)
+	result := r.Provider.DB().Model(&course).Updates(&course)
 	if result.Error != nil {
 		return result.Error
 	}
@@ -32,12 +33,17 @@ func (r *CourseRepository) Update(course models.Course) error {
 }
 
 func (r *CourseRepository) Find(course models.Course) ([]models.Course, error) {
-	return nil, nil
+	var courses []models.Course
+	result := r.Provider.DB().Preload(clause.Associations).Where(&course).Find(&courses)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return courses, nil
 }
 
 func (r *CourseRepository) GetAll() ([]models.Course, error) {
 	var courses []models.Course
-	result := r.Provider.DB().Find(&courses)
+	result := r.Provider.DB().Preload(clause.Associations).Find(&courses)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -46,7 +52,7 @@ func (r *CourseRepository) GetAll() ([]models.Course, error) {
 
 func (r *CourseRepository) Get(id, version uint) (models.Course, error) {
 	var course models.Course
-	result := r.Provider.DB().Where("id = ? AND version = ?", id, version).First(&course)
+	result := r.Provider.DB().Preload(clause.Associations).Where("id = ? AND version = ?", id, version).First(&course)
 	if result.Error != nil {
 		return models.Course{}, result.Error
 	}
