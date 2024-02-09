@@ -4,13 +4,12 @@ import (
 	"time"
 
 	"github.com/SmashGrade/backend/app/db"
-	e "github.com/SmashGrade/backend/app/error"
 	"gorm.io/gorm/clause"
 )
 
 type Repository interface {
-	Create(entity any) error
-	Update(entity any) error
+	Create(entity any) (err error)
+	Update(entity any) (err error)
 	Find(entity any) (entities []any, err error)
 	GetAll() (entites []any, err error)
 }
@@ -48,32 +47,44 @@ func NewBaseRepository(provider *db.BaseProvider) *BaseRepository {
 
 // Example functions
 // TODO: Please implement them in the actual repository concrete for the model
-func (r *BaseRepository) Create(entity any) error {
-	return e.ErrNotImplemented
+func (r *BaseRepository) Create(entity any) (err error) {
+	result := r.Provider.DB().Create(&entity)
+	err = result.Error
+	return
 }
 
-func (r *BaseRepository) Update(entity any) error {
-	return e.ErrNotImplemented
+func (r *BaseRepository) Update(entity any) (err error) {
+	result := r.Provider.DB().Model(&entity).Updates(&entity)
+	err = result.Error
+	return nil
 }
 
 func (r *BaseRepository) Find(entity any) (entities []any, err error) {
-	return nil, e.ErrNotImplemented
+	result := r.Provider.DB().Preload(clause.Associations).Where(&entity).Find(&entities)
+	err = result.Error
+	return
 }
 
 func (r *BaseRepository) GetAll() (entities []any, err error) {
-	return nil, e.ErrNotImplemented
+	result := r.Provider.DB().Preload(clause.Associations).Find(&entities)
+	err = result.Error
+	return
 }
 
-// For versions and timed repositories you also need to implement the following methods
-func (r *BaseRepository) Get(id uint, version uint) (entity interface{}, err error) {
+func (r *BaseRepository) GetId(id uint) (entity interface{}, err error) {
+	result := r.Provider.DB().Preload(clause.Associations).First(&entity, id)
+	err = result.Error
+	return
+}
+
+func (r *BaseRepository) GetVersioned(id uint, version uint) (entity interface{}, err error) {
 	result := r.Provider.DB().Preload(clause.Associations).Where("id = ? AND version = ?", id, version).First(&entity)
-	if result.Error != nil {
-		return nil, result.Error
-	}
-	return entity, nil
+	err = result.Error
+	return
 }
 
-// func (r *BaseRepository) Delete(id uint, version uint) error
-
-// func (r *BaseRepository) Get(id uint, startDate time.Time) (entity any, err error)
-// func (r *BaseRepository) Delete(id uint, startDate time.Time) error
+func (r *BaseRepository) GetTimed(id uint, startDate time.Time) (entity interface{}, err error) {
+	result := r.Provider.DB().Preload(clause.Associations).Where("id = ? AND startyear = ?", id, startDate).First(&entity)
+	err = result.Error
+	return
+}
