@@ -1,4 +1,4 @@
-package main
+package config
 
 import "fmt"
 
@@ -10,7 +10,7 @@ type APIConfig struct {
 
 }
 
-// Returns a new APIConfig
+// Returns a new configuration with default values
 func NewAPIConfig() *APIConfig {
 	return &APIConfig{
 		Host:        "0.0.0.0",

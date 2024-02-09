@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/SmashGrade/backend/app/db"
+	e "github.com/SmashGrade/backend/app/error"
 )
 
 type Repository interface {
@@ -47,19 +48,19 @@ func NewBaseRepository(provider *db.Provider) *BaseRepository {
 // Example functions
 // TODO: Please implement them in the actual repository concrete for the model
 func (r *BaseRepository) Create(entity any) error {
-	return nil
+	return e.ErrNotImplemented
 }
 
 func (r *BaseRepository) Update(entity any) error {
-	return nil
+	return e.ErrNotImplemented
 }
 
 func (r *BaseRepository) Find(entity any) (entities []any, err error) {
-	return nil, nil
+	return nil, e.ErrNotImplemented
 }
 
 func (r *BaseRepository) GetAll() (entities []any, err error) {
-	return nil, nil
+	return nil, e.ErrNotImplemented
 }
 
 // For versions and timed repositories you also need to implement the following methods

@@ -1,16 +1,23 @@
 package db
 
-import "gorm.io/gorm"
+import (
+	c "github.com/SmashGrade/backend/app/config"
+	e "github.com/SmashGrade/backend/app/error"
+	"github.com/SmashGrade/backend/app/models"
+	"gorm.io/gorm"
+)
 
 type Provider interface {
-	DB() *gorm.DB
-	Connect(connectionString string) error
-	IsConnected() bool
+	DB() *gorm.DB                          // Returns the database connection
+	Config() *c.APIConfig                  // Returns the API configuration
+	Connect(connectionString string) error // Connect to the database
+	IsConnected() bool                     // Returns true if the provider is connected to the database
 }
 
 type BaseProvider struct {
-	Db          *gorm.DB
-	isConnected bool
+	config      *c.APIConfig // API configuration
+	Db          *gorm.DB     // Database connection
+	isConnected bool         // True if the provider is connected to the database
 }
 
 // Returns the database connection
@@ -20,14 +27,18 @@ func (p *BaseProvider) DB() *gorm.DB {
 
 // Connect to the database
 func (p *BaseProvider) Connect(connectionString string) error {
-	if !p.IsConnected() {
-
-	}
+	// Not implemented in the base provider
+	return e.ErrNotImplemented
 }
 
 // Returns true if the provider is connected to the database
 func (p *BaseProvider) IsConnected() bool {
 	return p.isConnected
+}
+
+// Returns the API configuration
+func (p BaseProvider) Config() *c.APIConfig {
+	return p.config
 }
 
 type SQLiteProvider struct {
@@ -42,5 +53,34 @@ func (s *SQLiteProvider) Connect(connectionString string) error {
 
 // Migrates the database with all existing models
 func Migrate(p Provider) error {
-
+	models := []interface{}{
+		// Add all models here
+		models.Curriculumtype{},
+		models.Field{},
+		models.Evaluationtype{},
+		models.Examtype{},
+		models.Role{},
+		models.State{},
+		models.Gradetype{},
+		models.StudyStage{},
+		models.Focus{},
+		models.Module{},
+		models.Curriculum{},
+		models.Course{},
+		models.User{},
+		models.SelectedCourse{},
+		models.Exam{},
+		models.ExamEvaluation{},
+		models.Conversion{},
+	}
+	// Migrate all models if autoMigrateAtConnect is true
+	if p.Config().AutoMigrate {
+		for _, model := range models {
+			err := p.DB().AutoMigrate(model)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }
