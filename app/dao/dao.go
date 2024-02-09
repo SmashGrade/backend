@@ -32,7 +32,7 @@ func (c *CurriculumDao) Get(id uint, startValidity time.Time) (entity *models.Cu
 }
 
 // Creates new curriculum
-func (c *CurriculumDao) Create(entity *models.Curriculum) e.DaoError {
+func (c *CurriculumDao) Create(entity *models.Curriculum) *e.ApiError {
 	return e.NewDaoUnimplementedError()
 }
 
@@ -62,12 +62,12 @@ func (m *ModuleDao) Create(entity models.Module) (returnEntity *models.Module, e
 }
 
 // Will update an existing module specified by id and version
-func (m *ModuleDao) Update(entity models.Module) e.DaoError {
+func (m *ModuleDao) Update(entity models.Module) *e.ApiError {
 	return e.NewDaoUnimplementedError()
 }
 
 // Deletes a single module with id and version
-func (m *ModuleDao) Delete(id, version uint) e.DaoError {
+func (m *ModuleDao) Delete(id, version uint) *e.ApiError {
 	return e.NewDaoUnimplementedError()
 }
 
@@ -83,12 +83,18 @@ func NewCourseDao(courseRepository *repository.CourseRepository) *CourseDao {
 }
 
 // Returns course by id and version
-func (c *CourseDao) GetAll(id, version uint) (entities []models.Course, err *e.ApiError) {
+func (c *CourseDao) GetAll() (entities []models.Course, err *e.ApiError) {
 	courses, internalErr := c.repo.GetAll()
 	if internalErr != nil {
 		return nil, e.NewDaoDbError()
 	}
-	return courses, nil
+
+	outCourses := make([]models.Course, len(courses))
+	for i := range courses {
+		outCourses[i] = courses[i].(models.Course)
+	}
+
+	return outCourses, nil
 }
 
 // Returns course by id and version
