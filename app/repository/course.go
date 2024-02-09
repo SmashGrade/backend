@@ -18,8 +18,5 @@ func NewCourseRepository(provider db.Provider) *CourseRepository {
 
 func (r *CourseRepository) DeleteVersioned(id, version uint) error {
 	result := r.Provider.DB().Where("id = ? AND version = ?", id, version).Delete(&models.Course{})
-	if result.Error != nil {
-		return result.Error
-	}
-	return nil
+	return result.Error
 }
