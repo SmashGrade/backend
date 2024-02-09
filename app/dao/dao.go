@@ -14,17 +14,60 @@ type CurriculumTypeDao struct {
 }
 
 // Creates new dao with required repositories
-func NewCurriculumTypeDao(curriculumTypeRepository *interface{}) (dao *CurriculumTypeDao, err *e.ApiError) {
-	return nil, e.NewDaoUnimplementedError()
+func NewCurriculumTypeDao(curriculumTypeRepository *interface{}) *CurriculumTypeDao {
+	return nil
 }
 
 func (c *CurriculumTypeDao) GetAll() (entities []models.Curriculumtype, err *e.ApiError) {
 	return nil, e.NewDaoUnimplementedError()
 }
 
+func (c *CurriculumTypeDao) Get(id uint) (entity *models.Curriculumtype, err *e.ApiError) {
+	return nil, e.NewDaoUnimplementedError()
+}
+
+// evaluation type / Bewertungstyp for Module
+type EvaluationTypeDao struct {
+}
+
+// Creates new dao with required repositories
+func NewEvaluationTypeDao(evaluationTypeRepository *interface{}) *EvaluationTypeDao {
+	return nil
+}
+
+func (et *EvaluationTypeDao) GetAll() (entities []models.Evaluationtype, err *e.ApiError) {
+	return nil, e.NewDaoUnimplementedError()
+}
+
+func (et *EvaluationTypeDao) Get(id uint) (entity *models.Evaluationtype, err *e.ApiError) {
+	return nil, e.NewDaoUnimplementedError()
+}
+
+// state / Zustand for Module and Curriculum
+type StateDao struct {
+}
+
+// Creates new dao with required repositories
+func NewStateDao(evaluationTypeRepository *interface{}) *StateDao {
+	return nil
+}
+
+func (et *StateDao) GetAll() (entities []models.Evaluationtype, err *e.ApiError) {
+	return nil, e.NewDaoUnimplementedError()
+}
+
+func (et *StateDao) Get(id uint) (entity *models.Evaluationtype, err *e.ApiError) {
+	return nil, e.NewDaoUnimplementedError()
+}
+
 // Curriculum / Studiengang
 // Highest level of categorization
 type CurriculumDao struct{}
+
+// Create new curriculum with required repository
+func NewCurriculumDao(curriculumRepository *interface{}) *CurriculumDao {
+	return nil
+}
 
 // Returns existing curriculum
 func (c *CurriculumDao) Get(id uint, startValidity time.Time) (entity *models.Curriculum, err *e.ApiError) {
@@ -41,8 +84,8 @@ func (c *CurriculumDao) Create(entity *models.Curriculum) *e.ApiError {
 type ModuleDao struct{}
 
 // Creates a new dao with required repositories
-func NewModuleDao(moduleRepository *interface{}) (dao *ModuleDao, err *e.ApiError) {
-	return nil, e.NewDaoUnimplementedError()
+func NewModuleDao(moduleRepository *interface{}) *ModuleDao {
+	return nil
 }
 
 // Returns module identified by id and version
@@ -99,7 +142,11 @@ func (c *CourseDao) GetAll() (entities []models.Course, err *e.ApiError) {
 
 // Returns course by id and version
 func (c *CourseDao) Get(id, version uint) (entity *models.Course, err *e.ApiError) {
-	return nil, e.NewDaoUnimplementedError()
+	ent, internalError := c.repo.GetVersioned(id, version)
+	if internalError != nil {
+		return nil, e.NewDaoDbError()
+	}
+	return ent.(*models.Course), nil
 }
 
 // Returns course by id with highest version
@@ -110,6 +157,9 @@ func (c *CourseDao) GetLatest(id uint) (entity *models.Course, err *e.ApiError) 
 // Will create a new course if neither id nor version are set
 // Will create a new course version if only id is set
 func (c *CourseDao) Create(entity models.Course) (returnEntity *models.Course, err *e.ApiError) {
+
+	// repoError := c.repo.Create(entity) // TODO check create
+
 	return nil, e.NewDaoUnimplementedError()
 }
 
@@ -126,8 +176,8 @@ func (c *CourseDao) Delete(id, version uint) *e.ApiError {
 type ExamDao struct{}
 
 // Create new exam dao with all used providers
-func NewDoaExam(examProvider *interface{}, courseProvider *interface{}) (daoExam *ExamDao, err *e.ApiError) {
-	return nil, e.NewDaoUnimplementedError()
+func NewDoaExam(examProvider *interface{}, courseProvider *interface{}) *ExamDao {
+	return nil
 }
 
 // Returns a list of exams for a specific course
@@ -158,8 +208,8 @@ func (ex *ExamDao) Delete(courseId, courseVersion, examId uint) *e.ApiError {
 type UserDao struct{}
 
 // Creates new dao from required repositories
-func NewUserDao(userRepository *interface{}) (dao *UserDao, err *e.ApiError) {
-	return nil, e.NewDaoUnimplementedError()
+func NewUserDao(userRepository *interface{}) *UserDao {
+	return nil
 }
 
 // Returns a list of courses a user has assigned
@@ -172,4 +222,7 @@ func (u *UserDao) GetCoursesForYear(uid uint, startYear time.Time) (courses []mo
 	return nil, e.NewDaoUnimplementedError()
 }
 
-func (u *UserDao) GetExamEvaluations()
+// Returns a list of evaluations by startYear and exam
+func (u *UserDao) GetExamEvaluationsForYear(uid uint, startYear time.Time) {
+	// TODO
+}
