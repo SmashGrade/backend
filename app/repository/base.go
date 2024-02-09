@@ -71,19 +71,19 @@ func (r *BaseRepository) GetAll() (entities []any, err error) {
 	return
 }
 
-func (r *BaseRepository) GetId(id uint) (entity interface{}, err error) {
+func (r *BaseRepository) GetId(id uint) (entity any, err error) {
 	result := r.Provider.DB().Preload(clause.Associations).First(&entity, id)
 	err = result.Error
 	return
 }
 
-func (r *BaseRepository) GetVersioned(id uint, version uint) (entity interface{}, err error) {
+func (r *BaseRepository) GetVersioned(id uint, version uint) (entity any, err error) {
 	result := r.Provider.DB().Preload(clause.Associations).Where("id = ? AND version = ?", id, version).First(&entity)
 	err = result.Error
 	return
 }
 
-func (r *BaseRepository) GetTimed(id uint, startDate time.Time) (entity interface{}, err error) {
+func (r *BaseRepository) GetTimed(id uint, startDate time.Time) (entity any, err error) {
 	result := r.Provider.DB().Preload(clause.Associations).Where("id = ? AND startyear = ?", id, startDate).First(&entity)
 	err = result.Error
 	return
