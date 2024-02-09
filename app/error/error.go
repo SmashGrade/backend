@@ -17,13 +17,18 @@ type ApiError struct {
 
 // Function to return the error message as string
 // Implements the error interface
-func (e *ApiError) Error() string {
+func (e ApiError) Error() string {
 	return e.Msg
 }
 
 // Returns an API error with a 404 status code and a message for type t
 func ErrorNotFound(t string) ApiError {
 	return ApiError{Status: 404, Msg: fmt.Sprintf("%s not found", t)}
+}
+
+// Returns an API error with a 400 status code and a message for type t
+func ErrorInvalidRequest(t string) ApiError {
+	return ApiError{Status: 400, Msg: fmt.Sprintf("Invalid request: %s", t)}
 }
 
 // Handles an error thrown by any echo context function

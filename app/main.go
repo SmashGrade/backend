@@ -2,12 +2,12 @@ package main
 
 import (
 	c "github.com/SmashGrade/backend/app/config"
+	_ "github.com/SmashGrade/backend/app/docs"
 	e "github.com/SmashGrade/backend/app/error"
 	"github.com/labstack/echo/v4"
 	echoSwagger "github.com/swaggo/echo-swagger"
+	_ "gorm.io/gorm"
 )
-
-// TODO: https://github.com/swaggo/echo-swagger
 
 // @title Smashgrade Backend API
 // @version 1.0
