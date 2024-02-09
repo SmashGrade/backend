@@ -1,4 +1,4 @@
-package main
+package error
 
 import (
 	"fmt"
@@ -18,11 +18,11 @@ func (e *ApiError) Error() string {
 	return e.Msg
 }
 
-type DAOError int // Enum for DAO errors
+type DaoError int // Enum for DAO errors
 
 // Enum values for DAOError
 const (
-	DAOUndefined DAOError = iota
+	DAOUndefined DaoError = iota
 	DAONotFound
 	DAOAlreadyExists
 	DOAInvalid
@@ -47,7 +47,7 @@ func HandleEchoError(err error, c echo.Context) {
 }
 
 // Handles an error thrown by the DAO
-func HandleDAOError(e DAOError, t string) ApiError {
+func HandleDAOError(e DaoError, t string) ApiError {
 	switch e {
 	case DAONotFound:
 		return ErrorNotFound(t)

@@ -1,6 +1,7 @@
 package main
 
 import (
+	e "github.com/SmashGrade/backend/app/error"
 	"github.com/labstack/echo/v4"
 	echoSwagger "github.com/swaggo/echo-swagger"
 )
@@ -23,7 +24,7 @@ func main() {
 
 	server := echo.New()
 	// Assign the custom error handler to the server
-	server.HTTPErrorHandler = HandleEchoError
+	server.HTTPErrorHandler = e.HandleEchoError
 
 	// Add swagger documentation route
 	server.GET("/docs/*", echoSwagger.WrapHandler)
