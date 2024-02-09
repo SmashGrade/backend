@@ -5,6 +5,7 @@ import (
 
 	"github.com/SmashGrade/backend/app/db"
 	e "github.com/SmashGrade/backend/app/error"
+	"gorm.io/gorm/clause"
 )
 
 type Repository interface {
@@ -16,30 +17,30 @@ type Repository interface {
 
 // Repository methods for models with only an id
 type IdRepository interface {
-	Get(id uint) (entity any, err error)
-	Delete(id uint) error
+	GetId(id uint) (entity any, err error)
+	DeleteId(id uint) error
 }
 
 // Repository methods for models with id and version
 type VersionedRepository interface {
-	Get(id, version uint) (entity any, err error)
-	Delete(id, version uint) error
+	GetVersioned(id, version uint) (entity any, err error)
+	DeleteVersioned(id, version uint) error
 }
 
 // Repository methods for models with id and start date
 type TimedRepository interface {
-	Get(id uint, startDate time.Time) (entity any, err error)
-	Delete(id uint, startDate time.Time) error
+	GetTimed(id uint, startDate time.Time) (entity any, err error)
+	DeleteTimed(id uint, startDate time.Time) error
 }
 
 // BaseRepository is a base repository
 // that contains the database connection and CRUD operations
 type BaseRepository struct {
-	Provider *db.Provider
+	Provider *db.BaseProvider
 }
 
 // Constructor for BaseRepository
-func NewBaseRepository(provider *db.Provider) *BaseRepository {
+func NewBaseRepository(provider *db.BaseProvider) *BaseRepository {
 	return &BaseRepository{
 		Provider: provider,
 	}
@@ -64,7 +65,14 @@ func (r *BaseRepository) GetAll() (entities []any, err error) {
 }
 
 // For versions and timed repositories you also need to implement the following methods
-// func (r *BaseRepository) Get(id uint, version uint) (entity any, err error)
+func (r *BaseRepository) Get(id uint, version uint) (entity interface{}, err error) {
+	result := r.Provider.DB().Preload(clause.Associations).Where("id = ? AND version = ?", id, version).First(&entity)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return entity, nil
+}
+
 // func (r *BaseRepository) Delete(id uint, version uint) error
 
 // func (r *BaseRepository) Get(id uint, startDate time.Time) (entity any, err error)

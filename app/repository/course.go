@@ -8,6 +8,7 @@ import (
 
 type CourseRepository struct {
 	Provider db.Provider
+	*BaseRepository
 }
 
 func NewCourseRepository(provider db.Provider) *CourseRepository {
@@ -48,15 +49,6 @@ func (r *CourseRepository) GetAll() ([]models.Course, error) {
 		return nil, result.Error
 	}
 	return courses, nil
-}
-
-func (r *CourseRepository) Get(id, version uint) (models.Course, error) {
-	var course models.Course
-	result := r.Provider.DB().Preload(clause.Associations).Where("id = ? AND version = ?", id, version).First(&course)
-	if result.Error != nil {
-		return models.Course{}, result.Error
-	}
-	return course, nil
 }
 
 func (r *CourseRepository) Delete(id, version uint) error {
