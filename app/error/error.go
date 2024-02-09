@@ -21,17 +21,6 @@ func (e *ApiError) Error() string {
 	return e.Msg
 }
 
-type DaoError int // Enum for DAO errors
-
-// Enum values for DAOError
-const (
-	DAOUndefined DaoError = iota
-	DAONotFound
-	DAOAlreadyExists
-	DOAInvalid
-	DAOUnimplemented
-)
-
 // Returns an API error with a 404 status code and a message for type t
 func ErrorNotFound(t string) ApiError {
 	return ApiError{Status: 404, Msg: fmt.Sprintf("%s not found", t)}
@@ -50,18 +39,16 @@ func HandleEchoError(err error, c echo.Context) {
 	c.JSON(500, map[string]any{"error": "Internal server error"})
 }
 
-// Handles an error thrown by the DAO
-func HandleDAOError(e DaoError, t string) ApiError {
-	switch e {
-	case DAONotFound:
-		return ErrorNotFound(t)
-	case DAOAlreadyExists:
-		return ApiError{Status: 400, Msg: fmt.Sprintf("%s already exists", t)}
-	case DOAInvalid:
-		return ApiError{Status: 400, Msg: fmt.Sprintf("Invalid %s", t)}
-	case DAOUnimplemented:
-		return ApiError{Status: 500, Msg: "DAO function not implemented"}
-	default:
-		return ApiError{Status: 500, Msg: "Internal DAO error"}
+func NewDaoUnimplementedError() *ApiError {
+	return &ApiError{
+		Status: 501,
+		Msg:    "This DAO function is not yet implemented",
+	}
+}
+
+func NewDaoDbError() *ApiError {
+	return &ApiError{
+		Status: 500,
+		Msg:    "DB Error",
 	}
 }
