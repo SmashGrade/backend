@@ -72,13 +72,13 @@ func (m *ModuleDao) Delete(id, version uint) e.DaoError {
 }
 
 type CourseDao struct {
-	Repo *repository.CourseRepository
+	repo *repository.CourseRepository
 }
 
 // Create new dao with required repositories
 func NewCourseDao(courseRepository *repository.CourseRepository) *CourseDao {
 	return &CourseDao{
-		Repo: courseRepository,
+		repo: courseRepository,
 	}
 }
 
