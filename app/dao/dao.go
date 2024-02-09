@@ -9,115 +9,124 @@ import (
 
 // curriculum type / Studiengang art
 // has description like Vollzeit or Berufsbegleitend
-type DaoCurriculumType struct {
+type CurriculumTypeDao struct {
 }
 
-func (c *DaoCurriculumType) GetAll() (entities []models.Curriculumtype, err e.DaoError) {
+func (c *CurriculumTypeDao) GetAll() (entities []models.Curriculumtype, err e.DaoError) {
 	return nil, e.DAOUnimplemented
 }
 
 // Curriculum / Studiengang
 // Highest level of categorization
-type DaoCurriculum struct{}
+type CurriculumDao struct{}
 
 // Returns existing curriculum
-func (c *DaoCurriculum) Get(id uint, startValidity time.Time) (entity *models.Curriculum, err e.DaoError) {
+func (c *CurriculumDao) Get(id uint, startValidity time.Time) (entity *models.Curriculum, err e.DaoError) {
 	return nil, e.DAOUnimplemented
 }
 
 // Creates new curriculum
-func (c *DaoCurriculum) Create(entity *models.Curriculum) e.DaoError {
+func (c *CurriculumDao) Create(entity *models.Curriculum) e.DaoError {
 	return e.DAOUnimplemented
 }
 
 // Module / Modul
 // A collection of multiple courses
-type DaoModule struct{}
+type ModuleDao struct{}
 
 // Returns module identified by id and version
-func (m *DaoModule) Get(id, version uint) (entity *models.Module, err e.DaoError) {
+func (m *ModuleDao) Get(id, version uint) (entity *models.Module, err e.DaoError) {
 	return nil, e.DAOUnimplemented
 }
 
 // Returns module by id with highest version
-func (m *DaoModule) GetLatest(id uint) (entity *models.Module, err e.DaoError) {
+func (m *ModuleDao) GetLatest(id uint) (entity *models.Module, err e.DaoError) {
 	return nil, e.DAOUnimplemented
 }
 
 // Will create a new module if neither id nor version are set
 // Will create a new module version if only id is set
-func (m *DaoModule) Create(entity models.Module) (returnEntity *models.Module, err e.DaoError) {
+func (m *ModuleDao) Create(entity models.Module) (returnEntity *models.Module, err e.DaoError) {
 	return nil, e.DAOUnimplemented
 }
 
 // Will update an existing module specified by id and version
-func (m *DaoModule) Update(entity models.Module) e.DaoError {
+func (m *ModuleDao) Update(entity models.Module) e.DaoError {
 	return e.DAOUnimplemented
 }
 
 // Deletes a single module with id and version
-func (m *DaoModule) Delete(id, version uint) e.DaoError {
+func (m *ModuleDao) Delete(id, version uint) e.DaoError {
 	return e.DAOUnimplemented
 }
 
-type DaoCourse struct{}
+type CourseDao struct{}
+
+func NewCourseDao(courseRepository *interface{}) (dao *CourseDao, err e.DaoError) {
+	return nil, e.DAOUnimplemented
+}
 
 // Returns course by id and version
-func (c *DaoCourse) Get(id, version uint) (entity *models.Course, err e.DaoError) {
+func (c *CourseDao) Get(id, version uint) (entity *models.Course, err e.DaoError) {
 	return nil, e.DAOUnimplemented
 }
 
 // Returns course by id with highest version
-func (c *DaoCourse) GetLatest(id uint) (entity *models.Course, err e.DaoError) {
+func (c *CourseDao) GetLatest(id uint) (entity *models.Course, err e.DaoError) {
 	return nil, e.DAOUnimplemented
 }
 
 // Will create a new course if neither id nor version are set
 // Will create a new course version if only id is set
-func (c *DaoCourse) Create(entity models.Course) (returnEntity *models.Course, err e.DaoError) {
+func (c *CourseDao) Create(entity models.Course) (returnEntity *models.Course, err e.DaoError) {
 	return nil, e.DAOUnimplemented
 }
 
 // updates an existing course via id and version
-func (c *DaoCourse) Update(entity models.Course) e.DaoError {
+func (c *CourseDao) Update(entity models.Course) e.DaoError {
 	return e.DAOUnimplemented
 }
 
 // Deletes a course by id and version
-func (c *DaoCourse) Delete(id, version uint) e.DaoError {
+func (c *CourseDao) Delete(id, version uint) e.DaoError {
 	return e.DAOUnimplemented
 }
 
-type DaoExam struct{}
+type ExamDao struct{}
+
+// Create new exam dao with all used providers
+func NewDoaExam(examProvider *interface{}, courseProvider *interface{}) (daoExam *ExamDao, err e.DaoError) {
+	return nil, e.DAOUnimplemented
+}
 
 // Returns a list of exams for a specific course
-func (ex *DaoExam) GetForCourse(courseId, courseVersion uint) (entities []models.Exam, err e.DaoError) {
+func (ex *ExamDao) GetForCourse(courseId, courseVersion uint) (entities []models.Exam, err e.DaoError) {
 	return nil, e.DAOUnimplemented
 }
 
 // Returns a single exam for a course selected by id
-func (ex *DaoExam) Get(courseId, courseVersion, examId uint) (entity *models.Exam, err e.DaoError) {
+func (ex *ExamDao) Get(courseId, courseVersion, examId uint) (entity *models.Exam, err e.DaoError) {
 	return nil, e.DAOUnimplemented
 }
 
 // Creates a new exam for a course
-func (ex *DaoExam) Create(entity models.Exam) (returnEntity *models.Exam, err e.DaoError) {
+func (ex *ExamDao) Create(entity models.Exam) (returnEntity *models.Exam, err e.DaoError) {
 	return nil, e.DAOUnimplemented
 }
 
 // Updates an existing exam for a course
-func (ex *DaoExam) Update(entity models.Exam) e.DaoError {
+func (ex *ExamDao) Update(entity models.Exam) e.DaoError {
 	return e.DAOUnimplemented
 }
 
 // Deletes exam for a course
-func (ex *DaoExam) Delete(courseId, courseVersion, examId uint) e.DaoError {
+func (ex *ExamDao) Delete(courseId, courseVersion, examId uint) e.DaoError {
 	return e.DAOUnimplemented
 }
 
-type DaoUser struct{}
+type UserDao struct{}
 
 // Returns a list of courses a
-func (u *DaoUser) GetCourses(id uint, startYear time.Time) (courses []models.SelectedCourse, err e.DaoError) {
+func (u *UserDao) GetCourses(id uint, startYear time.Time) (courses []models.SelectedCourse, err e.DaoError) {
 	return nil, e.DAOUnimplemented
 }
