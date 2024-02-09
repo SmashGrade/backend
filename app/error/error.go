@@ -1,10 +1,13 @@
 package error
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/labstack/echo/v4"
 )
+
+var ErrNotImplemented = errors.New("this function is not implemented")
 
 // API error struct
 type ApiError struct {

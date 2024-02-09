@@ -1,6 +1,7 @@
 package main
 
 import (
+	c "github.com/SmashGrade/backend/app/config"
 	e "github.com/SmashGrade/backend/app/error"
 	"github.com/labstack/echo/v4"
 	echoSwagger "github.com/swaggo/echo-swagger"
@@ -20,7 +21,7 @@ import (
 func main() {
 
 	// Load configuration
-	config := NewAPIConfig()
+	config := c.NewAPIConfig()
 
 	server := echo.New()
 	// Assign the custom error handler to the server
