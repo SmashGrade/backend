@@ -32,3 +32,4 @@ func (r *ConversionRepository) DeleteTimed(id uint, startDate time.Time) error {
 		Where("id = ? AND ee_selected_course_class_startyear = ?", id, startDate).
 		Delete(&models.Conversion{})
 	return result.Error
+}

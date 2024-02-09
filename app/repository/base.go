@@ -54,10 +54,8 @@ func (r *BaseRepository) Create(entity any) (err error) {
 	return
 }
 
-func (r *BaseRepository) Update(entity any) (err error) {
-	result := r.Provider.DB().Model(&entity).Updates(&entity)
-	err = result.Error
-	return nil
+func (r *BaseRepository) Update(entity any) error {
+	return r.Provider.DB().Model(&entity).Updates(&entity).Error
 }
 
 func (r *BaseRepository) Find(entity any) (entities []any, err error) {
