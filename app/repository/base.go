@@ -12,6 +12,7 @@ type Repository interface {
 	Update(entity any) (err error)
 	Find(entity any) (entities []any, err error)
 	GetAll() (entites []any, err error)
+	GetLatestId() (id uint, err error)
 }
 
 // Repository methods for models with only an id
