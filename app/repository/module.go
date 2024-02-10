@@ -17,8 +17,7 @@ func NewModuleRepository(provider db.Provider) *ModuleRepository {
 }
 
 func (r *ModuleRepository) DeleteVersioned(id uint, version uint) error {
-	result := r.Provider.DB().Where("id = ? AND version = ?", id, version).Delete(&models.Module{})
-	return result.Error
+	return r.Provider.DB().Where("id = ? AND version = ?", id, version).Delete(&models.Module{}).Error
 }
 
 func (r *ModuleRepository) GetLatestId() (id uint, err error) {

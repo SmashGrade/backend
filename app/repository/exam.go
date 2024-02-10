@@ -17,6 +17,5 @@ func NewExamRepository(provider db.Provider) *ExamRepository {
 }
 
 func (r *ExamRepository) DeleteId(id uint) error {
-	result := r.Provider.DB().Delete(&models.Exam{}, id)
-	return result.Error
+	return r.Provider.DB().Delete(&models.Exam{}, id).Error
 }

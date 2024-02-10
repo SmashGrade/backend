@@ -17,6 +17,5 @@ func NewCurriculumtypeRepository(provider db.Provider) *CurriculumtypeRepository
 }
 
 func (r *CurriculumtypeRepository) DeleteId(id uint) error {
-	result := r.Provider.DB().Delete(&models.Curriculumtype{}, id)
-	return result.Error
+	return r.Provider.DB().Delete(&models.Curriculumtype{}, id).Error
 }

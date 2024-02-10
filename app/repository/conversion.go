@@ -28,8 +28,7 @@ func (r *ConversionRepository) GetTimed(id uint, startDate time.Time) (entity mo
 }
 
 func (r *ConversionRepository) DeleteTimed(id uint, startDate time.Time) error {
-	result := r.Provider.DB().Preload(clause.Associations).
+	return r.Provider.DB().
 		Where("id = ? AND ee_selected_course_class_startyear = ?", id, startDate).
-		Delete(&models.Conversion{})
-	return result.Error
+		Delete(&models.Conversion{}).Error
 }

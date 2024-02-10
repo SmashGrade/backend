@@ -17,6 +17,5 @@ func NewEvaluationtypeRepository(provider db.Provider) *EvaluationtypeRepository
 }
 
 func (r *EvaluationtypeRepository) DeleteId(id uint) error {
-	result := r.Provider.DB().Delete(&models.Evaluationtype{}, id)
-	return result.Error
+	return r.Provider.DB().Delete(&models.Evaluationtype{}, id).Error
 }

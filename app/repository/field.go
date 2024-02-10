@@ -17,6 +17,5 @@ func NewFieldRepository(provider db.Provider) *FieldRepository {
 }
 
 func (r *FieldRepository) DeleteId(id uint) error {
-	result := r.Provider.DB().Delete(&models.Field{}, id)
-	return result.Error
+	return r.Provider.DB().Delete(&models.Field{}, id).Error
 }

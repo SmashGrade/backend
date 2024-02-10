@@ -17,6 +17,5 @@ func NewFocusRepository(provider db.Provider) *FocusRepository {
 }
 
 func (r *FocusRepository) DeleteId(id uint) error {
-	result := r.Provider.DB().Delete(&models.Focus{}, id)
-	return result.Error
+	return r.Provider.DB().Delete(&models.Focus{}, id).Error
 }

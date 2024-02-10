@@ -17,6 +17,5 @@ func NewRoleRepository(provider db.Provider) *RoleRepository {
 }
 
 func (r *RoleRepository) DeleteId(id uint) error {
-	result := r.Provider.DB().Delete(&models.Role{}, id)
-	return result.Error
+	return r.Provider.DB().Delete(&models.Role{}, id).Error
 }

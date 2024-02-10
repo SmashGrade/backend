@@ -17,6 +17,5 @@ func NewGradetypeRepository(provider db.Provider) *GradetypeRepository {
 }
 
 func (r *GradetypeRepository) DeleteId(id uint) error {
-	result := r.Provider.DB().Delete(&models.Gradetype{}, id)
-	return result.Error
+	return r.Provider.DB().Delete(&models.Gradetype{}, id).Error
 }
