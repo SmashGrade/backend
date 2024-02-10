@@ -21,7 +21,7 @@ func (r *CourseRepository) DeleteVersioned(id, version uint) error {
 	return result.Error
 }
 
-func (r *CourseRepository) GetLatestetId() (id uint, err error) {
+func (r *CourseRepository) GetLatestId() (id uint, err error) {
 	result := r.Provider.DB().Select("max(id) as id").First(&models.Course{}).Pluck("id", &id)
 	err = result.Error
 	return
