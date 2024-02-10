@@ -8,18 +8,46 @@ import (
 	"github.com/SmashGrade/backend/app/repository"
 )
 
+// Converts a []any slice to a specific model slice via type assertion
+// out := convertSlice[models.Course](courses)
+func convertSlice[outputModel any](inputSlice []any) (outputSlice []outputModel) {
+	outSlice := make([]outputModel, len(inputSlice))
+	for i := range inputSlice {
+		outSlice[i] = inputSlice[i].(outputModel)
+	}
+
+	return outSlice
+}
+
+// Returns specific outputModel slice from a repository getAll call
+func getAllOrError[outputModel any](repo repository.Repository) (outputSlice []outputModel, err *e.ApiError) {
+	internalSlice, internalErr := repo.GetAll()
+	if internalErr != nil {
+		err = e.NewDaoDbError()
+		return
+	}
+
+	outputSlice = convertSlice[outputModel](internalSlice)
+
+	return
+}
+
 // curriculum type / Studiengang art
 // has description like Vollzeit or Berufsbegleitend
 type CurriculumTypeDao struct {
+	repo *repository.CurriculumtypeRepository
 }
 
 // Creates new dao with required repositories
-func NewCurriculumTypeDao(curriculumTypeRepository *interface{}) *CurriculumTypeDao {
-	return nil
+func NewCurriculumTypeDao(curriculumTypeRepository *repository.CurriculumtypeRepository) *CurriculumTypeDao {
+	return &CurriculumTypeDao{
+		repo: curriculumTypeRepository,
+	}
 }
 
+// Returns all curriculum types as slice
 func (c *CurriculumTypeDao) GetAll() (entities []models.Curriculumtype, err *e.ApiError) {
-	return nil, e.NewDaoUnimplementedError()
+	return getAllOrError[models.Curriculumtype](c.repo)
 }
 
 func (c *CurriculumTypeDao) Get(id uint) (entity *models.Curriculumtype, err *e.ApiError) {
@@ -28,15 +56,19 @@ func (c *CurriculumTypeDao) Get(id uint) (entity *models.Curriculumtype, err *e.
 
 // evaluation type / Bewertungstyp for Module
 type EvaluationTypeDao struct {
+	repo *repository.EvaluationtypeRepository
 }
 
 // Creates new dao with required repositories
-func NewEvaluationTypeDao(evaluationTypeRepository *interface{}) *EvaluationTypeDao {
-	return nil
+func NewEvaluationTypeDao(evaluationTypeRepository *repository.EvaluationtypeRepository) *EvaluationTypeDao {
+	return &EvaluationTypeDao{
+		repo: evaluationTypeRepository,
+	}
 }
 
+// returns slice of all evaluation types
 func (et *EvaluationTypeDao) GetAll() (entities []models.Evaluationtype, err *e.ApiError) {
-	return nil, e.NewDaoUnimplementedError()
+	return getAllOrError[models.Evaluationtype](et.repo)
 }
 
 func (et *EvaluationTypeDao) Get(id uint) (entity *models.Evaluationtype, err *e.ApiError) {
@@ -45,18 +77,22 @@ func (et *EvaluationTypeDao) Get(id uint) (entity *models.Evaluationtype, err *e
 
 // state / Zustand for Module and Curriculum
 type StateDao struct {
+	repo *repository.StateRepository
 }
 
 // Creates new dao with required repositories
-func NewStateDao(evaluationTypeRepository *interface{}) *StateDao {
-	return nil
+func NewStateDao(stateRepository *repository.StateRepository) *StateDao {
+	return &StateDao{
+		repo: stateRepository,
+	}
 }
 
-func (et *StateDao) GetAll() (entities []models.Evaluationtype, err *e.ApiError) {
-	return nil, e.NewDaoUnimplementedError()
+// returns all states as slice
+func (st *StateDao) GetAll() (entities []models.State, err *e.ApiError) {
+	return getAllOrError[models.State](st.repo)
 }
 
-func (et *StateDao) Get(id uint) (entity *models.Evaluationtype, err *e.ApiError) {
+func (st *StateDao) Get(id uint) (entity *models.State, err *e.ApiError) {
 	return nil, e.NewDaoUnimplementedError()
 }
 
@@ -132,10 +168,12 @@ func (c *CourseDao) GetAll() (entities []models.Course, err *e.ApiError) {
 		return nil, e.NewDaoDbError()
 	}
 
-	outCourses := make([]models.Course, len(courses))
+	outCourses := convertSlice[models.Course](courses)
+
+	/*outCourses := make([]models.Course, len(courses))
 	for i := range courses {
 		outCourses[i] = courses[i].(models.Course)
-	}
+	}*/
 
 	return outCourses, nil
 }

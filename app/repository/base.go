@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/SmashGrade/backend/app/db"
@@ -86,4 +87,9 @@ func (r *BaseRepository) GetTimed(id uint, startDate time.Time) (entity any, err
 	result := r.Provider.DB().Preload(clause.Associations).Where("id = ? AND startyear = ?", id, startDate).First(&entity)
 	err = result.Error
 	return
+}
+
+// dummy method to assure full implementation of basic repository interface
+func (r *BaseRepository) GetLatestId() (id uint, err error) {
+	return 0, fmt.Errorf("function 'GetLatestId' not implemented")
 }
