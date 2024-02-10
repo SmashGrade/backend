@@ -26,6 +26,7 @@ type IdRepository interface {
 type VersionedRepository interface {
 	GetVersioned(id, version uint) (entity any, err error)
 	DeleteVersioned(id, version uint) error
+	GetLatestVersioned(id uint) (entity any, err error)
 }
 
 // Repository methods for models with id and start date

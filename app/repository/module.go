@@ -25,3 +25,9 @@ func (r *ModuleRepository) GetLatestId() (id uint, err error) {
 	err = result.Error
 	return
 }
+
+// returns highest versioned entity
+func (r *ModuleRepository) GetLatestVersioned(id uint) (entity any, err error) {
+	err = r.Provider.DB().Where("id = ?", id).Order("version desc").First(entity).Error
+	return
+}

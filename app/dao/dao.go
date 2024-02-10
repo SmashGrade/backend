@@ -32,6 +32,24 @@ func getAllOrError[outputModel any](repo repository.Repository) (outputSlice []o
 	return
 }
 
+// Returns specific outputModel entity reference from repository getVersioned call
+func getVersionedOrError[outputModel any](repo repository.VersionedRepository, id, version uint) (outputEntity *outputModel, err *e.ApiError) {
+	ent, internalError := repo.GetVersioned(id, version)
+	if internalError != nil {
+		return nil, e.NewDaoDbError()
+	}
+	return ent.(*outputModel), nil
+}
+
+// Returns specific outputModel entity reference from repository getLatestVersioned call
+func getLatestVersionedOrError[outputModel any](repo repository.VersionedRepository, id uint) (outputEntity *outputModel, err *e.ApiError) {
+	ent, internalError := repo.GetLatestVersioned(id)
+	if internalError != nil {
+		return nil, e.NewDaoDbError()
+	}
+	return ent.(*outputModel), nil
+}
+
 // curriculum type / Studiengang art
 // has description like Vollzeit or Berufsbegleitend
 type CurriculumTypeDao struct {
@@ -117,21 +135,30 @@ func (c *CurriculumDao) Create(entity *models.Curriculum) *e.ApiError {
 
 // Module / Modul
 // A collection of multiple courses
-type ModuleDao struct{}
+type ModuleDao struct {
+	repo *repository.ModuleRepository
+}
 
 // Creates a new dao with required repositories
-func NewModuleDao(moduleRepository *interface{}) *ModuleDao {
-	return nil
+func NewModuleDao(moduleRepository *repository.ModuleRepository) *ModuleDao {
+	return &ModuleDao{
+		repo: moduleRepository,
+	}
+}
+
+// returns all modules as slice
+func (m *ModuleDao) GetAll() (entities []models.Module, err *e.ApiError) {
+	return getAllOrError[models.Module](m.repo)
 }
 
 // Returns module identified by id and version
 func (m *ModuleDao) Get(id, version uint) (entity *models.Module, err *e.ApiError) {
-	return nil, e.NewDaoUnimplementedError()
+	return getVersionedOrError[models.Module](m.repo, id, version)
 }
 
 // Returns module by id with highest version
 func (m *ModuleDao) GetLatest(id uint) (entity *models.Module, err *e.ApiError) {
-	return nil, e.NewDaoUnimplementedError()
+	return getLatestVersionedOrError[models.Module](m.repo, id)
 }
 
 // Will create a new module if neither id nor version are set
@@ -163,33 +190,17 @@ func NewCourseDao(courseRepository *repository.CourseRepository) *CourseDao {
 
 // Returns course by id and version
 func (c *CourseDao) GetAll() (entities []models.Course, err *e.ApiError) {
-	courses, internalErr := c.repo.GetAll()
-	if internalErr != nil {
-		return nil, e.NewDaoDbError()
-	}
-
-	outCourses := convertSlice[models.Course](courses)
-
-	/*outCourses := make([]models.Course, len(courses))
-	for i := range courses {
-		outCourses[i] = courses[i].(models.Course)
-	}*/
-
-	return outCourses, nil
+	return getAllOrError[models.Course](c.repo)
 }
 
 // Returns course by id and version
 func (c *CourseDao) Get(id, version uint) (entity *models.Course, err *e.ApiError) {
-	ent, internalError := c.repo.GetVersioned(id, version)
-	if internalError != nil {
-		return nil, e.NewDaoDbError()
-	}
-	return ent.(*models.Course), nil
+	return getVersionedOrError[models.Course](c.repo, id, version)
 }
 
 // Returns course by id with highest version
 func (c *CourseDao) GetLatest(id uint) (entity *models.Course, err *e.ApiError) {
-	return nil, e.NewDaoUnimplementedError()
+	return getLatestVersionedOrError[models.Course](c.repo, id)
 }
 
 // Will create a new course if neither id nor version are set

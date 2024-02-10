@@ -26,3 +26,9 @@ func (r *CourseRepository) GetLatestId() (id uint, err error) {
 	err = result.Error
 	return
 }
+
+// returns highest versioned entity
+func (r *CourseRepository) GetLatestVersioned(id uint) (entity any, err error) {
+	err = r.Provider.DB().Where("id = ?", id).Order("version desc").First(entity).Error
+	return
+}
