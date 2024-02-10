@@ -8,9 +8,9 @@ import (
 	"github.com/SmashGrade/backend/app/repository"
 )
 
-// Converts a []any slice to a specific model slice via type assertion
-// out := convertSlice[models.Course](courses)
-func convertSlice[outputModel any](inputSlice []any) (outputSlice []outputModel) {
+// Asserts that an []any slice is a specific model slice via type assertion
+// out := assertSlice[models.Course](courses)
+func assertSlice[outputModel any](inputSlice []any) (outputSlice []outputModel) {
 	outSlice := make([]outputModel, len(inputSlice))
 	for i := range inputSlice {
 		outSlice[i] = inputSlice[i].(outputModel)
@@ -27,7 +27,7 @@ func getAllOrError[outputModel any](repo repository.Repository) (outputSlice []o
 		return
 	}
 
-	outputSlice = convertSlice[outputModel](internalSlice)
+	outputSlice = assertSlice[outputModel](internalSlice)
 
 	return
 }
