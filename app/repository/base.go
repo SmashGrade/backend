@@ -8,7 +8,7 @@ import (
 )
 
 type Repository interface {
-	Create(entity any) (err error)
+	Create(entity any) (returnEntity any, err error)
 	Update(entity any) (err error)
 	Find(entity any) (entities []any, err error)
 	GetAll() (entites []any, err error)
@@ -48,9 +48,10 @@ func NewBaseRepository(provider *db.BaseProvider) *BaseRepository {
 
 // Example functions
 // TODO: Please implement them in the actual repository concrete for the model
-func (r *BaseRepository) Create(entity any) (err error) {
+func (r *BaseRepository) Create(entity any) (returnEntity any, err error) {
 	result := r.Provider.DB().Create(&entity)
 	err = result.Error
+	returnEntity = entity
 	return
 }
 

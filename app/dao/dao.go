@@ -207,19 +207,33 @@ func (c *CourseDao) GetLatest(id uint) (entity *models.Course, err *e.ApiError) 
 // Will create a new course version if only id is set
 func (c *CourseDao) Create(entity models.Course) (returnEntity *models.Course, err *e.ApiError) {
 
-	// repoError := c.repo.Create(entity) // TODO check create
+	internalEntity, internalError := c.repo.Create(entity)
 
-	return nil, e.NewDaoUnimplementedError()
+	if internalError != nil {
+		return nil, e.NewDaoDbError()
+	}
+
+	return internalEntity.(*models.Course), nil
 }
 
 // updates an existing course via id and version
 func (c *CourseDao) Update(entity models.Course) *e.ApiError {
-	return e.NewDaoUnimplementedError()
+	internalError := c.repo.Update(entity)
+	if internalError != nil {
+		return e.NewDaoDbError()
+	}
+
+	return nil
 }
 
 // Deletes a course by id and version
 func (c *CourseDao) Delete(id, version uint) *e.ApiError {
-	return e.NewDaoUnimplementedError()
+	internalError := c.repo.DeleteVersioned(id, version)
+	if internalError != nil {
+		return e.NewDaoDbError()
+	}
+
+	return nil
 }
 
 type ExamDao struct{}
