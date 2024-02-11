@@ -1,17 +1,21 @@
 package db
 
 import (
+	"log"
+	"strings"
+
 	c "github.com/SmashGrade/backend/app/config"
 	e "github.com/SmashGrade/backend/app/error"
 	"github.com/SmashGrade/backend/app/models"
+	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
 type Provider interface {
-	DB() *gorm.DB                          // Returns the database connection
-	Config() *c.APIConfig                  // Returns the API configuration
-	Connect(connectionString string) error // Connect to the database
-	IsConnected() bool                     // Returns true if the provider is connected to the database
+	DB() *gorm.DB         // Returns the database connection
+	Config() *c.APIConfig // Returns the API configuration
+	Connect() error       // Connect to the database
+	IsConnected() bool    // Returns true if the provider is connected to the database
 }
 
 type BaseProvider struct {
@@ -47,8 +51,37 @@ type SQLiteProvider struct {
 
 // Connect to the database
 // Expecting a connection string as sqlite://{path}
-func (s *SQLiteProvider) Connect(connectionString string) error {
+func (s *SQLiteProvider) Connect() error {
+	// If already connected, return nil
+	if s.IsConnected() {
+		return nil
+	}
+	// Fix the connection string, remove the sqlite:// prefix
+	connectionStr := strings.TrimPrefix(s.config.DBConnectionStr, "sqlite://")
+	log.Printf("Connecting to SQLite database at: %s", s.config.DBConnectionStr)
+	// Open the database connection
+	db, err := gorm.Open(sqlite.Open(connectionStr))
+	if err != nil {
+		return err
+	}
+	// Assign the database connection
+	s.Db = db
+	s.isConnected = true
+	log.Print("Connected to SQLite database")
+	// Migrate the database
+	err = Migrate(s)
+	if err != nil {
+		return err
+	}
 	return nil
+}
+
+func NewSQLiteProvider(config *c.APIConfig) *SQLiteProvider {
+	return &SQLiteProvider{
+		BaseProvider{
+			config: config,
+		},
+	}
 }
 
 // Migrates the database with all existing models
@@ -75,12 +108,31 @@ func Migrate(p Provider) error {
 	}
 	// Migrate all models if autoMigrateAtConnect is true
 	if p.Config().AutoMigrate {
+		log.Println("Auto migrating database")
 		for _, model := range models {
 			err := p.DB().AutoMigrate(model)
 			if err != nil {
 				return err
 			}
 		}
+		log.Println("Migration completed successfully")
 	}
 	return nil
+}
+
+// Returns a new provider based on the connection string
+func NewProvider(c *c.APIConfig) Provider {
+	var provider Provider
+	switch true {
+	case strings.HasPrefix(c.DBConnectionStr, "sqlite://"):
+		provider = NewSQLiteProvider(c)
+	default:
+		provider = nil
+	}
+	// Check connection and migrate database
+	err := provider.Connect()
+	if err != nil {
+		log.Fatalf("Failed to connect to database: %s", err)
+	}
+	return provider
 }

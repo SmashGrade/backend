@@ -2,6 +2,7 @@ package models
 
 type Module struct {
 	VersionedBasemodel
+	StateID          uint           `json:"-"`
 	State            State          `json:"state"`
 	StudyStageId     uint           `json:"-"`
 	StudyStage       StudyStage     `gorm:"foreignKey:StudyStageId" json:"studyStage"`

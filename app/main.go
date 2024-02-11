@@ -1,7 +1,9 @@
 package main
 
 import (
+	"github.com/SmashGrade/backend/app/api"
 	c "github.com/SmashGrade/backend/app/config"
+	"github.com/SmashGrade/backend/app/db"
 	_ "github.com/SmashGrade/backend/app/docs"
 	e "github.com/SmashGrade/backend/app/error"
 	"github.com/labstack/echo/v4"
@@ -29,6 +31,14 @@ func main() {
 
 	// Add swagger documentation route
 	server.GET("/docs/*", echoSwagger.WrapHandler)
+
+	// Initialize the database provider
+	provider := db.NewProvider(config)
+
+	// Initialize the router
+	router := api.NewRouter(server, provider)
+	// Register all v1 routes
+	router.RegisterV1()
 
 	// Start the server
 	// Any returned error is fatal
