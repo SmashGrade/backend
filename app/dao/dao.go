@@ -32,6 +32,15 @@ func getAllOrError[outputModel any](repo repository.Repository) (outputSlice []o
 	return
 }
 
+// Returns sepcific outputModel entity reference from repository getId
+func getOrError[outputModel any](repo repository.IdRepository, id uint) (outputEntity *outputModel, err *e.ApiError) {
+	ent, internalError := repo.GetId(id)
+	if internalError != nil {
+		return nil, e.NewDaoDbError()
+	}
+	return ent.(*outputModel), nil
+}
+
 // Returns specific outputModel entity reference from repository getVersioned call
 func getVersionedOrError[outputModel any](repo repository.VersionedRepository, id, version uint) (outputEntity *outputModel, err *e.ApiError) {
 	ent, internalError := repo.GetVersioned(id, version)
@@ -69,7 +78,29 @@ func (c *CurriculumTypeDao) GetAll() (entities []models.Curriculumtype, err *e.A
 }
 
 func (c *CurriculumTypeDao) Get(id uint) (entity *models.Curriculumtype, err *e.ApiError) {
-	return nil, e.NewDaoUnimplementedError()
+	return getOrError[models.Curriculumtype](c.repo, id)
+}
+
+// gradetype / benotungssystem
+// has a description
+type GradeTypeDao struct {
+	repo *repository.GradetypeRepository
+}
+
+// Creates new dao with required repositories
+func NewGradeTypeDao(gradetypeRepository *repository.GradetypeRepository) *GradeTypeDao {
+	return &GradeTypeDao{
+		repo: gradetypeRepository,
+	}
+}
+
+// Returns all grade types as slice
+func (c *GradeTypeDao) GetAll() (entities []models.Gradetype, err *e.ApiError) {
+	return getAllOrError[models.Gradetype](c.repo)
+}
+
+func (c *GradeTypeDao) Get(id uint) (entity *models.Gradetype, err *e.ApiError) {
+	return getOrError[models.Gradetype](c.repo, id)
 }
 
 // evaluation type / Bewertungstyp for Module
@@ -90,7 +121,7 @@ func (et *EvaluationTypeDao) GetAll() (entities []models.Evaluationtype, err *e.
 }
 
 func (et *EvaluationTypeDao) Get(id uint) (entity *models.Evaluationtype, err *e.ApiError) {
-	return nil, e.NewDaoUnimplementedError()
+	return getOrError[models.Evaluationtype](et.repo, id)
 }
 
 // state / Zustand for Module and Curriculum
@@ -111,7 +142,7 @@ func (st *StateDao) GetAll() (entities []models.State, err *e.ApiError) {
 }
 
 func (st *StateDao) Get(id uint) (entity *models.State, err *e.ApiError) {
-	return nil, e.NewDaoUnimplementedError()
+	return getOrError[models.State](st.repo, id)
 }
 
 // Curriculum / Studiengang
