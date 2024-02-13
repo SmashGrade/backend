@@ -6,13 +6,12 @@ import (
 )
 
 type StateRepository struct {
-	Provider db.Provider
 	*BaseRepository
 }
 
 func NewStateRepository(provider db.Provider) *StateRepository {
 	return &StateRepository{
-		Provider: provider,
+		BaseRepository: NewBaseRepository(provider),
 	}
 }
 

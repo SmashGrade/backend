@@ -9,13 +9,12 @@ import (
 )
 
 type ConversionRepository struct {
-	Provider db.Provider
 	*BaseRepository
 }
 
 func NewConversionRepository(provider db.Provider) *ConversionRepository {
 	return &ConversionRepository{
-		Provider: provider,
+		BaseRepository: NewBaseRepository(provider),
 	}
 }
 

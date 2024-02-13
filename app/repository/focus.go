@@ -6,13 +6,12 @@ import (
 )
 
 type FocusRepository struct {
-	Provider db.Provider
 	*BaseRepository
 }
 
 func NewFocusRepository(provider db.Provider) *FocusRepository {
 	return &FocusRepository{
-		Provider: provider,
+		BaseRepository: NewBaseRepository(provider),
 	}
 }
 

@@ -6,13 +6,12 @@ import (
 )
 
 type GradetypeRepository struct {
-	Provider db.Provider
 	*BaseRepository
 }
 
 func NewGradetypeRepository(provider db.Provider) *GradetypeRepository {
 	return &GradetypeRepository{
-		Provider: provider,
+		BaseRepository: NewBaseRepository(provider),
 	}
 }
 

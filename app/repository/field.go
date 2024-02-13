@@ -6,13 +6,12 @@ import (
 )
 
 type FieldRepository struct {
-	Provider db.Provider
 	*BaseRepository
 }
 
 func NewFieldRepository(provider db.Provider) *FieldRepository {
 	return &FieldRepository{
-		Provider: provider,
+		BaseRepository: NewBaseRepository(provider),
 	}
 }
 

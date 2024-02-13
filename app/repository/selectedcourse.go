@@ -8,13 +8,12 @@ import (
 )
 
 type SelectedCourseRepository struct {
-	Provider db.Provider
 	*BaseRepository
 }
 
 func NewSelectedCourseRepository(provider db.Provider) *SelectedCourseRepository {
 	return &SelectedCourseRepository{
-		Provider: provider,
+		BaseRepository: NewBaseRepository(provider),
 	}
 }
 

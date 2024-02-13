@@ -3,8 +3,32 @@ package dao
 import (
 	"testing"
 
+	c "github.com/SmashGrade/backend/app/config"
+	"github.com/SmashGrade/backend/app/db"
+	_ "github.com/SmashGrade/backend/app/docs"
 	"github.com/SmashGrade/backend/app/models"
+	"github.com/SmashGrade/backend/app/repository"
+	_ "gorm.io/gorm"
 )
+
+// Smoketest
+func TestMagicSmoke(t *testing.T) {
+	config := c.NewAPIConfig()
+	provider := db.NewProvider(config)
+
+	repo := repository.NewCourseRepository(provider)
+
+	dao := NewCourseDao(repo)
+
+	courseEnt := &models.Course{Description: "Lol"}
+
+	retEnt, err := dao.Create(courseEnt)
+	if err != nil {
+		t.Fatalf("Got db error")
+	}
+
+	t.Logf("Got '%v'", retEnt)
+}
 
 // Check if a slice can be asserted correctly and keep all data intact
 func TestAssertSlice(t *testing.T) {

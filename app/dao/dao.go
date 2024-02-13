@@ -236,7 +236,7 @@ func (c *CourseDao) GetLatest(id uint) (entity *models.Course, err *e.ApiError) 
 
 // Will create a new course if neither id nor version are set
 // Will create a new course version if only id is set
-func (c *CourseDao) Create(entity models.Course) (returnEntity *models.Course, err *e.ApiError) {
+func (c *CourseDao) Create(entity *models.Course) (returnEntity *models.Course, err *e.ApiError) {
 
 	internalEntity, internalError := c.repo.Create(entity)
 

@@ -8,7 +8,7 @@ import (
 
 // Basemodel is the base model for all models
 type Basemodel struct {
-	Id        uint           `gorm:"primarykey" json:"id"`
+	ID        uint           `gorm:"primarykey" json:"id"`
 	CreatedAt time.Time      `json:"created"`
 	UpdatedAt time.Time      `json:"updated"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"deleted,omitempty"`

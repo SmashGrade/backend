@@ -8,13 +8,12 @@ import (
 )
 
 type ExamEvaluationRepository struct {
-	Provider db.Provider
 	*BaseRepository
 }
 
 func NewExamEvaluationRepository(provider db.Provider) *ExamEvaluationRepository {
 	return &ExamEvaluationRepository{
-		Provider: provider,
+		BaseRepository: NewBaseRepository(provider),
 	}
 }
 

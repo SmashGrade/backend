@@ -6,13 +6,12 @@ import (
 )
 
 type ExamRepository struct {
-	Provider db.Provider
 	*BaseRepository
 }
 
 func NewExamRepository(provider db.Provider) *ExamRepository {
 	return &ExamRepository{
-		Provider: provider,
+		BaseRepository: NewBaseRepository(provider),
 	}
 }
 

@@ -6,13 +6,12 @@ import (
 )
 
 type RoleRepository struct {
-	Provider db.Provider
 	*BaseRepository
 }
 
 func NewRoleRepository(provider db.Provider) *RoleRepository {
 	return &RoleRepository{
-		Provider: provider,
+		BaseRepository: NewBaseRepository(provider),
 	}
 }
 

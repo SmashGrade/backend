@@ -36,11 +36,11 @@ type TimedRepository interface {
 // BaseRepository is a base repository
 // that contains the database connection and CRUD operations
 type BaseRepository struct {
-	Provider *db.BaseProvider
+	Provider db.Provider
 }
 
 // Constructor for BaseRepository
-func NewBaseRepository(provider *db.BaseProvider) *BaseRepository {
+func NewBaseRepository(provider db.Provider) *BaseRepository {
 	return &BaseRepository{
 		Provider: provider,
 	}
@@ -49,7 +49,7 @@ func NewBaseRepository(provider *db.BaseProvider) *BaseRepository {
 // Example functions
 // TODO: Please implement them in the actual repository concrete for the model
 func (r *BaseRepository) Create(entity any) (returnEntity any, err error) {
-	result := r.Provider.DB().Create(&entity)
+	result := r.Provider.DB().Create(entity)
 	err = result.Error
 	returnEntity = entity
 	return

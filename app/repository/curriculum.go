@@ -9,13 +9,12 @@ import (
 )
 
 type CurriculumRepository struct {
-	Provider db.Provider
 	*BaseRepository
 }
 
 func NewCurriculumRepository(provider db.Provider) *CurriculumRepository {
 	return &CurriculumRepository{
-		Provider: provider,
+		BaseRepository: NewBaseRepository(provider),
 	}
 }
 

@@ -6,13 +6,12 @@ import (
 )
 
 type EvaluationtypeRepository struct {
-	Provider db.Provider
 	*BaseRepository
 }
 
 func NewEvaluationtypeRepository(provider db.Provider) *EvaluationtypeRepository {
 	return &EvaluationtypeRepository{
-		Provider: provider,
+		BaseRepository: NewBaseRepository(provider),
 	}
 }
 
