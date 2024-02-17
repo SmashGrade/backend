@@ -21,8 +21,7 @@ func assertSlice[outputModel any](inputSlice []any) (outputSlice []outputModel) 
 
 // Returns specific outputModel slice from a repository getAll call
 func getAllOrError[outputModel any](repo repository.Repository) (outputSlice []outputModel, err *e.ApiError) {
-	var entity outputModel
-	internalSlice, internalErr := repo.GetAll(entity)
+	internalSlice, internalErr := repo.GetAll()
 	if internalErr != nil {
 		err = e.NewDaoDbError()
 		return
@@ -34,8 +33,7 @@ func getAllOrError[outputModel any](repo repository.Repository) (outputSlice []o
 
 // Returns sepcific outputModel entity reference from repository getId
 func getOrError[outputModel any](repo repository.IdRepository, id uint) (outputEntity *outputModel, err *e.ApiError) {
-	var entity outputModel
-	ent, internalError := repo.GetId(id, entity)
+	ent, internalError := repo.GetId(id)
 	if internalError != nil {
 		return nil, e.NewDaoDbError()
 	}
@@ -44,8 +42,7 @@ func getOrError[outputModel any](repo repository.IdRepository, id uint) (outputE
 
 // Returns specific outputModel entity reference from repository getVersioned call
 func getVersionedOrError[outputModel any](repo repository.VersionedRepository, id, version uint) (outputEntity *outputModel, err *e.ApiError) {
-	var entity outputModel
-	ent, internalError := repo.GetVersioned(id, version, entity)
+	ent, internalError := repo.GetVersioned(id, version)
 	if internalError != nil {
 		return nil, e.NewDaoDbError()
 	}
@@ -54,8 +51,7 @@ func getVersionedOrError[outputModel any](repo repository.VersionedRepository, i
 
 // Returns specific outputModel entity reference from repository getLatestVersioned call
 func getLatestVersionedOrError[outputModel any](repo repository.VersionedRepository, id uint) (outputEntity *outputModel, err *e.ApiError) {
-	var entity outputModel
-	ent, internalError := repo.GetLatestVersioned(id, entity)
+	ent, internalError := repo.GetLatestVersioned(id)
 	if internalError != nil {
 		return nil, e.NewDaoDbError()
 	}
@@ -329,8 +325,7 @@ func (c *CourseDao) Update(entity models.Course) *e.ApiError {
 
 // Deletes a course by id and version
 func (c *CourseDao) Delete(id, version uint) *e.ApiError {
-	var entity models.Course
-	internalError := c.repo.DeleteVersioned(id, version, entity)
+	internalError := c.repo.DeleteVersioned(id, version)
 	if internalError != nil {
 		return e.NewDaoDbError()
 	}
