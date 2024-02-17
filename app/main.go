@@ -30,7 +30,7 @@ func main() {
 	server.HTTPErrorHandler = e.HandleEchoError
 
 	// Add swagger documentation route
-	server.GET("/docs/*", echoSwagger.WrapHandler)
+	server.GET("/docs*", echoSwagger.WrapHandler)
 
 	// Initialize the database provider
 	provider := db.NewProvider(config)

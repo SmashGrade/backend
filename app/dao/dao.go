@@ -84,6 +84,69 @@ func (c *CurriculumTypeDao) Get(id uint) (entity *models.Curriculumtype, err *e.
 	return getOrError[models.Curriculumtype](c.repo, id)
 }
 
+// field / Schwerpunkt
+type FieldDao struct {
+	repo *repository.FieldRepository
+}
+
+// Creates new dao with required repositories
+func NewFieldDao(fieldRepository *repository.FieldRepository) *FieldDao {
+	return &FieldDao{
+		repo: fieldRepository,
+	}
+}
+
+// Returns all fields as slice
+func (c *FieldDao) GetAll() (entities []models.Field, err *e.ApiError) {
+	return getAllOrError[models.Field](c.repo)
+}
+
+func (c *FieldDao) Get(id uint) (entity *models.Field, err *e.ApiError) {
+	return getOrError[models.Field](c.repo, id)
+}
+
+// focus / Fachrichtung
+type FocusDao struct {
+	repo *repository.FocusRepository
+}
+
+// Creates new dao with required repositories
+func NewFocusDao(focusRepository *repository.FocusRepository) *FocusDao {
+	return &FocusDao{
+		repo: focusRepository,
+	}
+}
+
+// Returns all focus as slice
+func (c *FocusDao) GetAll() (entities []models.Focus, err *e.ApiError) {
+	return getAllOrError[models.Focus](c.repo)
+}
+
+func (c *FocusDao) Get(id uint) (entity *models.Focus, err *e.ApiError) {
+	return getOrError[models.Focus](c.repo, id)
+}
+
+// exam type / Test art
+type ExamtypeDao struct {
+	repo *repository.ExamtypeRepository
+}
+
+// Creates new dao with required repositories
+func NewExamtypeDao(examtypeRepository *repository.ExamtypeRepository) *ExamtypeDao {
+	return &ExamtypeDao{
+		repo: examtypeRepository,
+	}
+}
+
+// Returns all exam types as slice
+func (c *ExamtypeDao) GetAll() (entities []models.Examtype, err *e.ApiError) {
+	return getAllOrError[models.Examtype](c.repo)
+}
+
+func (c *ExamtypeDao) Get(id uint) (entity *models.Examtype, err *e.ApiError) {
+	return getOrError[models.Examtype](c.repo, id)
+}
+
 // gradetype / benotungssystem
 // has a description
 type GradeTypeDao struct {

@@ -12,11 +12,13 @@ import (
 // All list outputs under one big object
 type OutputController struct {
 	*BaseController
-	//fieldDao dao.fieldDao
 	stateDao           *dao.StateDao
 	curriculumytypeDao *dao.CurriculumTypeDao
 	gradetypeDao       *dao.GradeTypeDao
 	evaluationtypeDao  *dao.EvaluationTypeDao
+	fieldDao           *dao.FieldDao
+	focusDao           *dao.FocusDao
+	examtypeDao        *dao.ExamtypeDao
 }
 
 // Constructor for output controller
@@ -27,6 +29,9 @@ func NewOutputController(provider db.Provider) *OutputController {
 		curriculumytypeDao: dao.NewCurriculumTypeDao(repository.NewCurriculumtypeRepository(provider)),
 		gradetypeDao:       dao.NewGradeTypeDao(repository.NewGradetypeRepository(provider)),
 		evaluationtypeDao:  dao.NewEvaluationTypeDao(repository.NewEvaluationtypeRepository(provider)),
+		fieldDao:           dao.NewFieldDao(repository.NewFieldRepository(provider)),
+		focusDao:           dao.NewFocusDao(repository.NewFocusRepository(provider)),
+		examtypeDao:        dao.NewExamtypeDao(repository.NewExamtypeRepository(provider)),
 	}
 }
 
@@ -98,10 +103,64 @@ func (c *OutputController) Evaluationtypes(ctx echo.Context) error {
 	return c.Yeet(ctx, res)
 }
 
+// @Summary Get all fields
+// @Description Get all fields
+// @Tags fields
+// @Produce json
+// @Success 200 {array} models.Field
+// @Failure 401 {object} error.ApiError
+// @Failure 403 {object} error.ApiError
+// @Failure 500 {object} error.ApiError
+// @Router /fields [get]
+func (c *OutputController) Fields(ctx echo.Context) error {
+	res, err := c.fieldDao.GetAll()
+	if err != nil {
+		return err
+	}
+	return c.Yeet(ctx, res)
+}
+
+// @Summary Get all focuses
+// @Description Get all focuses
+// @Tags focuses
+// @Produce json
+// @Success 200 {array} models.Focus
+// @Failure 401 {object} error.ApiError
+// @Failure 403 {object} error.ApiError
+// @Failure 500 {object} error.ApiError
+// @Router /focuses [get]
+func (c *OutputController) Focuses(ctx echo.Context) error {
+	res, err := c.focusDao.GetAll()
+	if err != nil {
+		return err
+	}
+	return c.Yeet(ctx, res)
+}
+
+// @Summary Get all exam types
+// @Description Get all exam types
+// @Tags examtypes
+// @Produce json
+// @Success 200 {array} models.Examtype
+// @Failure 401 {object} error.ApiError
+// @Failure 403 {object} error.ApiError
+// @Failure 500 {object} error.ApiError
+// @Router /examtypes [get]
+func (c *OutputController) Examtypes(ctx echo.Context) error {
+	res, err := c.examtypeDao.GetAll()
+	if err != nil {
+		return err
+	}
+	return c.Yeet(ctx, res)
+}
+
 // register all output endpoints to router
 func RegisterV1Output(g *echo.Group, o *OutputController) {
 	g.GET("/states", o.States)
 	g.GET("/curriculumtypes", o.Curriculumtypes)
 	g.GET("/gradetypes", o.Gradetypes)
 	g.GET("/evaluationtypes", o.Evaluationtypes)
+	g.GET("/fields", o.Fields)
+	g.GET("/focuses", o.Focuses)
+	g.GET("/examtypes", o.Examtypes)
 }
