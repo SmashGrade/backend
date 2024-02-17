@@ -1,6 +1,6 @@
 # two stage build
 
-FROM docker.io/golang:1.21.3 AS build
+FROM docker.io/golang:1.21.6 AS build
 
 WORKDIR /app
 
