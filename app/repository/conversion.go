@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"reflect"
 	"time"
 
 	"github.com/SmashGrade/backend/app/db"
@@ -18,16 +19,28 @@ func NewConversionRepository(provider db.Provider) *ConversionRepository {
 	}
 }
 
-func (r *ConversionRepository) GetTimed(id uint, startDate time.Time) (entity models.Conversion, err error) {
+func (r *ConversionRepository) GetTimed(id uint, startDate time.Time, entity any) (any, error) {
+	// Get tye of entity
+	dtype := reflect.TypeOf(entity)
+	// Create a new instance of the entity type
+	newEntity := reflect.New(dtype).Interface()
+
 	result := r.Provider.DB().Preload(clause.Associations).
 		Where("id = ? AND ee_selected_course_class_startyear = ?", id, startDate).
-		First(&entity)
-	err = result.Error
-	return
+		First(newEntity)
+	if result.Error != nil {
+		return models.Conversion{}, result.Error
+	}
+	return newEntity, nil
 }
 
-func (r *ConversionRepository) DeleteTimed(id uint, startDate time.Time) error {
+func (r *ConversionRepository) DeleteTimed(id uint, startDate time.Time, entity any) error {
+	// Get tye of entity
+	dtype := reflect.TypeOf(entity)
+	// Create a new instance of the entity type
+	newEntity := reflect.New(dtype).Interface()
+
 	return r.Provider.DB().
 		Where("id = ? AND ee_selected_course_class_startyear = ?", id, startDate).
-		Delete(&models.Conversion{}).Error
+		Delete(newEntity).Error
 }

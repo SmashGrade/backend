@@ -2,7 +2,6 @@ package repository
 
 import (
 	"github.com/SmashGrade/backend/app/db"
-	"github.com/SmashGrade/backend/app/models"
 )
 
 type ExamtypeRepository struct {
@@ -13,8 +12,4 @@ func NewExamtypeRepository(provider db.Provider) *ExamtypeRepository {
 	return &ExamtypeRepository{
 		BaseRepository: NewBaseRepository(provider),
 	}
-}
-
-func (r *ExamtypeRepository) DeleteId(id uint) error {
-	return r.Provider.DB().Delete(&models.Examtype{}, id).Error
 }
