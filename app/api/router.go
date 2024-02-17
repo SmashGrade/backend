@@ -9,6 +9,7 @@ import (
 type Router struct {
 	echo   *echo.Echo
 	course *CourseController
+	output *OutputController
 }
 
 // NewRouter creates a new router
@@ -16,6 +17,7 @@ func NewRouter(e *echo.Echo, p db.Provider) *Router {
 	return &Router{
 		echo:   e,
 		course: NewCourseController(p),
+		output: NewOutputController(p),
 	}
 }
 
@@ -26,4 +28,6 @@ func (r *Router) RegisterV1() {
 	// Register all v1 routes
 	v1.GET("/courses", r.course.Courses)
 	v1.GET("/courses/:id/:version", r.course.Course)
+
+	RegisterV1Output(v1, r.output)
 }
