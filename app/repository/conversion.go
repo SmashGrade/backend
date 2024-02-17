@@ -18,7 +18,7 @@ func NewConversionRepository(provider db.Provider) *ConversionRepository {
 	}
 }
 
-func (r *ConversionRepository) GetTimed(id uint, startDate time.Time, entity any) (any, error) {
+func (r *ConversionRepository) GetTimed(id uint, startDate time.Time) (any, error) {
 	newEntity := r.getInterface()
 
 	result := r.Provider.DB().Preload(clause.Associations).
@@ -30,7 +30,7 @@ func (r *ConversionRepository) GetTimed(id uint, startDate time.Time, entity any
 	return newEntity, nil
 }
 
-func (r *ConversionRepository) DeleteTimed(id uint, startDate time.Time, entity any) error {
+func (r *ConversionRepository) DeleteTimed(id uint, startDate time.Time) error {
 	newEntity := r.getInterface()
 
 	return r.Provider.DB().
