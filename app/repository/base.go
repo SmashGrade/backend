@@ -65,8 +65,15 @@ func (r *BaseRepository) getInterface() any {
 	return reflect.New(dtype).Interface()
 }
 
-// Example functions
-// TODO: Please implement them in the actual repository concrete for the model
+/*
+Creates new Entity on the DB.
+
+WARNING: Expect Pointer or else it will panic
+
+Usage (example with models.Course):
+
+	newCourse, err := repository.Create(&course)
+*/
 func (r *BaseRepository) Create(entity any) (any, error) {
 	result := r.Provider.DB().Create(entity)
 	if result.Error != nil {
@@ -75,6 +82,13 @@ func (r *BaseRepository) Create(entity any) (any, error) {
 	return entity, nil
 }
 
+/*
+Updates Entity on the DB.
+
+Usage (example with models.Course):
+
+	err := repository.Update(&course)
+*/
 func (r *BaseRepository) Update(entity any) error {
 	return r.Provider.DB().Updates(entity).Error
 }
@@ -89,6 +103,14 @@ func (r *BaseRepository) Find(entity any) (any, error) {
 	return entities, nil
 }
 
+/*
+Gets list of entity from DB
+
+Usage (example with models.Course):
+
+	res, err := repository.GetAll()
+	courses := res.([]models.Course)
+*/
 func (r *BaseRepository) GetAll() (any, error) {
 	entities := r.getSliceInterface()
 
@@ -99,6 +121,14 @@ func (r *BaseRepository) GetAll() (any, error) {
 	return entities, nil
 }
 
+/*
+Get entity by providing the id
+
+Usage (example with models.Field)
+
+	res, err := repository.GetId(3)
+	field := res.(*models.Field)
+*/
 func (r *BaseRepository) GetId(id uint) (any, error) {
 	newEntity := r.getInterface()
 
@@ -109,6 +139,14 @@ func (r *BaseRepository) GetId(id uint) (any, error) {
 	return newEntity, nil
 }
 
+/*
+Get entity by providing the id and version
+
+Usage (example with models.Course)
+
+	res, err := repository.GetVersioned(1, 2)
+	course := result.(*models.Course)
+*/
 func (r *BaseRepository) GetVersioned(id, version uint) (any, error) {
 	newEntity := r.getInterface()
 
@@ -119,6 +157,14 @@ func (r *BaseRepository) GetVersioned(id, version uint) (any, error) {
 	return newEntity, nil
 }
 
+/*
+Get entity by providing the id and startdate
+
+Usage (example with models.Conversion):
+
+	res, err := repository.GetTimed(1, time.Date(2024, time.January, 1, 0, 0, 0, 0, time.UTC))
+	conversion := res.(*models.Conversion)
+*/
 func (r *BaseRepository) GetTimed(id uint, startDate time.Time) (any, error) {
 	newEntity := r.getInterface()
 
@@ -129,12 +175,27 @@ func (r *BaseRepository) GetTimed(id uint, startDate time.Time) (any, error) {
 	return newEntity, nil
 }
 
+/*
+Delete entity by providing the id and version
+
+Usage (example with models.Course):
+
+	err := respository.DeleteVersioned(1, 2)
+*/
 func (r *BaseRepository) DeleteVersioned(id, version uint) error {
 	newEntity := r.getInterface()
 
 	return r.Provider.DB().Where("id = ? AND version = ?", id, version).Delete(newEntity).Error
 }
 
+/*
+Get entity with the highst version, providing the id
+
+Usage (example with models.Course):
+
+	res, err := repository.GetLatestVersioned(1)
+	course := res.(*models.Course)
+*/
 func (r *BaseRepository) GetLatestVersioned(id uint) (any, error) {
 	newEntity := r.getInterface()
 
@@ -145,6 +206,13 @@ func (r *BaseRepository) GetLatestVersioned(id uint) (any, error) {
 	return newEntity, nil
 }
 
+/*
+Delete entity by providing the id
+
+Usage (example with models.Field):
+
+	err := respository.DeleteId(1)
+*/
 func (r *BaseRepository) DeleteId(id uint) error {
 	newEntity := r.getInterface()
 
