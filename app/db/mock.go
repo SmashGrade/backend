@@ -16,6 +16,15 @@ func prefillMockDB(p Provider) {
 	prefillEvaluationtype(p)
 	prefillExam(p)
 	prefillExamEvaluation(p)
+	prefillExamtype(p)
+	prefillFocus(p)
+	prefillGradetype(p)
+	prefillModules(p)
+	prefillRole(p)
+	prefillSelectedCourse(p)
+	prefillState(p)
+	prefillStudyStage(p)
+	prefillUser(p)
 }
 
 // Field that will be added to the mock DB
@@ -234,4 +243,242 @@ func prefillExamEvaluation(p Provider) {
 	examEvaluation_2 := ExamEvaluation_2()
 	p.DB().Table("exam_evaluations").Create(&examEvaluation_1)
 	p.DB().Table("exam_evaluations").Create(&examEvaluation_2)
+}
+
+// Examtype that will be added to the mock DB
+func Examtype_1() models.Examtype {
+	var examtype models.Examtype
+	examtype.Description = "Examtype Description 1"
+	examtype.ID = 1
+	return examtype
+}
+
+// Examtype that will be added to the mock DB
+func Examtype_2() models.Examtype {
+	var examtype models.Examtype
+	examtype.Description = "Examtype Description 2"
+	examtype.ID = 2
+	return examtype
+}
+
+// add all the examtypes to the examtypes table of the mockDB
+func prefillExamtype(p Provider) {
+	examtype_1 := Examtype_1()
+	examtype_2 := Examtype_2()
+	p.DB().Table("examtypes").Create(&examtype_1)
+	p.DB().Table("examtypes").Create(&examtype_2)
+}
+
+// Focus that will be added to the mock DB
+func Focus_1() models.Focus {
+	var focus models.Focus
+	focus.Description = "Focus Description 1"
+	focus.ID = 1
+	return focus
+}
+
+// Focus that will be added to the mock DB
+func Focus_2() models.Focus {
+	var focus models.Focus
+	focus.Description = "Focus Description 2"
+	focus.ID = 2
+	return focus
+}
+
+// add all the focuss to the focuss table of the mockDB
+func prefillFocus(p Provider) {
+	focus_1 := Focus_1()
+	focus_2 := Focus_2()
+	p.DB().Table("focus").Create(&focus_1)
+	p.DB().Table("focus").Create(&focus_2)
+}
+
+// Gradetype that will be added to the mock DB
+func Gradetype_1() models.Gradetype {
+	var gradetype models.Gradetype
+	gradetype.Description = "Gradetype Description 1"
+	gradetype.ID = 1
+	return gradetype
+}
+
+// Gradetype that will be added to the mock DB
+func Gradetype_2() models.Gradetype {
+	var gradetype models.Gradetype
+	gradetype.Description = "Gradetype Description 2"
+	gradetype.ID = 2
+	return gradetype
+}
+
+// add all the gradetypes to the gradetypes table of the mockDB
+func prefillGradetype(p Provider) {
+	gradetype_1 := Gradetype_1()
+	gradetype_2 := Gradetype_2()
+	p.DB().Table("gradetypes").Create(&gradetype_1)
+	p.DB().Table("gradetypes").Create(&gradetype_2)
+}
+
+// Module that will be added to the mock DB
+func Module_1() models.Module {
+	var module models.Module
+	module.Description = "Module 1"
+	module.Number = "NR02"
+	module.Version = 1
+	module.ID = 1
+	return module
+}
+
+// Module that will be added to the mock DB
+func Module_2_1() models.Module {
+	var module models.Module
+	module.Description = "Module 2"
+	module.Number = "NR02"
+	module.Version = 1
+	module.ID = 2
+	return module
+}
+
+// Module that will be added to the mock DB
+func Module_2_2() models.Module {
+	var module models.Module
+	module.Description = "Module 2"
+	module.Number = "NR02"
+	module.Version = 2
+	module.ID = 2
+	return module
+}
+
+// add all the modules to the modules table of the mockDB
+func prefillModules(p Provider) {
+	module_1 := Module_1()
+	module_2_1 := Module_2_1()
+	module_2_2 := Module_2_2()
+	p.DB().Table("modules").Create(&module_1)
+	p.DB().Table("modules").Create(&module_2_1)
+	p.DB().Table("modules").Create(&module_2_2)
+}
+
+// Role that will be added to the mock DB
+func Role_1() models.Role {
+	var role models.Role
+	role.Description = "Role Description 1"
+	role.ID = 1
+	return role
+}
+
+// Role that will be added to the mock DB
+func Role_2() models.Role {
+	var role models.Role
+	role.Description = "Role Description 2"
+	role.ID = 2
+	return role
+}
+
+// add all the roles to the roles table of the mockDB
+func prefillRole(p Provider) {
+	role_1 := Role_1()
+	role_2 := Role_2()
+	p.DB().Table("roles").Create(&role_1)
+	p.DB().Table("roles").Create(&role_2)
+}
+
+// SelectedCourse that will be added to the mock DB
+func SelectedCourse_1() models.SelectedCourse {
+	var selectedCourse models.SelectedCourse
+	selectedCourse.UserID = 1
+	selectedCourse.CourseID = 1
+	selectedCourse.CourseVersion = 1
+	selectedCourse.ClassStartyear = time.Date(2024, time.January, 1, 0, 0, 0, 0, time.UTC)
+	selectedCourse.Dispensed = false
+	return selectedCourse
+}
+
+// SelectedCourse that will be added to the mock DB
+func SelectedCourse_2() models.SelectedCourse {
+	var selectedCourse models.SelectedCourse
+	selectedCourse.UserID = 2
+	selectedCourse.CourseID = 2
+	selectedCourse.CourseVersion = 2
+	selectedCourse.ClassStartyear = time.Date(2024, time.February, 2, 0, 0, 0, 0, time.UTC)
+	selectedCourse.Dispensed = false
+	return selectedCourse
+}
+
+// add all the selectedCourses to the selectedCourses table of the mockDB
+func prefillSelectedCourse(p Provider) {
+	selectedCourse_1 := SelectedCourse_1()
+	selectedCourse_2 := SelectedCourse_2()
+	p.DB().Table("selected_courses").Create(&selectedCourse_1)
+	p.DB().Table("selected_courses").Create(&selectedCourse_2)
+}
+
+// State that will be added to the mock DB
+func State_1() models.State {
+	var state models.State
+	state.Description = "State Description 1"
+	state.ID = 1
+	return state
+}
+
+// State that will be added to the mock DB
+func State_2() models.State {
+	var state models.State
+	state.Description = "State Description 2"
+	state.ID = 2
+	return state
+}
+
+// add all the states to the states table of the mockDB
+func prefillState(p Provider) {
+	state_1 := State_1()
+	state_2 := State_2()
+	p.DB().Table("states").Create(&state_1)
+	p.DB().Table("states").Create(&state_2)
+}
+
+// StudyStage that will be added to the mock DB
+func StudyStage_1() models.StudyStage {
+	var studyStage models.StudyStage
+	studyStage.Description = "StudyStage Description 1"
+	studyStage.ID = 1
+	return studyStage
+}
+
+// StudyStage that will be added to the mock DB
+func StudyStage_2() models.StudyStage {
+	var studyStage models.StudyStage
+	studyStage.Description = "StudyStage Description 2"
+	studyStage.ID = 2
+	return studyStage
+}
+
+// add all the studyStages to the studyStages table of the mockDB
+func prefillStudyStage(p Provider) {
+	studyStage_1 := StudyStage_1()
+	studyStage_2 := StudyStage_2()
+	p.DB().Table("study_stages").Create(&studyStage_1)
+	p.DB().Table("study_stages").Create(&studyStage_2)
+}
+
+// User that will be added to the mock DB
+func User_1() models.User {
+	var user models.User
+	user.Name = "User Name 1"
+	user.ID = 1
+	return user
+}
+
+// User that will be added to the mock DB
+func User_2() models.User {
+	var user models.User
+	user.Name = "User Name 2"
+	user.ID = 2
+	return user
+}
+
+// add all the users to the users table of the mockDB
+func prefillUser(p Provider) {
+	user_1 := User_1()
+	user_2 := User_2()
+	p.DB().Table("users").Create(&user_1)
+	p.DB().Table("users").Create(&user_2)
 }
