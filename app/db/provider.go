@@ -127,7 +127,7 @@ type PostgresProvider struct {
 // Connect to the database
 func (p *PostgresProvider) Connect() error {
 	// Not implemented
-	return nil
+	return e.ErrNotImplemented
 }
 
 // Returns a new Postgres provider
@@ -146,7 +146,7 @@ type MySQLProvider struct {
 // Connect to the database
 func (m *MySQLProvider) Connect() error {
 	// Not implemented
-	return nil
+	return e.ErrNotImplemented
 }
 
 // Returns a new MySQL provider
@@ -172,9 +172,11 @@ func NewProvider(config *c.APIConfig) Provider {
 		provider = nil
 	}
 	// Check connection and migrate database
-	err := provider.Connect()
-	if err != nil {
-		log.Fatalf("Failed to connect to database: %s", err)
+	if config.Connect {
+		err := provider.Connect()
+		if err != nil {
+			log.Fatalf("Failed to connect to database: %s", err)
+		}
 	}
 	return provider
 }

@@ -9,6 +9,7 @@ type APIConfig struct {
 	Host                string                     `yaml:"host"`                // Host is the address of the server
 	Port                int                        `yaml:"port"`                // Port is the port of the server
 	AutoMigrate         bool                       `yaml:"autoMigrate"`         // AutoMigrate is a flag to determine if the database should be migrated automatically
+	Connect             bool                       `yaml:"connect"`             // Connect is a flag to determine if the database should be connected automatically
 	DBConnectionStr     string                     `yaml:"dbConnectionStr"`     // DBConnectionStr is the connection string for the database
 	ExamTypes           []string                   `yaml:"examTypes"`           // ExamTypes is the list of exam types
 	ExamEvaluationTypes []ExamEvaluationTypeConfig `yaml:"examEvaluationTypes"` // EvalTypes is the list of evaluation types
@@ -32,6 +33,7 @@ func NewAPIConfig() *APIConfig {
 	return &APIConfig{
 		Host:            "0.0.0.0",
 		Port:            9000,
+		Connect:         true,
 		AutoMigrate:     true,
 		DBConnectionStr: "sqlite://data.db",
 		ExamTypes:       []string{"Mündliche oder schriftliche Prüfung ", "Präsentationen", "Lernbericht", "schriftliche Arbeit", "Lernjournal"},

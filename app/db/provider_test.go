@@ -29,7 +29,7 @@ func TestProviderDBSelection(t *testing.T) {
 	}{
 		{
 			name:             "SQLite",
-			connectionString: "sqlite://data.db",
+			connectionString: "sqlite://:memory:",
 			want:             "*db.SQLiteProvider",
 		},
 		{
@@ -47,6 +47,7 @@ func TestProviderDBSelection(t *testing.T) {
 		t.Run(testData.name, func(t *testing.T) {
 			config := c.NewAPIConfig()
 			config.DBConnectionStr = testData.connectionString
+			config.Connect = false
 			got := db.NewProvider(config)
 			if reflect.TypeOf(got).String() != testData.want {
 				t.Errorf("NewProvider() = %v, want %v", reflect.TypeOf(got), testData.want)
