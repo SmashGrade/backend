@@ -120,12 +120,54 @@ func Migrate(p Provider) error {
 	return nil
 }
 
+type PostgresProvider struct {
+	BaseProvider
+}
+
+// Connect to the database
+func (p *PostgresProvider) Connect() error {
+	// Not implemented
+	return nil
+}
+
+// Returns a new Postgres provider
+func NewPostgresProvider(config *c.APIConfig) *PostgresProvider {
+	return &PostgresProvider{
+		BaseProvider{
+			config: config,
+		},
+	}
+}
+
+type MySQLProvider struct {
+	BaseProvider
+}
+
+// Connect to the database
+func (m *MySQLProvider) Connect() error {
+	// Not implemented
+	return nil
+}
+
+// Returns a new MySQL provider
+func NewMySQLProvider(config *c.APIConfig) *MySQLProvider {
+	return &MySQLProvider{
+		BaseProvider{
+			config: config,
+		},
+	}
+}
+
 // Returns a new provider based on the connection string
 func NewProvider(config *c.APIConfig) Provider {
 	var provider Provider
 	switch true {
 	case strings.HasPrefix(config.DBConnectionStr, "sqlite://"):
 		provider = NewSQLiteProvider(config)
+	case strings.HasPrefix(config.DBConnectionStr, "postgres://"):
+		provider = NewPostgresProvider(config)
+	case strings.HasPrefix(config.DBConnectionStr, "mysql://"):
+		provider = NewMySQLProvider(config)
 	default:
 		provider = nil
 	}
@@ -137,7 +179,7 @@ func NewProvider(config *c.APIConfig) Provider {
 	return provider
 }
 
-// Returns a in memory provider for mocking and testing
+// Returns an in memory provider for mocking and testing
 func NewMockProvider() Provider {
 	// Override provider connection string with sqlite memory
 	var mockConfig *c.APIConfig = c.NewAPIConfig()
