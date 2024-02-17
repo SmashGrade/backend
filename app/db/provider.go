@@ -148,6 +148,7 @@ func NewMockProvider() Provider {
 	provider := NewProvider(mockConfig)
 	// TODO: Add entities that are always the same
 	// e.g Users, Courses
+	prefillMockDB(provider)
 
 	return provider
 }

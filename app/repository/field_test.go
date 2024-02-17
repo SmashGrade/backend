@@ -1,65 +1,88 @@
 package repository
 
 import (
-	"fmt"
-	"log"
 	"testing"
 
 	"github.com/SmashGrade/backend/app/db"
 	"github.com/SmashGrade/backend/app/models"
 	"github.com/go-test/deep"
 	"github.com/stretchr/testify/require"
-	"gopkg.in/DATA-DOG/go-sqlmock.v1"
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
 )
 
-func NewMockDB() (*gorm.DB, sqlmock.Sqlmock) {
-	db, mock, err := sqlmock.New()
-	if err != nil {
-		log.Fatalf("An error '%s' was not expected when opening a stub database connection", err)
-	}
+func Test_Field_Create(t *testing.T) {
+	repository := NewFieldRepository(db.NewMockProvider())
 
-	gormDB, err := gorm.Open(mysql.New(mysql.Config{
-		Conn:                      db,
-		SkipInitializeWithVersion: true,
-	}), &gorm.Config{})
+	field_1 := db.Field_1()
+	field_1.ID = 0
 
-	if err != nil {
-		log.Fatalf("An error '%s' was not expected when opening gorm database", err)
-	}
+	_, err := repository.Create(&field_1)
 
-	return gormDB, mock
+	require.NoError(t, err)
 }
 
-// TODO: Quick test of unit testing. Delete at the end
-func Test_FieldRepository_TestExamples(t *testing.T) {
+func Test_Field_Update(t *testing.T) {
+	repository := NewFieldRepository(db.NewMockProvider())
 
-	provider := db.NewMockProvider()
-	repository := NewFieldRepository(provider)
+	// Update Description of Field
+	field := db.Field_1()
+	field.Description = "edited description Field 1"
+	err := repository.Update(&field)
 
-	field := models.Field{
-		Description: "test-Description",
-	}
-	field2 := models.Field{
-		Description: "test-lululul",
-	}
-	repository.Create(&field)
-	repository.Create(&field2)
-
-	var myField models.Field
-	res, err := repository.GetAll(myField)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	res2, err := repository.GetId(1, models.Field{})
-	newField := res2.(*models.Field)
-	fmt.Println(newField.Description)
-
-	fields, _ := res.([]models.Field)
+	// Return all Fields for comparing
+	result2, _ := repository.GetAll(models.Field{})
+	fields := result2.([]models.Field)
 
 	require.NoError(t, err)
 	require.Nil(t, deep.Equal(field.Description, fields[0].Description))
+}
 
+func Test_Field_Find(t *testing.T) {
+	repository := NewFieldRepository(db.NewMockProvider())
+
+	// Find Field
+	result2, err := repository.Find(db.Field_1())
+	fields := result2.([]models.Field)
+
+	require.NoError(t, err)
+	require.Nil(t, deep.Equal(db.Field_1().ID, fields[0].ID))
+}
+
+func Test_Field_GetAll(t *testing.T) {
+	repository := NewFieldRepository(db.NewMockProvider())
+
+	// Get all fields
+	result, err := repository.GetAll(models.Field{})
+	fields := result.([]models.Field)
+
+	require.NoError(t, err)
+	require.Nil(t, deep.Equal(db.Field_1().ID, fields[0].ID))
+	require.Nil(t, deep.Equal(db.Field_2().ID, fields[1].ID))
+}
+
+func Test_Field_GetID(t *testing.T) {
+	repository := NewFieldRepository(db.NewMockProvider())
+
+	// Get by ID
+	result, err := repository.GetId(db.Field_1().ID, models.Field{})
+	field := result.(*models.Field)
+
+	require.NoError(t, err)
+	require.Nil(t, deep.Equal(field.Description, db.Field_1().Description))
+}
+
+func Test_Field_DeleteId(t *testing.T) {
+	repository := NewFieldRepository(db.NewMockProvider())
+
+	// Get length of slice of all fields
+	result, _ := repository.GetAll(models.Field{})
+	afterCreateLength := len(result.([]models.Field))
+
+	// Delete field
+	err := repository.DeleteId(db.Field_1().ID, models.Field{})
+
+	result2, _ := repository.GetAll((models.Field{}))
+	afterDeleteLength := len(result2.([]models.Field))
+
+	require.NoError(t, err)
+	require.Nil(t, deep.Equal(afterCreateLength-1, afterDeleteLength))
 }
