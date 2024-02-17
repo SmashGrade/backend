@@ -4,10 +4,12 @@ import (
 	"github.com/SmashGrade/backend/app/models"
 )
 
+// Fill MockDB with prefill functions
 func prefillMockDB(p Provider) {
 	prefillFields(p)
 }
 
+// Field that will be added to the mock DB
 func Field_1() models.Field {
 	var field models.Field
 	field.Description = "description Field 1"
@@ -15,6 +17,7 @@ func Field_1() models.Field {
 	return field
 }
 
+// Field that will be added to the mock DB
 func Field_2() models.Field {
 	var field models.Field
 	field.Description = "description Field 2"
@@ -22,6 +25,7 @@ func Field_2() models.Field {
 	return field
 }
 
+// add all the fields to the fields table of the mockDB
 func prefillFields(p Provider) {
 	field_1 := Field_1()
 	field_2 := Field_2()
