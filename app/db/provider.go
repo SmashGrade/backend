@@ -108,7 +108,7 @@ func Migrate(p Provider) error {
 	}
 	// Migrate all models if autoMigrateAtConnect is true
 	if p.Config().AutoMigrate {
-		log.Println("Auto migrating database")
+		log.Println("Auto migrating database...")
 		for _, model := range models {
 			err := p.DB().AutoMigrate(model)
 			if err != nil {
