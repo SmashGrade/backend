@@ -2,6 +2,7 @@ package repository
 
 import (
 	"github.com/SmashGrade/backend/app/db"
+	"github.com/SmashGrade/backend/app/models"
 )
 
 type FieldRepository struct {
@@ -10,6 +11,6 @@ type FieldRepository struct {
 
 func NewFieldRepository(provider db.Provider) *FieldRepository {
 	return &FieldRepository{
-		BaseRepository: NewBaseRepository(provider),
+		BaseRepository: NewBaseRepository(provider, models.Field{}),
 	}
 }

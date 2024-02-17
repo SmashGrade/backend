@@ -12,38 +12,40 @@ type Repository interface {
 	Create(entity any) (any, error)
 	Update(entity any) error
 	Find(entity any) (any, error)
-	GetAll(entity any) (any, error)
+	GetAll() (any, error)
 }
 
 // Repository methods for models with only an id
 type IdRepository interface {
-	GetId(id uint, entity any) (any, error)
-	DeleteId(id uint, entity any) error
+	GetId(id uint) (any, error)
+	DeleteId(id uint) error
 }
 
 // Repository methods for models with id and version
 type VersionedRepository interface {
-	GetVersioned(id, version uint, entity any) (any, error)
-	DeleteVersioned(id, version uint, entity any) error
-	GetLatestVersioned(id uint, entity any) (any, error)
+	GetVersioned(id, version uint) (any, error)
+	DeleteVersioned(id, version uint) error
+	GetLatestVersioned(id uint) (any, error)
 }
 
 // Repository methods for models with id and start date
 type TimedRepository interface {
-	GetTimed(id uint, startDate time.Time, entity any) (any, error)
-	DeleteTimed(id uint, startDate time.Time, entity any) error
+	GetTimed(id uint, startDate time.Time) (any, error)
+	DeleteTimed(id uint, startDate time.Time) error
 }
 
 // BaseRepository is a base repository
 // that contains the database connection and CRUD operations
 type BaseRepository struct {
 	Provider db.Provider
+	Type     any
 }
 
 // Constructor for BaseRepository
-func NewBaseRepository(provider db.Provider) *BaseRepository {
+func NewBaseRepository(provider db.Provider, entity any) *BaseRepository {
 	return &BaseRepository{
 		Provider: provider,
+		Type:     entity,
 	}
 }
 
@@ -74,9 +76,9 @@ func (r *BaseRepository) Find(entity any) (any, error) {
 	return entities, nil
 }
 
-func (r *BaseRepository) GetAll(entity any) (any, error) {
+func (r *BaseRepository) GetAll() (any, error) {
 	// Get type of entity
-	dtype := reflect.TypeOf(entity)
+	dtype := reflect.TypeOf(r.Type)
 	// Create a new Slice of the entity type
 	entities := reflect.New(reflect.SliceOf(dtype)).Elem().Interface()
 
@@ -87,9 +89,9 @@ func (r *BaseRepository) GetAll(entity any) (any, error) {
 	return entities, nil
 }
 
-func (r *BaseRepository) GetId(id uint, entity any) (any, error) {
+func (r *BaseRepository) GetId(id uint) (any, error) {
 	// Get tye of entity
-	dtype := reflect.TypeOf(entity)
+	dtype := reflect.TypeOf(r.Type)
 	// Create a new instance of the entity type
 	newEntity := reflect.New(dtype).Interface()
 
@@ -100,9 +102,9 @@ func (r *BaseRepository) GetId(id uint, entity any) (any, error) {
 	return newEntity, nil
 }
 
-func (r *BaseRepository) GetVersioned(id, version uint, entity any) (any, error) {
+func (r *BaseRepository) GetVersioned(id, version uint) (any, error) {
 	// Get tye of entity
-	dtype := reflect.TypeOf(entity)
+	dtype := reflect.TypeOf(r.Type)
 	// Create a new instance of the entity type
 	newEntity := reflect.New(dtype).Interface()
 
@@ -113,9 +115,9 @@ func (r *BaseRepository) GetVersioned(id, version uint, entity any) (any, error)
 	return newEntity, nil
 }
 
-func (r *BaseRepository) GetTimed(id uint, startDate time.Time, entity any) (any, error) {
+func (r *BaseRepository) GetTimed(id uint, startDate time.Time) (any, error) {
 	// Get tye of entity
-	dtype := reflect.TypeOf(entity)
+	dtype := reflect.TypeOf(r.Type)
 	// Create a new instance of the entity type
 	newEntity := reflect.New(dtype).Interface()
 
@@ -126,18 +128,18 @@ func (r *BaseRepository) GetTimed(id uint, startDate time.Time, entity any) (any
 	return newEntity, nil
 }
 
-func (r *BaseRepository) DeleteVersioned(id, version uint, entity any) error {
+func (r *BaseRepository) DeleteVersioned(id, version uint) error {
 	// Get tye of entity
-	dtype := reflect.TypeOf(entity)
+	dtype := reflect.TypeOf(r.Type)
 	// Create a new instance of the entity type
 	newEntity := reflect.New(dtype).Interface()
 
 	return r.Provider.DB().Where("id = ? AND version = ?", id, version).Delete(newEntity).Error
 }
 
-func (r *BaseRepository) GetLatestVersioned(id uint, entity any) (any, error) {
+func (r *BaseRepository) GetLatestVersioned(id uint) (any, error) {
 	// Get tye of entity
-	dtype := reflect.TypeOf(entity)
+	dtype := reflect.TypeOf(r.Type)
 	// Create a new instance of the entity type
 	newEntity := reflect.New(dtype).Interface()
 
@@ -148,9 +150,9 @@ func (r *BaseRepository) GetLatestVersioned(id uint, entity any) (any, error) {
 	return newEntity, nil
 }
 
-func (r *BaseRepository) DeleteId(id uint, entity any) error {
+func (r *BaseRepository) DeleteId(id uint) error {
 	// Get tye of entity
-	dtype := reflect.TypeOf(entity)
+	dtype := reflect.TypeOf(r.Type)
 	// Create a new instance of the entity type
 	newEntity := reflect.New(dtype).Interface()
 

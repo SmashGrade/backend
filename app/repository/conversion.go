@@ -15,7 +15,7 @@ type ConversionRepository struct {
 
 func NewConversionRepository(provider db.Provider) *ConversionRepository {
 	return &ConversionRepository{
-		BaseRepository: NewBaseRepository(provider),
+		BaseRepository: NewBaseRepository(provider, models.Conversion{}),
 	}
 }
 

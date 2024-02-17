@@ -15,7 +15,7 @@ type CurriculumRepository struct {
 
 func NewCurriculumRepository(provider db.Provider) *CurriculumRepository {
 	return &CurriculumRepository{
-		BaseRepository: NewBaseRepository(provider),
+		BaseRepository: NewBaseRepository(provider, models.Curriculum{}),
 	}
 }
 func (r *CurriculumRepository) GetTimed(id uint, startDate time.Time, entity any) (any, error) {

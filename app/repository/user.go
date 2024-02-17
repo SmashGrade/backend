@@ -2,6 +2,7 @@ package repository
 
 import (
 	"github.com/SmashGrade/backend/app/db"
+	"github.com/SmashGrade/backend/app/models"
 )
 
 type UserRepository struct {
@@ -10,6 +11,6 @@ type UserRepository struct {
 
 func NewUserRepository(provider db.Provider) *UserRepository {
 	return &UserRepository{
-		BaseRepository: NewBaseRepository(provider),
+		BaseRepository: NewBaseRepository(provider, models.User{}),
 	}
 }

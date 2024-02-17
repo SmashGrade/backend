@@ -2,6 +2,7 @@ package repository
 
 import (
 	"github.com/SmashGrade/backend/app/db"
+	"github.com/SmashGrade/backend/app/models"
 )
 
 type GradetypeRepository struct {
@@ -10,6 +11,6 @@ type GradetypeRepository struct {
 
 func NewGradetypeRepository(provider db.Provider) *GradetypeRepository {
 	return &GradetypeRepository{
-		BaseRepository: NewBaseRepository(provider),
+		BaseRepository: NewBaseRepository(provider, models.Gradetype{}),
 	}
 }

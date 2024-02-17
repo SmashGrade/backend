@@ -29,7 +29,7 @@ func Test_Field_Update(t *testing.T) {
 	err := repository.Update(&field)
 
 	// Return all Fields for comparing
-	result2, _ := repository.GetAll(models.Field{})
+	result2, _ := repository.GetAll()
 	fields := result2.([]models.Field)
 
 	require.NoError(t, err)
@@ -51,7 +51,7 @@ func Test_Field_GetAll(t *testing.T) {
 	repository := NewFieldRepository(db.NewMockProvider())
 
 	// Get all fields
-	result, err := repository.GetAll(models.Field{})
+	result, err := repository.GetAll()
 	fields := result.([]models.Field)
 
 	require.NoError(t, err)
@@ -63,7 +63,7 @@ func Test_Field_GetID(t *testing.T) {
 	repository := NewFieldRepository(db.NewMockProvider())
 
 	// Get by ID
-	result, err := repository.GetId(db.Field_1().ID, models.Field{})
+	result, err := repository.GetId(db.Field_1().ID)
 	field := result.(*models.Field)
 
 	require.NoError(t, err)
@@ -74,13 +74,13 @@ func Test_Field_DeleteId(t *testing.T) {
 	repository := NewFieldRepository(db.NewMockProvider())
 
 	// Get length of slice of all fields
-	result, _ := repository.GetAll(models.Field{})
+	result, _ := repository.GetAll()
 	afterCreateLength := len(result.([]models.Field))
 
 	// Delete field
-	err := repository.DeleteId(db.Field_1().ID, models.Field{})
+	err := repository.DeleteId(db.Field_1().ID)
 
-	result2, _ := repository.GetAll((models.Field{}))
+	result2, _ := repository.GetAll()
 	afterDeleteLength := len(result2.([]models.Field))
 
 	require.NoError(t, err)

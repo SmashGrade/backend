@@ -11,7 +11,7 @@ type ModuleRepository struct {
 
 func NewModuleRepository(provider db.Provider) *ModuleRepository {
 	return &ModuleRepository{
-		BaseRepository: NewBaseRepository(provider),
+		BaseRepository: NewBaseRepository(provider, models.Module{}),
 	}
 }
 

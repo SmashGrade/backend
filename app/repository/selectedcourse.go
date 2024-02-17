@@ -13,7 +13,7 @@ type SelectedCourseRepository struct {
 
 func NewSelectedCourseRepository(provider db.Provider) *SelectedCourseRepository {
 	return &SelectedCourseRepository{
-		BaseRepository: NewBaseRepository(provider),
+		BaseRepository: NewBaseRepository(provider, models.SelectedCourse{}),
 	}
 }
 

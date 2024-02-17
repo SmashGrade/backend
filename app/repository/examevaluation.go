@@ -13,7 +13,7 @@ type ExamEvaluationRepository struct {
 
 func NewExamEvaluationRepository(provider db.Provider) *ExamEvaluationRepository {
 	return &ExamEvaluationRepository{
-		BaseRepository: NewBaseRepository(provider),
+		BaseRepository: NewBaseRepository(provider, models.ExamEvaluation{}),
 	}
 }
 

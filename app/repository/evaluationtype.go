@@ -2,6 +2,7 @@ package repository
 
 import (
 	"github.com/SmashGrade/backend/app/db"
+	"github.com/SmashGrade/backend/app/models"
 )
 
 type EvaluationtypeRepository struct {
@@ -10,6 +11,6 @@ type EvaluationtypeRepository struct {
 
 func NewEvaluationtypeRepository(provider db.Provider) *EvaluationtypeRepository {
 	return &EvaluationtypeRepository{
-		BaseRepository: NewBaseRepository(provider),
+		BaseRepository: NewBaseRepository(provider, models.Evaluationtype{}),
 	}
 }
