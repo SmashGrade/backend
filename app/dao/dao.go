@@ -80,6 +80,48 @@ func (c *CurriculumTypeDao) Get(id uint) (entity *models.Curriculumtype, err *e.
 	return getOrError[models.Curriculumtype](c.repo, id)
 }
 
+func (c *CurriculumTypeDao) Create(entity models.Curriculumtype) (returnEntity *models.Curriculumtype, err *e.ApiError) {
+	internalEntity, internalError := c.repo.Create(&entity)
+
+	if internalError != nil {
+		return nil, e.NewDaoDbError()
+	}
+
+	return internalEntity.(*models.Curriculumtype), nil
+}
+
+// Create default values for curriculum type
+func (c *CurriculumTypeDao) CreateDefaults() *e.ApiError {
+	existingEntities, err := c.GetAll()
+	if err != nil {
+		return err
+	}
+
+	for _, v := range c.repo.Provider.Config().CurriculumTypes {
+
+		existingFound := false
+		for _, existing := range existingEntities {
+			if v.Description == existing.Description {
+				existingFound = true
+				break
+			}
+		}
+		if existingFound {
+			continue
+		}
+
+		_, err := c.Create(models.Curriculumtype{
+			Description:   v.Description,
+			DurationYears: v.DurationYears,
+		})
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 // field / Schwerpunkt
 type FieldDao struct {
 	repo *repository.FieldRepository

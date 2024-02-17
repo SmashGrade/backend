@@ -14,12 +14,17 @@ type APIConfig struct {
 	ExamEvaluationTypes []ExamEvaluationTypeConfig `yaml:"examEvaluationTypes"` // EvalTypes is the list of evaluation types
 	GradeTypes          []string                   `yaml:"gradeTypes"`          // GradeTypes is the list of grade types
 	States              []string                   `yaml:"states"`              // States is the list of states
-	CurriculumTypes     []string                   `yaml:"curriculumTypes"`     // CurriculumTypes is the list of curriculum types
+	CurriculumTypes     []CurriculumTypeConfig     `yaml:"curriculumTypes"`     // CurriculumTypes is the list of curriculum types
 }
 
 type ExamEvaluationTypeConfig struct {
 	code        string `yaml:"code"`        // code is the code of the evaluation type
 	description string `yaml:"description"` // description is the description of the evaluation type
+}
+
+type CurriculumTypeConfig struct {
+	Description   string `yaml:"description"`
+	DurationYears uint   `yaml:"durationyears"`
 }
 
 // Returns a new configuration with default values
@@ -37,8 +42,10 @@ func NewAPIConfig() *APIConfig {
 			{code: "D", description: "Modul bestanden, wenn der Durchschnitt der Kurse genügend ist (mehr als 60%). (Art. 31)"},
 			{code: "E", description: "Modul bestanden, wenn alle Kurse erfüllt sind. (Art. 32)"},
 		},
-		States:          []string{"Aktiv", "Inaktiv"},
-		CurriculumTypes: []string{"Vollzeit", "Teilzeit"},
+		States: []string{"Aktiv", "Inaktiv"},
+		CurriculumTypes: []CurriculumTypeConfig{
+			CurriculumTypeConfig{Description: "Vollzeit", DurationYears: 2}, CurriculumTypeConfig{Description: "Teilzeit", DurationYears: 3},
+		},
 	}
 }
 
