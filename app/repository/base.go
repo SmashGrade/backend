@@ -93,6 +93,14 @@ func (r *BaseRepository) Update(entity any) error {
 	return r.Provider.DB().Updates(entity).Error
 }
 
+/*
+Get list of entitys providing a entity
+
+Usage (example with models.Course):
+
+	res, err := repository.Find(course)
+	courses := res.([]models.Course)
+*/
 func (r *BaseRepository) Find(entity any) (any, error) {
 	entities := r.getSliceInterface()
 
