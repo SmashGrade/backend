@@ -49,6 +49,22 @@ func NewBaseRepository(provider db.Provider, entity any) *BaseRepository {
 	}
 }
 
+// Return the slice of the Type in the BaseRepository
+func (r *BaseRepository) getSliceInterface() any {
+	// Get the type of Type
+	dtype := reflect.TypeOf(r.Type)
+	// Create a new Slice of the entity type
+	return reflect.New(reflect.SliceOf(dtype)).Elem().Interface()
+}
+
+// Return the interface of the Type in the BaseRepository
+func (r *BaseRepository) getInterface() any {
+	// Get the type of Type
+	dtype := reflect.TypeOf(r.Type)
+	// Create a new instance of the entity type
+	return reflect.New(dtype).Interface()
+}
+
 // Example functions
 // TODO: Please implement them in the actual repository concrete for the model
 func (r *BaseRepository) Create(entity any) (any, error) {
@@ -64,10 +80,7 @@ func (r *BaseRepository) Update(entity any) error {
 }
 
 func (r *BaseRepository) Find(entity any) (any, error) {
-	// Get type of entity
-	dtype := reflect.TypeOf(entity)
-	// Create a new Slice of the entity type
-	entities := reflect.New(reflect.SliceOf(dtype)).Elem().Interface()
+	entities := r.getSliceInterface()
 
 	result := r.Provider.DB().Preload(clause.Associations).Where(&entity).Find(&entities)
 	if result.Error != nil {
@@ -77,10 +90,7 @@ func (r *BaseRepository) Find(entity any) (any, error) {
 }
 
 func (r *BaseRepository) GetAll() (any, error) {
-	// Get type of entity
-	dtype := reflect.TypeOf(r.Type)
-	// Create a new Slice of the entity type
-	entities := reflect.New(reflect.SliceOf(dtype)).Elem().Interface()
+	entities := r.getSliceInterface()
 
 	result := r.Provider.DB().Preload(clause.Associations).Find(&entities)
 	if result.Error != nil {
@@ -90,10 +100,7 @@ func (r *BaseRepository) GetAll() (any, error) {
 }
 
 func (r *BaseRepository) GetId(id uint) (any, error) {
-	// Get tye of entity
-	dtype := reflect.TypeOf(r.Type)
-	// Create a new instance of the entity type
-	newEntity := reflect.New(dtype).Interface()
+	newEntity := r.getInterface()
 
 	result := r.Provider.DB().Preload(clause.Associations).First(newEntity, id)
 	if result.Error != nil {
@@ -103,10 +110,7 @@ func (r *BaseRepository) GetId(id uint) (any, error) {
 }
 
 func (r *BaseRepository) GetVersioned(id, version uint) (any, error) {
-	// Get tye of entity
-	dtype := reflect.TypeOf(r.Type)
-	// Create a new instance of the entity type
-	newEntity := reflect.New(dtype).Interface()
+	newEntity := r.getInterface()
 
 	result := r.Provider.DB().Preload(clause.Associations).Where("id = ? AND version = ?", id, version).First(newEntity)
 	if result.Error != nil {
@@ -116,10 +120,7 @@ func (r *BaseRepository) GetVersioned(id, version uint) (any, error) {
 }
 
 func (r *BaseRepository) GetTimed(id uint, startDate time.Time) (any, error) {
-	// Get tye of entity
-	dtype := reflect.TypeOf(r.Type)
-	// Create a new instance of the entity type
-	newEntity := reflect.New(dtype).Interface()
+	newEntity := r.getInterface()
 
 	result := r.Provider.DB().Preload(clause.Associations).Where("id = ? AND startyear = ?", id, startDate).First(newEntity)
 	if result.Error != nil {
@@ -129,19 +130,13 @@ func (r *BaseRepository) GetTimed(id uint, startDate time.Time) (any, error) {
 }
 
 func (r *BaseRepository) DeleteVersioned(id, version uint) error {
-	// Get tye of entity
-	dtype := reflect.TypeOf(r.Type)
-	// Create a new instance of the entity type
-	newEntity := reflect.New(dtype).Interface()
+	newEntity := r.getInterface()
 
 	return r.Provider.DB().Where("id = ? AND version = ?", id, version).Delete(newEntity).Error
 }
 
 func (r *BaseRepository) GetLatestVersioned(id uint) (any, error) {
-	// Get tye of entity
-	dtype := reflect.TypeOf(r.Type)
-	// Create a new instance of the entity type
-	newEntity := reflect.New(dtype).Interface()
+	newEntity := r.getInterface()
 
 	result := r.Provider.DB().Where("id = ?", id).Order("version desc").First(newEntity)
 	if result.Error != nil {
@@ -151,10 +146,7 @@ func (r *BaseRepository) GetLatestVersioned(id uint) (any, error) {
 }
 
 func (r *BaseRepository) DeleteId(id uint) error {
-	// Get tye of entity
-	dtype := reflect.TypeOf(r.Type)
-	// Create a new instance of the entity type
-	newEntity := reflect.New(dtype).Interface()
+	newEntity := r.getInterface()
 
 	return r.Provider.DB().Delete(newEntity, id).Error
 }

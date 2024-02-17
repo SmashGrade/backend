@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"reflect"
 	"time"
 
 	"github.com/SmashGrade/backend/app/db"
@@ -19,10 +18,7 @@ func NewCurriculumRepository(provider db.Provider) *CurriculumRepository {
 	}
 }
 func (r *CurriculumRepository) GetTimed(id uint, startDate time.Time, entity any) (any, error) {
-	// Get tye of entity
-	dtype := reflect.TypeOf(entity)
-	// Create a new instance of the entity type
-	newEntity := reflect.New(dtype).Interface()
+	newEntity := r.getInterface()
 
 	result := r.Provider.DB().Preload(clause.Associations).
 		Where("id = ? AND start_validity = ?", id, startDate).
@@ -34,10 +30,7 @@ func (r *CurriculumRepository) GetTimed(id uint, startDate time.Time, entity any
 }
 
 func (r *CurriculumRepository) DeleteTimed(id uint, startDate time.Time, entity any) error {
-	// Get tye of entity
-	dtype := reflect.TypeOf(entity)
-	// Create a new instance of the entity type
-	newEntity := reflect.New(dtype).Interface()
+	newEntity := r.getInterface()
 
 	return r.Provider.DB().
 		Where("id = ? AND start_validity = ?", id, startDate).

@@ -14,9 +14,3 @@ func NewModuleRepository(provider db.Provider) *ModuleRepository {
 		BaseRepository: NewBaseRepository(provider, models.Module{}),
 	}
 }
-
-func (r *ModuleRepository) GetLatestId() (id uint, err error) {
-	result := r.Provider.DB().Select("max(id) as id").First(&models.Module{}).Pluck("id", &id)
-	err = result.Error
-	return
-}
