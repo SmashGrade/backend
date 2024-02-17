@@ -6,6 +6,10 @@ WORKDIR /app
 
 COPY app .
 
+# generate updated swagger docs
+RUN go install github.com/swaggo/swag/cmd/swag@latest
+RUN swag init --pd --parseDepth 3
+
 # cgo is needed for sqlite
 RUN go mod download && go test ./... && CGO_ENABLED=1 GOOS=linux go build -o backend
 
