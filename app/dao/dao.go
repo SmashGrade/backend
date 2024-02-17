@@ -150,11 +150,15 @@ func (st *StateDao) Get(id uint) (entity *models.State, err *e.ApiError) {
 
 // Curriculum / Studiengang
 // Highest level of categorization
-type CurriculumDao struct{}
+type CurriculumDao struct {
+	repo *repository.CurriculumRepository
+}
 
 // Create new curriculum with required repository
-func NewCurriculumDao(curriculumRepository *interface{}) *CurriculumDao {
-	return nil
+func NewCurriculumDao(curriculumRepository *repository.CurriculumRepository) *CurriculumDao {
+	return &CurriculumDao{
+		repo: curriculumRepository,
+	}
 }
 
 // Returns existing curriculum
