@@ -30,6 +30,48 @@ func TestMagicSmoke(t *testing.T) {
 	t.Logf("Got '%v'", retEnt)
 }
 
+// GetAll should give a slice of ents
+func TestGetAll(t *testing.T) {
+	config := c.NewAPIConfig()
+	provider := db.NewProvider(config)
+
+	repo := repository.NewCourseRepository(provider)
+
+	dao := NewCourseDao(repo)
+
+	courseEnt := &models.Course{Description: "Lol"}
+
+	retEnt, err := dao.Create(courseEnt)
+	if err != nil {
+		t.Fatalf("Got db error")
+	}
+
+	courseEnt.ID = 0
+
+	_, err = dao.Create(courseEnt)
+	if err != nil {
+		t.Fatalf("Got db error")
+	}
+
+	entities, err := dao.GetAll()
+	if err != nil {
+		t.Fatalf("Got db error at getAll")
+	}
+
+	t.Logf("Return %v entities", len(entities))
+
+	found := false
+	for _, v := range entities {
+		if v.Description == retEnt.Description {
+			found = true
+		}
+	}
+
+	if found == false {
+		t.Fatalf("Inserted course not found in getAll")
+	}
+}
+
 // Check if a slice can be asserted correctly and keep all data intact
 func TestAssertSlice(t *testing.T) {
 	inputSlice := make([]any, 0)
