@@ -14,6 +14,7 @@ func prefillMockDB(p Provider) {
 	prefillCurriculum(p)
 	prefillCurriculumtype(p)
 	prefillEvaluationtype(p)
+	prefillExam(p)
 }
 
 // Field that will be added to the mock DB
@@ -184,4 +185,28 @@ func prefillEvaluationtype(p Provider) {
 	evaluationtype_2 := Evaluationtype_2()
 	p.DB().Table("evaluationtypes").Create(&evaluationtype_1)
 	p.DB().Table("evaluationtypes").Create(&evaluationtype_2)
+}
+
+// Evaluationtype that will be added to the mock DB
+func Exam_1() models.Exam {
+	var exam models.Exam
+	exam.Description = "Exam Description 1"
+	exam.ID = 1
+	return exam
+}
+
+// Evaluationtype that will be added to the mock DB
+func Exam_2() models.Exam {
+	var exam models.Exam
+	exam.Description = "Exam Description 2"
+	exam.ID = 2
+	return exam
+}
+
+// add all the evaluationtype to the courses table of the mockDB
+func prefillExam(p Provider) {
+	exam_1 := Exam_1()
+	exam_2 := Exam_2()
+	p.DB().Table("exams").Create(&exam_1)
+	p.DB().Table("exams").Create(&exam_2)
 }
