@@ -12,6 +12,7 @@ func prefillMockDB(p Provider) {
 	prefillConversions(p)
 	prefillCourses(p)
 	prefillCurriculum(p)
+	prefillCurriculumtype(p)
 }
 
 // Field that will be added to the mock DB
@@ -134,4 +135,28 @@ func prefillCurriculum(p Provider) {
 	curriculum_2 := Curriculum_2()
 	p.DB().Table("curriculums").Create(&curriculum_1)
 	p.DB().Table("curriculums").Create(&curriculum_2)
+}
+
+// Curriculumtype that will be added to the mock DB
+func Curriculumtype_1() models.Curriculumtype {
+	var curriculum models.Curriculumtype
+	curriculum.Description = "Curriculumtype Description 1"
+	curriculum.ID = 1
+	return curriculum
+}
+
+// Curriculumtype that will be added to the mock DB
+func Curriculumtype_2() models.Curriculumtype {
+	var curriculum models.Curriculumtype
+	curriculum.Description = "Curriculumtype Description 2"
+	curriculum.ID = 2
+	return curriculum
+}
+
+// add all the curriculumtype to the courses table of the mockDB
+func prefillCurriculumtype(p Provider) {
+	curriculumtype_1 := Curriculumtype_1()
+	curriculumtype_2 := Curriculumtype_2()
+	p.DB().Table("curriculumtypes").Create(&curriculumtype_1)
+	p.DB().Table("curriculumtypes").Create(&curriculumtype_2)
 }

@@ -11,6 +11,6 @@ type CurriculumtypeRepository struct {
 
 func NewCurriculumtypeRepository(provider db.Provider) *CurriculumtypeRepository {
 	return &CurriculumtypeRepository{
-		BaseRepository: NewBaseRepository(provider, models.Curriculum{}),
+		BaseRepository: NewBaseRepository(provider, models.Curriculumtype{}),
 	}
 }

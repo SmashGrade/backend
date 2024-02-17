@@ -23,12 +23,12 @@ func Test_Curriculum_Create(t *testing.T) {
 func Test_Curriculum_Update(t *testing.T) {
 	repository := NewCurriculumRepository(db.NewMockProvider())
 
-	// Update Description of Field
+	// Update Description of Curriculum
 	curriculum := db.Curriculum_1()
-	curriculum.Description = "edited description Field 1"
+	curriculum.Description = "edited description Curriculum 1"
 	err := repository.Update(&curriculum)
 
-	// Return all Fields for comparing
+	// Return all Curriculums for comparing
 	result2, _ := repository.GetAll()
 	curriculums := result2.([]models.Curriculum)
 
@@ -39,7 +39,7 @@ func Test_Curriculum_Update(t *testing.T) {
 func Test_Curriculum_Find(t *testing.T) {
 	repository := NewCurriculumRepository(db.NewMockProvider())
 
-	// Find Field
+	// Find Curriculum
 	result2, err := repository.Find(db.Curriculum_1())
 	curriculums := result2.([]models.Curriculum)
 
@@ -73,11 +73,11 @@ func Test_Curriculum_GetID(t *testing.T) {
 func Test_Curriculum_DeleteId(t *testing.T) {
 	repository := NewCurriculumRepository(db.NewMockProvider())
 
-	// Get length of slice of all fields
+	// Get length of slice of all curriculum
 	result, _ := repository.GetAll()
 	afterCreateLength := len(result.([]models.Curriculum))
 
-	// Delete field
+	// Delete curriculum
 	err := repository.DeleteId(db.Curriculum_1().ID)
 
 	result2, _ := repository.GetAll()
