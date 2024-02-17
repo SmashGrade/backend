@@ -28,8 +28,7 @@ func getAllOrError[outputModel any](repo repository.Repository) (outputSlice []o
 		return
 	}
 
-	outputSlice = assertSlice[outputModel](internalSlice)
-
+	outputSlice = internalSlice.([]outputModel)
 	return
 }
 
