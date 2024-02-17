@@ -22,15 +22,15 @@ func NewCourseController(provider db.Provider) *CourseController {
 	}
 }
 
-// @Summary Get all courses
-// @Description Get all courses
-// @Tags courses
-// @Produce json
-// @Success 200 {array} models.Course
-// @Failure 401 {object} error.ApiError
-// @Failure 403 {object} error.ApiError
-// @Failure 500 {object} error.ApiError
-// @Router /courses [get]
+//	@Summary		Get all courses
+//	@Description	Get all courses
+//	@Tags			courses
+//	@Produce		json
+//	@Success		200	{array}		models.Course
+//	@Failure		401	{object}	error.ApiError
+//	@Failure		403	{object}	error.ApiError
+//	@Failure		500	{object}	error.ApiError
+//	@Router			/courses [get]
 func (c *CourseController) Courses(ctx echo.Context) error {
 	res, err := c.Dao.GetAll()
 	if err != nil {
@@ -39,17 +39,17 @@ func (c *CourseController) Courses(ctx echo.Context) error {
 	return c.Yeet(ctx, res)
 }
 
-// @Summary Get a specific course
-// @Description Get a specific course
-// @Tags courses
-// @Param id path uint true "Course ID"
-// @Param version path uint true "Course Version"
-// @Produce json
-// @Success 200 {object} models.Course
-// @Failure 401 {object} error.ApiError
-// @Failure 403 {object} error.ApiError
-// @Failure 500 {object} error.ApiError
-// @Router /courses/{id}/{version} [get]
+//	@Summary		Get a specific course
+//	@Description	Get a specific course
+//	@Tags			courses
+//	@Param			id		path	uint	true	"Course ID"
+//	@Param			version	path	uint	true	"Course Version"
+//	@Produce		json
+//	@Success		200	{object}	models.Course
+//	@Failure		401	{object}	error.ApiError
+//	@Failure		403	{object}	error.ApiError
+//	@Failure		500	{object}	error.ApiError
+//	@Router			/courses/{id}/{version} [get]
 func (c *CourseController) Course(ctx echo.Context) error {
 	// Read id parameter from request
 	id := c.GetPathParamInt(ctx, "id")

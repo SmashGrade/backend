@@ -7,5 +7,8 @@
 
 cd app
 
+# Format the swagger comments
+swag fmt
+
 # Generate the documentation
 swag init --pd --parseDepth 3
