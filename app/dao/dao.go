@@ -208,7 +208,7 @@ func (st *StateDao) Get(id uint) (entity *models.State, err *e.ApiError) {
 }
 
 func (st *StateDao) Create(entity models.State) (returnEntity *models.State, err *e.ApiError) {
-	internalEntity, internalError := st.repo.Create(entity)
+	internalEntity, internalError := st.repo.Create(&entity)
 
 	if internalError != nil {
 		return nil, e.NewDaoDbError()

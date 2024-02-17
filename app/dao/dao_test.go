@@ -97,3 +97,44 @@ func TestAssertSlice(t *testing.T) {
 		}
 	}
 }
+
+// Create default values and check for double insertion and existing
+func TestCreateDefaults(t *testing.T) {
+	provider := db.NewMockProvider()
+
+	repo := repository.NewStateRepository(provider)
+
+	dao := NewStateDao(repo)
+
+	err := dao.CreateDefaults()
+	if err != nil {
+		t.Fatalf("Got db error at first")
+	}
+
+	err = dao.CreateDefaults()
+	if err != nil {
+		t.Fatalf("Got db error at second")
+	}
+
+	entities, err := dao.GetAll()
+	if err != nil {
+		t.Fatalf("Got error in getAll")
+	}
+
+	checkDescription := ""
+	checkId := -1
+	for i, v := range entities {
+		if checkDescription == "" {
+			checkDescription = v.Description
+			checkId = i
+		} else {
+			if checkDescription == v.Description {
+				t.Fatalf("Got same description '%v' on id '%v' and '%v'", v.Description, checkId, i)
+			}
+		}
+	}
+
+	if len(entities) != len(provider.Config().States) {
+		t.Fatalf("Expected '%v' entries, got '%v'", len(entities), len(provider.Config().States))
+	}
+}
