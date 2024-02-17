@@ -185,6 +185,47 @@ func (c *ExamtypeDao) Get(id uint) (entity *models.Examtype, err *e.ApiError) {
 	return getOrError[models.Examtype](c.repo, id)
 }
 
+func (c *ExamtypeDao) Create(entity models.Examtype) (returnEntity *models.Examtype, err *e.ApiError) {
+	internalEntity, internalError := c.repo.Create(&entity)
+
+	if internalError != nil {
+		return nil, e.NewDaoDbError()
+	}
+
+	return internalEntity.(*models.Examtype), nil
+}
+
+// Create default values for exam type
+func (c *ExamtypeDao) CreateDefaults() *e.ApiError {
+	existingEntities, err := c.GetAll()
+	if err != nil {
+		return err
+	}
+
+	for _, v := range c.repo.Provider.Config().ExamTypes {
+
+		existingFound := false
+		for _, existing := range existingEntities {
+			if v == existing.Description {
+				existingFound = true
+				break
+			}
+		}
+		if existingFound {
+			continue
+		}
+
+		_, err := c.Create(models.Examtype{
+			Description: v,
+		})
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 // gradetype / benotungssystem
 // has a description
 type GradeTypeDao struct {
@@ -207,6 +248,47 @@ func (c *GradeTypeDao) Get(id uint) (entity *models.Gradetype, err *e.ApiError) 
 	return getOrError[models.Gradetype](c.repo, id)
 }
 
+func (c *GradeTypeDao) Create(entity models.Gradetype) (returnEntity *models.Gradetype, err *e.ApiError) {
+	internalEntity, internalError := c.repo.Create(&entity)
+
+	if internalError != nil {
+		return nil, e.NewDaoDbError()
+	}
+
+	return internalEntity.(*models.Gradetype), nil
+}
+
+// Create default values for grade type
+func (c *GradeTypeDao) CreateDefaults() *e.ApiError {
+	existingEntities, err := c.GetAll()
+	if err != nil {
+		return err
+	}
+
+	for _, v := range c.repo.Provider.Config().GradeTypes {
+
+		existingFound := false
+		for _, existing := range existingEntities {
+			if v == existing.Description {
+				existingFound = true
+				break
+			}
+		}
+		if existingFound {
+			continue
+		}
+
+		_, err := c.Create(models.Gradetype{
+			Description: v,
+		})
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 // evaluation type / Bewertungstyp for Module
 type EvaluationTypeDao struct {
 	repo *repository.EvaluationtypeRepository
@@ -226,6 +308,48 @@ func (et *EvaluationTypeDao) GetAll() (entities []models.Evaluationtype, err *e.
 
 func (et *EvaluationTypeDao) Get(id uint) (entity *models.Evaluationtype, err *e.ApiError) {
 	return getOrError[models.Evaluationtype](et.repo, id)
+}
+
+func (et *EvaluationTypeDao) Create(entity models.Evaluationtype) (returnEntity *models.Evaluationtype, err *e.ApiError) {
+	internalEntity, internalError := et.repo.Create(&entity)
+
+	if internalError != nil {
+		return nil, e.NewDaoDbError()
+	}
+
+	return internalEntity.(*models.Evaluationtype), nil
+}
+
+// Create default values for grade type
+func (et *EvaluationTypeDao) CreateDefaults() *e.ApiError {
+	existingEntities, err := et.GetAll()
+	if err != nil {
+		return err
+	}
+
+	for _, v := range et.repo.Provider.Config().ExamEvaluationTypes {
+
+		existingFound := false
+		for _, existing := range existingEntities {
+			if v.Description == existing.Description {
+				existingFound = true
+				break
+			}
+		}
+		if existingFound {
+			continue
+		}
+
+		_, err := et.Create(models.Evaluationtype{
+			Description: v.Description,
+			Code:        v.Code,
+		})
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 // state / Zustand for Module and Curriculum

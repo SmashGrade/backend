@@ -18,8 +18,8 @@ type APIConfig struct {
 }
 
 type ExamEvaluationTypeConfig struct {
-	code        string `yaml:"code"`        // code is the code of the evaluation type
-	description string `yaml:"description"` // description is the description of the evaluation type
+	Code        string `yaml:"code"`        // code is the code of the evaluation type
+	Description string `yaml:"description"` // description is the description of the evaluation type
 }
 
 type CurriculumTypeConfig struct {
@@ -37,14 +37,14 @@ func NewAPIConfig() *APIConfig {
 		ExamTypes:       []string{"Mündliche oder schriftliche Prüfung ", "Präsentationen", "Lernbericht", "schriftliche Arbeit", "Lernjournal"},
 		GradeTypes:      []string{"Kein Eintrag", "Note (1-6)", "Prozentwert (0-100)"},
 		ExamEvaluationTypes: []ExamEvaluationTypeConfig{
-			{code: "F", description: "Modul bestanden, wenn jeder Kurs eine genügende Bewertung aufweist. (Art. 29)"},
-			{code: "M", description: "Modul bestanden, wenn der Durchschnitt aller Kurse genügend und nicht mehr als ein Kurs im Modul ungenügend ist. (Art. 30)"},
-			{code: "D", description: "Modul bestanden, wenn der Durchschnitt der Kurse genügend ist (mehr als 60%). (Art. 31)"},
-			{code: "E", description: "Modul bestanden, wenn alle Kurse erfüllt sind. (Art. 32)"},
+			{Code: "F", Description: "Modul bestanden, wenn jeder Kurs eine genügende Bewertung aufweist. (Art. 29)"},
+			{Code: "M", Description: "Modul bestanden, wenn der Durchschnitt aller Kurse genügend und nicht mehr als ein Kurs im Modul ungenügend ist. (Art. 30)"},
+			{Code: "D", Description: "Modul bestanden, wenn der Durchschnitt der Kurse genügend ist (mehr als 60%). (Art. 31)"},
+			{Code: "E", Description: "Modul bestanden, wenn alle Kurse erfüllt sind. (Art. 32)"},
 		},
 		States: []string{"Aktiv", "Inaktiv"},
 		CurriculumTypes: []CurriculumTypeConfig{
-			CurriculumTypeConfig{Description: "Vollzeit", DurationYears: 2}, CurriculumTypeConfig{Description: "Teilzeit", DurationYears: 3},
+			{Description: "Vollzeit", DurationYears: 2}, {Description: "Teilzeit", DurationYears: 3},
 		},
 	}
 }
