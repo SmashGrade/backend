@@ -207,6 +207,47 @@ func (st *StateDao) Get(id uint) (entity *models.State, err *e.ApiError) {
 	return getOrError[models.State](st.repo, id)
 }
 
+func (st *StateDao) Create(entity models.State) (returnEntity *models.State, err *e.ApiError) {
+	internalEntity, internalError := st.repo.Create(entity)
+
+	if internalError != nil {
+		return nil, e.NewDaoDbError()
+	}
+
+	return internalEntity.(*models.State), nil
+}
+
+// Create default values for state
+func (st *StateDao) CreateDefaults() *e.ApiError {
+	existingEntities, err := st.GetAll()
+	if err != nil {
+		return err
+	}
+
+	for _, v := range st.repo.Provider.Config().States {
+
+		existingFound := false
+		for _, existing := range existingEntities {
+			if v == existing.Description {
+				existingFound = true
+				break
+			}
+		}
+		if existingFound {
+			continue
+		}
+
+		_, err := st.Create(models.State{
+			Description: v,
+		})
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 // Curriculum / Studiengang
 // Highest level of categorization
 type CurriculumDao struct {
