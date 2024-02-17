@@ -3,7 +3,6 @@ package dao
 import (
 	"testing"
 
-	c "github.com/SmashGrade/backend/app/config"
 	"github.com/SmashGrade/backend/app/db"
 	_ "github.com/SmashGrade/backend/app/docs"
 	"github.com/SmashGrade/backend/app/models"
@@ -13,8 +12,7 @@ import (
 
 // Smoketest
 func TestMagicSmoke(t *testing.T) {
-	config := c.NewAPIConfig()
-	provider := db.NewProvider(config)
+	provider := db.NewMockProvider()
 
 	repo := repository.NewCourseRepository(provider)
 
@@ -32,8 +30,7 @@ func TestMagicSmoke(t *testing.T) {
 
 // GetAll should give a slice of ents
 func TestGetAll(t *testing.T) {
-	config := c.NewAPIConfig()
-	provider := db.NewProvider(config)
+	provider := db.NewMockProvider()
 
 	repo := repository.NewCourseRepository(provider)
 
