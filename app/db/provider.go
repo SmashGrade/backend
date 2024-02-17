@@ -121,11 +121,11 @@ func Migrate(p Provider) error {
 }
 
 // Returns a new provider based on the connection string
-func NewProvider(c *c.APIConfig) Provider {
+func NewProvider(config *c.APIConfig) Provider {
 	var provider Provider
 	switch true {
-	case strings.HasPrefix(c.DBConnectionStr, "sqlite://"):
-		provider = NewSQLiteProvider(c)
+	case strings.HasPrefix(config.DBConnectionStr, "sqlite://"):
+		provider = NewSQLiteProvider(config)
 	default:
 		provider = nil
 	}
@@ -134,5 +134,20 @@ func NewProvider(c *c.APIConfig) Provider {
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %s", err)
 	}
+	return provider
+}
+
+// Returns a in memory provider for mocking and testing
+func NewMockProvider() Provider {
+	// Override provider connection string with sqlite memory
+	var mockConfig *c.APIConfig = c.NewAPIConfig()
+	// Override connection string
+	mockConfig.DBConnectionStr = "sqlite://:memory:"
+	// Ensure that DB in memory is always migrate
+	mockConfig.AutoMigrate = true
+	provider := NewProvider(mockConfig)
+	// TODO: Add entities that are always the same
+	// e.g Users, Courses
+
 	return provider
 }
