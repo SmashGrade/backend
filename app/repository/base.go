@@ -27,6 +27,8 @@ type VersionedRepository interface {
 	GetVersioned(id uuid.UUID, version uint) (any, error)
 	DeleteVersioned(id uuid.UUID, version uint) error
 	GetLatestVersioned(id uuid.UUID) (any, error)
+	GetLatestVersion(id uuid.UUID) (uint, error)
+	GetNextVersion(id uuid.UUID) (uint, error)
 }
 
 // Repository methods for models with id and start date

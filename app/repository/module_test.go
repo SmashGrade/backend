@@ -98,3 +98,51 @@ func Test_Module_GetLatestVersioned(t *testing.T) {
 	require.NoError(t, err)
 	require.Nil(t, deep.Equal(module.Version, db.Module_2_2().Version))
 }
+
+// check if the version is correctly incremented and tracked
+func TestModuleVersionIncrement(t *testing.T) {
+	repository := NewModuleRepository(db.NewPrefilledMockProvider())
+
+	all, err := repository.GetAll()
+	require.NoError(t, err)
+
+	modules, ok := all.([]models.Module)
+	require.True(t, ok, "slice type assertion failed")
+
+	latestVersion, err := repository.GetLatestVersion(modules[0].ID) // TODO: this fails
+	require.NoError(t, err)
+
+	nextVersion, err := repository.GetNextVersion(modules[0].ID)
+	require.NoError(t, err)
+
+	if nextVersion <= latestVersion {
+		t.Fatalf("Next version %v should be greater than current version %v", nextVersion, latestVersion)
+	}
+
+	currentEntity, err := repository.GetLatestVersioned(modules[0].ID)
+	require.NoError(t, err)
+
+	currentModule, ok := currentEntity.(models.Module)
+	require.True(t, ok, "type assertion failed")
+
+	currentModule.Version = nextVersion
+
+	createdEntity, err := repository.Create(currentModule)
+	require.NoError(t, err)
+
+	createdModule, ok := createdEntity.(models.Module)
+	require.True(t, ok, "type assertion failed")
+
+	latestVersion, err = repository.GetLatestVersion(modules[0].ID)
+	require.NoError(t, err)
+
+	nextVersion, err = repository.GetNextVersion(modules[0].ID)
+	require.NoError(t, err)
+
+	require.Equal(t, currentModule.ID, createdModule.ID)
+	require.Equal(t, latestVersion, createdModule.Version)
+
+	if nextVersion <= latestVersion {
+		t.Fatalf("Next version %v should be greater than current version %v", nextVersion, latestVersion)
+	}
+}
