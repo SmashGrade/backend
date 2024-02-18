@@ -540,11 +540,17 @@ func (c *CourseDao) Delete(id, version uint) *e.ApiError {
 	return nil
 }
 
-type ExamDao struct{}
+type ExamDao struct {
+	examRepo   *repository.ExamRepository
+	courseRepo *repository.CourseRepository
+}
 
 // Create new exam dao with all used providers
-func NewDoaExam(examProvider *interface{}, courseProvider *interface{}) *ExamDao {
-	return nil
+func NewDoaExam(examRepository *repository.ExamRepository, courseRepository *repository.CourseRepository) *ExamDao {
+	return &ExamDao{
+		examRepo:   examRepository,
+		courseRepo: courseRepository,
+	}
 }
 
 // Returns a list of exams for a specific course
@@ -572,11 +578,15 @@ func (ex *ExamDao) Delete(courseId, courseVersion, examId uint) *e.ApiError {
 	return e.NewDaoUnimplementedError()
 }
 
-type UserDao struct{}
+type UserDao struct {
+	repo *repository.UserRepository
+}
 
 // Creates new dao from required repositories
-func NewUserDao(userRepository *interface{}) *UserDao {
-	return nil
+func NewUserDao(userRepository *repository.UserRepository) *UserDao {
+	return &UserDao{
+		repo: userRepository,
+	}
 }
 
 // Returns a list of courses a user has assigned
