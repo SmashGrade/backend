@@ -252,28 +252,50 @@ func (r *BaseRepository) GetLatestId() (uint, error) {
 		// Return the error if it is not nil
 		return 0, result.Error
 	}
+	// Get the id from the result
+	var lastId uint
+	err := result.Pluck("id", &lastId)
+	if err.Error != nil {
+		return 0, err.Error
+	}
 
-	// Reflect the entity to get the id field
-	// Check if its valid and of type uint
-	// Return its value
-	entityValueElement := reflect.ValueOf(entity).Elem()
-	entityValueElementIdField := entityValueElement.FieldByName("ID")
-	if !entityValueElementIdField.IsValid() {
-		return 0, errors.New("error: entity does not contain a id field to autoincrement")
-	}
-	if entityValueElementIdField.Kind() != reflect.Uint {
-		return 0, errors.New("error: entity id field is not of type uint")
-	}
-	id, ok := entityValueElementIdField.Interface().(uint)
-	if !ok {
-		return 0, errors.New("error: failed to convert id to uint")
-	}
-	return id, nil
+	return lastId, nil
 }
 
 // returns next possible id for the entity (manual autoincrement)
 func (r *BaseRepository) GetNextId() (uint, error) {
 	id, err := r.GetLatestId()
+	if err != nil {
+		return 0, err
+	}
+	return id + 1, nil
+}
+
+// returns currently highest used version
+func (r *BaseRepository) GetLatestVersion() (uint, error) {
+	entity := r.getInterface()
+
+	result := r.Provider.DB().Order("version desc").First(entity)
+	// Check if the result is not found and return the first id for the table
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		return 0, nil
+	} else if result.Error != nil {
+		// Return the error if it is not nil
+		return 0, result.Error
+	}
+	// Get the id from the result
+	var lastVersion uint
+	err := result.Pluck("version", &lastVersion)
+	if err.Error != nil {
+		return 0, err.Error
+	}
+
+	return lastVersion, nil
+}
+
+// returns next possible version for the entity (manual autoincrement)
+func (r *BaseRepository) GetNextVersion() (uint, error) {
+	id, err := r.GetLatestVersion()
 	if err != nil {
 		return 0, err
 	}
