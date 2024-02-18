@@ -49,15 +49,16 @@ func NewOutputController(provider db.Provider) *OutputController {
 	return ctrl
 }
 
-// @Summary		Get all states
-// @Description	Get all states
-// @Tags			states
-// @Produce		json
-// @Success		200	{array}		models.State
-// @Failure		401	{object}	error.ApiError
-// @Failure		403	{object}	error.ApiError
-// @Failure		500	{object}	error.ApiError
-// @Router			/states [get]
+//	@Summary		Get all states
+//	@Description	Get all states
+//	@Tags			states
+//	@Produce		json
+//	@Success		200	{array}		models.State
+//	@Failure		401	{object}	error.ApiError
+//	@Failure		403	{object}	error.ApiError
+//	@Failure		500	{object}	error.ApiError
+//	@Router			/states [get]
+//	@Security		Bearer
 func (c *OutputController) States(ctx echo.Context) error {
 	res, err := c.stateDao.GetAll()
 	if err != nil {
@@ -66,15 +67,16 @@ func (c *OutputController) States(ctx echo.Context) error {
 	return c.Yeet(ctx, res)
 }
 
-// @Summary		Get all curriculum types
-// @Description	Get all curriculum types
-// @Tags			curriculumtypes
-// @Produce		json
-// @Success		200	{array}		models.Curriculumtype
-// @Failure		401	{object}	error.ApiError
-// @Failure		403	{object}	error.ApiError
-// @Failure		500	{object}	error.ApiError
-// @Router			/curriculumtypes [get]
+//	@Summary		Get all curriculum types
+//	@Description	Get all curriculum types
+//	@Tags			curriculumtypes
+//	@Produce		json
+//	@Success		200	{array}		models.Curriculumtype
+//	@Failure		401	{object}	error.ApiError
+//	@Failure		403	{object}	error.ApiError
+//	@Failure		500	{object}	error.ApiError
+//	@Router			/curriculumtypes [get]
+//	@Security		Bearer
 func (c *OutputController) Curriculumtypes(ctx echo.Context) error {
 	res, err := c.curriculumytypeDao.GetAll()
 	if err != nil {
@@ -83,15 +85,16 @@ func (c *OutputController) Curriculumtypes(ctx echo.Context) error {
 	return c.Yeet(ctx, res)
 }
 
-// @Summary		Get all grade types
-// @Description	Get all grade types
-// @Tags			gradetypes
-// @Produce		json
-// @Success		200	{array}		models.Gradetype
-// @Failure		401	{object}	error.ApiError
-// @Failure		403	{object}	error.ApiError
-// @Failure		500	{object}	error.ApiError
-// @Router			/gradetypes [get]
+//	@Summary		Get all grade types
+//	@Description	Get all grade types
+//	@Tags			gradetypes
+//	@Produce		json
+//	@Success		200	{array}		models.Gradetype
+//	@Failure		401	{object}	error.ApiError
+//	@Failure		403	{object}	error.ApiError
+//	@Failure		500	{object}	error.ApiError
+//	@Router			/gradetypes [get]
+//	@Security		Bearer
 func (c *OutputController) Gradetypes(ctx echo.Context) error {
 	res, err := c.gradetypeDao.GetAll()
 	if err != nil {
@@ -100,15 +103,16 @@ func (c *OutputController) Gradetypes(ctx echo.Context) error {
 	return c.Yeet(ctx, res)
 }
 
-// @Summary		Get all evaluation types
-// @Description	Get all evaluation types
-// @Tags			evaluationtypes
-// @Produce		json
-// @Success		200	{array}		models.Evaluationtype
-// @Failure		401	{object}	error.ApiError
-// @Failure		403	{object}	error.ApiError
-// @Failure		500	{object}	error.ApiError
-// @Router			/evaluationtypes [get]
+//	@Summary		Get all evaluation types
+//	@Description	Get all evaluation types
+//	@Tags			evaluationtypes
+//	@Produce		json
+//	@Success		200	{array}		models.Evaluationtype
+//	@Failure		401	{object}	error.ApiError
+//	@Failure		403	{object}	error.ApiError
+//	@Failure		500	{object}	error.ApiError
+//	@Router			/evaluationtypes [get]
+//	@Security		Bearer
 func (c *OutputController) Evaluationtypes(ctx echo.Context) error {
 	res, err := c.evaluationtypeDao.GetAll()
 	if err != nil {
@@ -117,15 +121,16 @@ func (c *OutputController) Evaluationtypes(ctx echo.Context) error {
 	return c.Yeet(ctx, res)
 }
 
-// @Summary		Get all fields
-// @Description	Get all fields
-// @Tags			fields
-// @Produce		json
-// @Success		200	{array}		models.Field
-// @Failure		401	{object}	error.ApiError
-// @Failure		403	{object}	error.ApiError
-// @Failure		500	{object}	error.ApiError
-// @Router			/fields [get]
+//	@Summary		Get all fields
+//	@Description	Get all fields
+//	@Tags			fields
+//	@Produce		json
+//	@Success		200	{array}		models.Field
+//	@Failure		401	{object}	error.ApiError
+//	@Failure		403	{object}	error.ApiError
+//	@Failure		500	{object}	error.ApiError
+//	@Router			/fields [get]
+//	@Security		Bearer
 func (c *OutputController) Fields(ctx echo.Context) error {
 	res, err := c.fieldDao.GetAll()
 	if err != nil {
@@ -134,15 +139,16 @@ func (c *OutputController) Fields(ctx echo.Context) error {
 	return c.Yeet(ctx, res)
 }
 
-// @Summary		Get all focuses
-// @Description	Get all focuses
-// @Tags			focuses
-// @Produce		json
-// @Success		200	{array}		models.Focus
-// @Failure		401	{object}	error.ApiError
-// @Failure		403	{object}	error.ApiError
-// @Failure		500	{object}	error.ApiError
-// @Router			/focuses [get]
+//	@Summary		Get all focuses
+//	@Description	Get all focuses
+//	@Tags			focuses
+//	@Produce		json
+//	@Success		200	{array}		models.Focus
+//	@Failure		401	{object}	error.ApiError
+//	@Failure		403	{object}	error.ApiError
+//	@Failure		500	{object}	error.ApiError
+//	@Router			/focuses [get]
+//	@Security		Bearer
 func (c *OutputController) Focuses(ctx echo.Context) error {
 	res, err := c.focusDao.GetAll()
 	if err != nil {
@@ -151,15 +157,16 @@ func (c *OutputController) Focuses(ctx echo.Context) error {
 	return c.Yeet(ctx, res)
 }
 
-// @Summary		Get all exam types
-// @Description	Get all exam types
-// @Tags			examtypes
-// @Produce		json
-// @Success		200	{array}		models.Examtype
-// @Failure		401	{object}	error.ApiError
-// @Failure		403	{object}	error.ApiError
-// @Failure		500	{object}	error.ApiError
-// @Router			/examtypes [get]
+//	@Summary		Get all exam types
+//	@Description	Get all exam types
+//	@Tags			examtypes
+//	@Produce		json
+//	@Success		200	{array}		models.Examtype
+//	@Failure		401	{object}	error.ApiError
+//	@Failure		403	{object}	error.ApiError
+//	@Failure		500	{object}	error.ApiError
+//	@Router			/examtypes [get]
+//	@Security		Bearer
 func (c *OutputController) Examtypes(ctx echo.Context) error {
 	res, err := c.examtypeDao.GetAll()
 	if err != nil {

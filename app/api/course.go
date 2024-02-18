@@ -31,6 +31,7 @@ func NewCourseController(provider db.Provider) *CourseController {
 //	@Failure		403	{object}	error.ApiError
 //	@Failure		500	{object}	error.ApiError
 //	@Router			/courses [get]
+//	@Security		Bearer
 func (c *CourseController) Courses(ctx echo.Context) error {
 	res, err := c.Dao.GetAll()
 	if err != nil {
@@ -50,6 +51,7 @@ func (c *CourseController) Courses(ctx echo.Context) error {
 //	@Failure		403	{object}	error.ApiError
 //	@Failure		500	{object}	error.ApiError
 //	@Router			/courses/{id}/{version} [get]
+//	@Security		Bearer
 func (c *CourseController) Course(ctx echo.Context) error {
 	// Read id parameter from request
 	id := c.GetPathParamInt(ctx, "id")
@@ -68,4 +70,10 @@ func (c *CourseController) Course(ctx echo.Context) error {
 	}
 	// Return the result to the client
 	return c.Yeet(ctx, res)
+}
+
+// register all output endpoints to router
+func RegisterV1Courses(g *echo.Group, c *CourseController) {
+	g.GET("/courses", c.Courses)
+	g.GET("/courses/:id/:version", c.Course)
 }

@@ -14,10 +14,14 @@
         "version": "1.0"
     },
     "host": "api.smashgrade.ch",
-    "basePath": "/v1",
     "paths": {
         "/courses": {
             "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Get all courses",
                 "produces": [
                     "application/json"
@@ -59,6 +63,11 @@
         },
         "/courses/{id}/{version}": {
             "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Get a specific course",
                 "produces": [
                     "application/json"
@@ -113,6 +122,11 @@
         },
         "/curriculumtypes": {
             "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Get all curriculum types",
                 "produces": [
                     "application/json"
@@ -154,6 +168,11 @@
         },
         "/evaluationtypes": {
             "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Get all evaluation types",
                 "produces": [
                     "application/json"
@@ -195,6 +214,11 @@
         },
         "/examtypes": {
             "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Get all exam types",
                 "produces": [
                     "application/json"
@@ -236,6 +260,11 @@
         },
         "/fields": {
             "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Get all fields",
                 "produces": [
                     "application/json"
@@ -277,6 +306,11 @@
         },
         "/focuses": {
             "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Get all focuses",
                 "produces": [
                     "application/json"
@@ -318,6 +352,11 @@
         },
         "/gradetypes": {
             "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Get all grade types",
                 "produces": [
                     "application/json"
@@ -359,6 +398,11 @@
         },
         "/states": {
             "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Get all states",
                 "produces": [
                     "application/json"
@@ -831,6 +875,14 @@
                     "type": "string"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "Bearer": {
+            "description": "Type \"Bearer\" followed by a space and JWT token.",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }

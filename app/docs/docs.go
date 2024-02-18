@@ -24,6 +24,11 @@ const docTemplate = `{
     "paths": {
         "/courses": {
             "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Get all courses",
                 "produces": [
                     "application/json"
@@ -65,6 +70,11 @@ const docTemplate = `{
         },
         "/courses/{id}/{version}": {
             "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Get a specific course",
                 "produces": [
                     "application/json"
@@ -119,6 +129,11 @@ const docTemplate = `{
         },
         "/curriculumtypes": {
             "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Get all curriculum types",
                 "produces": [
                     "application/json"
@@ -160,6 +175,11 @@ const docTemplate = `{
         },
         "/evaluationtypes": {
             "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Get all evaluation types",
                 "produces": [
                     "application/json"
@@ -201,6 +221,11 @@ const docTemplate = `{
         },
         "/examtypes": {
             "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Get all exam types",
                 "produces": [
                     "application/json"
@@ -242,6 +267,11 @@ const docTemplate = `{
         },
         "/fields": {
             "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Get all fields",
                 "produces": [
                     "application/json"
@@ -283,6 +313,11 @@ const docTemplate = `{
         },
         "/focuses": {
             "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Get all focuses",
                 "produces": [
                     "application/json"
@@ -324,6 +359,11 @@ const docTemplate = `{
         },
         "/gradetypes": {
             "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Get all grade types",
                 "produces": [
                     "application/json"
@@ -365,6 +405,11 @@ const docTemplate = `{
         },
         "/states": {
             "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Get all states",
                 "produces": [
                     "application/json"
@@ -838,6 +883,14 @@ const docTemplate = `{
                 }
             }
         }
+    },
+    "securityDefinitions": {
+        "Bearer": {
+            "description": "Type \"Bearer\" followed by a space and JWT token.",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
     }
 }`
 
@@ -845,7 +898,7 @@ const docTemplate = `{
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
 	Host:             "api.smashgrade.ch",
-	BasePath:         "/v1",
+	BasePath:         "",
 	Schemes:          []string{},
 	Title:            "Smashgrade Backend API",
 	Description:      "Backend API for Smashgrade, a web application for tracking your student grades.",
