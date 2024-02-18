@@ -4,10 +4,13 @@ FROM docker.io/golang:1.21.6 AS build
 
 WORKDIR /app
 
+# Download swag
+RUN go install github.com/swaggo/swag/cmd/swag@latest
+
+# Copy app to container
 COPY app .
 
-# generate updated swagger docs
-RUN go install github.com/swaggo/swag/cmd/swag@latest
+# Generate swagger docs
 RUN swag init --pd --parseDepth 3
 
 # cgo is needed for sqlite
