@@ -252,7 +252,7 @@ func (r *BaseRepository) GetLatestId() (uint, error) {
 	}
 	// Get the id from the result
 	var ids []uint
-	err := result.Pluck("id", ids)
+	err := result.Pluck("id", &ids)
 	if err.Error != nil {
 		return 0, err.Error
 	}
@@ -284,7 +284,7 @@ func (r *BaseRepository) GetLatestVersion(id uint) (uint, error) {
 	}
 	// Get the id from the result
 	var versions []uint
-	err := result.Pluck("version", versions)
+	err := result.Pluck("version", &versions)
 	if err.Error != nil {
 		return 0, err.Error
 	}
