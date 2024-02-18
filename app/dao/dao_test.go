@@ -249,3 +249,53 @@ func TestCreateCourseVersion(t *testing.T) {
 	require.NotEqual(t, testCourse.Version, createdCourse.Version)
 	require.Equal(t, uint(1), createdCourse.Version)
 }
+
+func TestModuleCRUD(t *testing.T) {
+	provider := db.NewPrefilledMockProvider()
+
+	dao := NewModuleDao(repository.NewModuleRepository(provider))
+
+	testDescr := "testdescr"
+
+	// Create
+	retModule, err := dao.Create(models.Module{
+		Description: testDescr,
+	})
+	require.Nil(t, err)
+	require.NotEqual(t, uuid.UUID{}, retModule.ID)
+	require.Equal(t, testDescr, retModule.Description)
+
+	// Read
+	readModuleGet, err := dao.Get(retModule.ID, retModule.Version)
+	require.Nil(t, err)
+	require.Equal(t, retModule.Version, readModuleGet.Version)
+	require.Equal(t, retModule.ID, readModuleGet.ID)
+
+	readModuleGetLatest, err := dao.GetLatest(retModule.ID)
+	require.Nil(t, err)
+	require.Equal(t, retModule.Version, readModuleGetLatest.Version)
+	require.Equal(t, retModule.ID, readModuleGetLatest.ID)
+
+	// Update
+	newTestDescr := "wowee"
+	newModule := models.Module{
+		Description: newTestDescr,
+	}
+	newModule.ID = retModule.ID
+	newModule.Version = retModule.Version
+
+	err = dao.Update(newModule)
+	require.Nil(t, err)
+
+	updatedModule, err := dao.Get(retModule.ID, retModule.Version)
+	require.Nil(t, err)
+	require.Equal(t, retModule.Version, readModuleGet.Version)
+	require.Equal(t, retModule.ID, readModuleGet.ID)
+	require.Equal(t, newTestDescr, updatedModule.Description)
+
+	// Delete
+	err = dao.Delete(retModule.ID, retModule.Version)
+	require.Nil(t, err)
+	_, err = dao.Get(retModule.ID, retModule.Version)
+	require.NotNil(t, err)
+}

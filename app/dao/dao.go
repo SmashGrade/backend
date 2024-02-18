@@ -482,17 +482,47 @@ func (m *ModuleDao) GetLatest(id uuid.UUID) (entity *models.Module, err *e.ApiEr
 // Will create a new module if neither id nor version are set
 // Will create a new module version if only id is set
 func (m *ModuleDao) Create(entity models.Module) (returnEntity *models.Module, err *e.ApiError) {
-	return nil, e.NewDaoUnimplementedError()
+	var internalError error
+
+	// First check if the id is zero, if yes generate it
+	if entity.GenerateIdIfEmpty() {
+		entity.Version = 1 // set version to one on new id
+	} else {
+		if entity.Version == 0 { // generate new version if it is initial on existing id
+			entity.Version, internalError = m.repo.GetNextVersion(entity.ID)
+			if internalError != nil {
+				entity.Version = 1 // no previous version found
+			}
+		}
+	}
+
+	internalEntity, internalError := m.repo.Create(&entity)
+
+	if internalError != nil {
+		return nil, e.NewDaoDbError()
+	}
+
+	return internalEntity.(*models.Module), nil
 }
 
 // Will update an existing module specified by id and version
 func (m *ModuleDao) Update(entity models.Module) *e.ApiError {
-	return e.NewDaoUnimplementedError()
+	internalError := m.repo.Update(entity)
+	if internalError != nil {
+		return e.NewDaoDbError()
+	}
+
+	return nil
 }
 
 // Deletes a single module with id and version
-func (m *ModuleDao) Delete(id, version uint) *e.ApiError {
-	return e.NewDaoUnimplementedError()
+func (m *ModuleDao) Delete(id uuid.UUID, version uint) *e.ApiError {
+	internalError := m.repo.DeleteVersioned(id, version)
+	if internalError != nil {
+		return e.NewDaoDbError()
+	}
+
+	return nil
 }
 
 type CourseDao struct {
