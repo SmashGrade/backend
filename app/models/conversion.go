@@ -1,10 +1,17 @@
 package models
 
-import "time"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 // Grade conversion from raw input in the exam evaluation in a gradetype
 type Conversion struct {
-	Basemodel
+	ID        uint           `gorm:"primarykey;autoincrement:false" json:"id"`
+	CreatedAt time.Time      `json:"created"`
+	UpdatedAt time.Time      `json:"updated"`
+	DeletedAt gorm.DeletedAt `gorm:"index" json:"deleted,omitempty"`
 
 	EERegisteredByID               uint      `gorm:"primarykey" json:"EERegisteredByID"`
 	EESelectedCourseUserID         uint      `gorm:"primarykey" json:"EESelectedCourseUserID"`

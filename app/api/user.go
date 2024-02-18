@@ -32,7 +32,13 @@ func NewUserController(provider db.Provider) *UserController {
 // @Router			/user [get]
 // @Security		Bearer
 func (c *UserController) User(ctx echo.Context) error {
-	return nil
+	user, err := c.GetUser(ctx)
+	// Return error if error occurred
+	if err != nil {
+		return err
+	}
+	// Return the user
+	return c.Yeet(ctx, user)
 }
 
 // register all output endpoints to router

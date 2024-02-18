@@ -3,7 +3,6 @@ package models
 import (
 	"time"
 
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -16,30 +15,17 @@ type Basemodel struct {
 }
 
 // VersionedBasemodel is the base model for all models with versioning
+// Bug: Autoincrement does not work with composite primary keys
 type VersionedBasemodel struct {
-	ID        uuid.UUID      `gorm:"type:uuid;primarykey;" json:"id"`
+	ID        uint           `gorm:"primarykey;autoincrement:false" json:"id"`
+	Version   uint           `gorm:"primarykey" json:"version"`
 	CreatedAt time.Time      `json:"created"`
 	UpdatedAt time.Time      `json:"updated"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"deleted,omitempty"`
-	Version   uint           `gorm:"primarykey" json:"version"`
-}
-
-// sets id to random uuid
-func (v *VersionedBasemodel) GenerateId() {
-	v.ID = uuid.New()
-}
-
-// sets id to random uuid if it is initial, returns true if id is generated
-func (v *VersionedBasemodel) GenerateIdIfEmpty() bool {
-	var emptyUUID = uuid.UUID{}
-	if v.ID == emptyUUID {
-		v.GenerateId()
-		return true
-	}
-	return false
 }
 
 // TerminatedBasemodel is the base model for all models with a start time
+// Bug: Autoincrement does not work with composite primary keys
 type TerminatedBasemodel struct {
 	ID            uint           `gorm:"primaryKey;autoincrement:false" json:"id"`
 	StartValidity time.Time      `gorm:"primarykey;autoincrement:false" json:"startvalidity"`
