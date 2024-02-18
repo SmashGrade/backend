@@ -27,7 +27,7 @@ func NewModuleController(provider db.Provider) *ModuleController {
 // @Description	Get all modules
 // @Tags			modules
 // @Produce		json
-// @Success		200	{array}		models.module
+// @Success		200	{array}		models.Module
 // @Failure		401	{object}	error.ApiError
 // @Failure		403	{object}	error.ApiError
 // @Failure		500	{object}	error.ApiError
