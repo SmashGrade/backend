@@ -250,15 +250,22 @@ func (r *BaseRepository) GetLatestId() (uint, error) {
 		// Return the error if it is not nil
 		return 0, result.Error
 	}
-	// Get the id from the result
-	var ids []uint
-	err := result.Pluck("id", &ids)
-	if err.Error != nil {
-		return 0, err.Error
+	// Reflect the entity to get the id field
+	// Check if its valid and of type uint
+	// Return its value
+	entityValueElement := reflect.ValueOf(entity).Elem()
+	entityValueElementIdField := entityValueElement.FieldByName("ID")
+	if !entityValueElementIdField.IsValid() {
+		return 0, errors.New("error: entity does not contain a id field to autoincrement")
 	}
-	// Expecting the first id to be the largest since we ordered the query
-	largestId := (ids)[0]
-	return largestId, nil
+	if entityValueElementIdField.Kind() != reflect.Uint {
+		return 0, errors.New("error: entity id field is not of type uint")
+	}
+	id, ok := entityValueElementIdField.Interface().(uint)
+	if !ok {
+		return 0, errors.New("error: failed to convert id to uint")
+	}
+	return id, nil
 }
 
 // returns next possible id for the entity (manual autoincrement)
@@ -282,15 +289,22 @@ func (r *BaseRepository) GetLatestVersion(id uint) (uint, error) {
 		// Return the error if it is not nil
 		return 0, result.Error
 	}
-	// Get the id from the result
-	var versions []uint
-	err := result.Pluck("version", &versions)
-	if err.Error != nil {
-		return 0, err.Error
+	// Reflect the entity to get the id field
+	// Check if its valid and of type uint
+	// Return its value
+	entityValueElement := reflect.ValueOf(entity).Elem()
+	entityValueVersionField := entityValueElement.FieldByName("Version")
+	if !entityValueVersionField.IsValid() {
+		return 0, errors.New("error: entity does not contain a id field to autoincrement")
 	}
-	// Expecting the first id to be the largest since we ordered the query
-	largestVersion := (versions)[0]
-	return largestVersion, nil
+	if entityValueVersionField.Kind() != reflect.Uint {
+		return 0, errors.New("error: entity id field is not of type uint")
+	}
+	version, ok := entityValueVersionField.Interface().(uint)
+	if !ok {
+		return 0, errors.New("error: failed to convert id to uint")
+	}
+	return version, nil
 }
 
 // returns next possible version for the entity (manual autoincrement)
