@@ -105,7 +105,7 @@ Usage (example with models.Course):
 func (r *BaseRepository) Find(entity any) (any, error) {
 	entities := r.getSliceInterface()
 
-	result := r.Provider.DB().Preload(clause.Associations).Where(&entity).Find(&entities)
+	result := r.Provider.DB().Preload(clause.Associations).Find(&entities, entity)
 	if result.Error != nil {
 		return nil, result.Error
 	}
