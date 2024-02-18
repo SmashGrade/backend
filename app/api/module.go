@@ -1,11 +1,12 @@
 package api
 
 import (
+	"strconv"
+
 	"github.com/SmashGrade/backend/app/dao"
 	"github.com/SmashGrade/backend/app/db"
 	e "github.com/SmashGrade/backend/app/error"
 	"github.com/SmashGrade/backend/app/repository"
-	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 )
 
@@ -44,7 +45,7 @@ func (c *ModuleController) Modules(ctx echo.Context) error {
 // @Summary		Get a specific module
 // @Description	Get a specific module
 // @Tags			modules
-// @Param			id		path	string	true	"Module ID"
+// @Param			id		path	uint	true	"Module ID"
 // @Param			version	path	uint	true	"Module Version"
 // @Produce		json
 // @Success		200	{object}	models.Module
@@ -59,7 +60,7 @@ func (c *ModuleController) Module(ctx echo.Context) error {
 	if id == "" {
 		return e.ErrorInvalidRequest("module id")
 	}
-	paramuuid, err := uuid.Parse(id)
+	paramid, err := strconv.Atoi(id)
 	if err != nil {
 		return e.ErrorInvalidRequest("module id")
 	}
@@ -69,7 +70,7 @@ func (c *ModuleController) Module(ctx echo.Context) error {
 		return e.ErrorInvalidRequest("module version")
 	}
 	// Ask the DAO for the module
-	res, err := c.Dao.Get(paramuuid, uint(version))
+	res, err := c.Dao.Get(uint(paramid), uint(version))
 	if err != nil {
 		return err
 	}

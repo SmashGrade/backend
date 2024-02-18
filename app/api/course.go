@@ -1,11 +1,12 @@
 package api
 
 import (
+	"strconv"
+
 	"github.com/SmashGrade/backend/app/dao"
 	"github.com/SmashGrade/backend/app/db"
 	e "github.com/SmashGrade/backend/app/error"
 	"github.com/SmashGrade/backend/app/repository"
-	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 )
 
@@ -44,7 +45,7 @@ func (c *CourseController) Courses(ctx echo.Context) error {
 // @Summary		Get a specific course
 // @Description	Get a specific course
 // @Tags			courses
-// @Param			id		path	string	true	"Course ID"
+// @Param			id		path	uint	true	"Course ID"
 // @Param			version	path	uint	true	"Course Version"
 // @Produce		json
 // @Success		200	{object}	models.Course
@@ -59,7 +60,7 @@ func (c *CourseController) Course(ctx echo.Context) error {
 	if id == "" {
 		return e.ErrorInvalidRequest("course id")
 	}
-	paramuuid, err := uuid.Parse(id)
+	paramid, err := strconv.Atoi(id) //uuid.Parse(id)
 	if err != nil {
 		return e.ErrorInvalidRequest("course id")
 	}
@@ -69,7 +70,7 @@ func (c *CourseController) Course(ctx echo.Context) error {
 		return e.ErrorInvalidRequest("course version")
 	}
 	// Ask the DAO for the course
-	res, err := c.Dao.Get(paramuuid, uint(version))
+	res, err := c.Dao.Get(uint(paramid), uint(version))
 	if err != nil {
 		return err
 	}
