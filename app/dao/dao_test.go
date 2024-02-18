@@ -7,7 +7,6 @@ import (
 	_ "github.com/SmashGrade/backend/app/docs"
 	"github.com/SmashGrade/backend/app/models"
 	"github.com/SmashGrade/backend/app/repository"
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 	_ "gorm.io/gorm"
 )
@@ -38,8 +37,6 @@ func TestGetAll(t *testing.T) {
 
 	dao := NewCourseDao(repo)
 
-	var emptyUUID = uuid.UUID{}
-
 	courseEnt := models.Course{Description: "Lol"}
 
 	retEnt, err := dao.Create(courseEnt)
@@ -48,7 +45,7 @@ func TestGetAll(t *testing.T) {
 	}
 
 	// original entity must not be modified
-	require.Equal(t, emptyUUID, courseEnt.ID)
+	require.Equal(t, uint(0), courseEnt.ID)
 
 	_, err = dao.Create(courseEnt)
 	if err != nil {
