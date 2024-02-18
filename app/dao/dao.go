@@ -447,7 +447,7 @@ func (c *CurriculumDao) Get(id uint, startValidity time.Time) (entity *models.Cu
 }
 
 // Creates new curriculum
-func (c *CurriculumDao) Create(entity *models.Curriculum) *e.ApiError {
+func (c *CurriculumDao) Create(entity models.Curriculum) *e.ApiError {
 	return e.NewDaoUnimplementedError()
 }
 
@@ -523,9 +523,11 @@ func (c *CourseDao) GetLatest(id uuid.UUID) (entity *models.Course, err *e.ApiEr
 
 // Will create a new course if neither id nor version are set
 // Will create a new course version if only id is set
-func (c *CourseDao) Create(entity *models.Course) (returnEntity *models.Course, err *e.ApiError) {
+func (c *CourseDao) Create(entity models.Course) (returnEntity *models.Course, err *e.ApiError) {
 
-	internalEntity, internalError := c.repo.Create(entity)
+	entity.GenerateIdIfEmpty()
+
+	internalEntity, internalError := c.repo.Create(&entity)
 
 	if internalError != nil {
 		return nil, e.NewDaoDbError()

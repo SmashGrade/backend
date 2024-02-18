@@ -23,3 +23,16 @@ type VersionedBasemodel struct {
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"deleted,omitempty"`
 	Version   uint           `gorm:"primarykey" json:"version"`
 }
+
+// sets id to random uuid
+func (v *VersionedBasemodel) GenerateId() {
+	v.ID = uuid.New()
+}
+
+// sets id to random uuid if it is initial
+func (v *VersionedBasemodel) GenerateIdIfEmpty() {
+	var emptyUUID = uuid.UUID{}
+	if v.ID == emptyUUID {
+		v.GenerateId()
+	}
+}

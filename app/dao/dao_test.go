@@ -8,6 +8,7 @@ import (
 	"github.com/SmashGrade/backend/app/models"
 	"github.com/SmashGrade/backend/app/repository"
 	"github.com/google/uuid"
+	"github.com/stretchr/testify/require"
 	_ "gorm.io/gorm"
 )
 
@@ -19,7 +20,7 @@ func TestMagicSmoke(t *testing.T) {
 
 	dao := NewCourseDao(repo)
 
-	courseEnt := &models.Course{Description: "Lol"}
+	courseEnt := models.Course{Description: "Lol"}
 
 	retEnt, err := dao.Create(courseEnt)
 	if err != nil {
@@ -37,14 +38,17 @@ func TestGetAll(t *testing.T) {
 
 	dao := NewCourseDao(repo)
 
-	courseEnt := &models.Course{Description: "Lol"}
+	var emptyUUID = uuid.UUID{}
+
+	courseEnt := models.Course{Description: "Lol"}
 
 	retEnt, err := dao.Create(courseEnt)
 	if err != nil {
 		t.Fatalf("Got db error")
 	}
 
-	courseEnt.ID = uuid.UUID{}
+	// original entity must not be modified
+	require.Equal(t, emptyUUID, courseEnt.ID)
 
 	_, err = dao.Create(courseEnt)
 	if err != nil {
