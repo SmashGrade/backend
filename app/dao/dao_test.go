@@ -139,3 +139,50 @@ func TestCreateDefaults(t *testing.T) {
 		t.Fatalf("Expected '%v' entries, got '%v'", len(entities), len(provider.Config().States))
 	}
 }
+
+// check if field and focus can be matched
+func TestCreateFieldAndFocus(t *testing.T) {
+	provider := db.NewMockProvider()
+
+	fieldRepo := repository.NewFieldRepository(provider)
+
+	fielDao := NewFieldDao(fieldRepo)
+
+	focusRepo := repository.NewFocusRepository(provider)
+
+	focusDao := NewFocusDao(focusRepo)
+
+	retField, err := fielDao.Create(models.Field{
+		Description: "TestField",
+	})
+	if err != nil {
+		t.Fatal("Error at creating field")
+	}
+
+	_, err = focusDao.Create(models.Focus{
+		Description: "TestFocus1",
+		Field:       *retField,
+	})
+	if err != nil {
+		t.Fatal("Error at creating first focus")
+	}
+
+	_, err = focusDao.Create(models.Focus{
+		Description: "TestFocus2",
+		Field:       *retField,
+	})
+	if err != nil {
+		t.Fatal("Error at creating second focus")
+	}
+
+	focuses, err := focusDao.GetAll()
+	if err != nil {
+		t.Fatal("Error at getAll focus")
+	}
+
+	for _, f := range focuses {
+		if f.Field.ID != retField.ID {
+			t.Fatalf("on focus %v expected fieldID %v got %v", f.ID, retField.ID, f.Field.ID)
+		}
+	}
+}

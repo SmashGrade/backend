@@ -59,6 +59,17 @@ func getLatestVersionedOrError[outputModel any](repo repository.VersionedReposit
 	return ent.(*outputModel), nil
 }
 
+// Returns a specific modelType entity reference from generic repository create call
+func createOrError[modelType any](repo repository.Repository, entity modelType) (returnEntity *modelType, err *e.ApiError) {
+	internalEntity, internalError := repo.Create(&entity)
+
+	if internalError != nil {
+		return nil, e.NewDaoDbError()
+	}
+
+	return internalEntity.(*modelType), nil
+}
+
 // curriculum type / Studiengang art
 // has description like Vollzeit or Berufsbegleitend
 type CurriculumTypeDao struct {
@@ -82,13 +93,7 @@ func (c *CurriculumTypeDao) Get(id uint) (entity *models.Curriculumtype, err *e.
 }
 
 func (c *CurriculumTypeDao) Create(entity models.Curriculumtype) (returnEntity *models.Curriculumtype, err *e.ApiError) {
-	internalEntity, internalError := c.repo.Create(&entity)
-
-	if internalError != nil {
-		return nil, e.NewDaoDbError()
-	}
-
-	return internalEntity.(*models.Curriculumtype), nil
+	return createOrError(c.repo, entity)
 }
 
 // Create default values for curriculum type
@@ -144,6 +149,10 @@ func (c *FieldDao) Get(id uint) (entity *models.Field, err *e.ApiError) {
 	return getOrError[models.Field](c.repo, id)
 }
 
+func (c *FieldDao) Create(entity models.Field) (returnEntity *models.Field, err *e.ApiError) {
+	return createOrError(c.repo, entity)
+}
+
 // focus / Fachrichtung
 type FocusDao struct {
 	repo *repository.FocusRepository
@@ -163,6 +172,10 @@ func (c *FocusDao) GetAll() (entities []models.Focus, err *e.ApiError) {
 
 func (c *FocusDao) Get(id uint) (entity *models.Focus, err *e.ApiError) {
 	return getOrError[models.Focus](c.repo, id)
+}
+
+func (c *FocusDao) Create(entity models.Focus) (returnEntity *models.Focus, err *e.ApiError) {
+	return createOrError(c.repo, entity)
 }
 
 // exam type / Test art
