@@ -7,6 +7,7 @@ import (
 	_ "github.com/SmashGrade/backend/app/docs"
 	"github.com/SmashGrade/backend/app/models"
 	"github.com/SmashGrade/backend/app/repository"
+	"github.com/google/uuid"
 	_ "gorm.io/gorm"
 )
 
@@ -43,7 +44,7 @@ func TestGetAll(t *testing.T) {
 		t.Fatalf("Got db error")
 	}
 
-	courseEnt.ID = 0
+	courseEnt.ID = uuid.UUID{}
 
 	_, err = dao.Create(courseEnt)
 	if err != nil {

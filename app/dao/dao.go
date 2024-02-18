@@ -6,6 +6,7 @@ import (
 	e "github.com/SmashGrade/backend/app/error"
 	"github.com/SmashGrade/backend/app/models"
 	"github.com/SmashGrade/backend/app/repository"
+	"github.com/google/uuid"
 )
 
 // Asserts that an []any slice is a specific model slice via type assertion
@@ -41,7 +42,7 @@ func getOrError[outputModel any](repo repository.IdRepository, id uint) (outputE
 }
 
 // Returns specific outputModel entity reference from repository getVersioned call
-func getVersionedOrError[outputModel any](repo repository.VersionedRepository, id, version uint) (outputEntity *outputModel, err *e.ApiError) {
+func getVersionedOrError[outputModel any](repo repository.VersionedRepository, id uuid.UUID, version uint) (outputEntity *outputModel, err *e.ApiError) {
 	ent, internalError := repo.GetVersioned(id, version)
 	if internalError != nil {
 		return nil, e.NewDaoDbError()
@@ -50,7 +51,7 @@ func getVersionedOrError[outputModel any](repo repository.VersionedRepository, i
 }
 
 // Returns specific outputModel entity reference from repository getLatestVersioned call
-func getLatestVersionedOrError[outputModel any](repo repository.VersionedRepository, id uint) (outputEntity *outputModel, err *e.ApiError) {
+func getLatestVersionedOrError[outputModel any](repo repository.VersionedRepository, id uuid.UUID) (outputEntity *outputModel, err *e.ApiError) {
 	ent, internalError := repo.GetLatestVersioned(id)
 	if internalError != nil {
 		return nil, e.NewDaoDbError()
@@ -456,12 +457,12 @@ func (m *ModuleDao) GetAll() (entities []models.Module, err *e.ApiError) {
 }
 
 // Returns module identified by id and version
-func (m *ModuleDao) Get(id, version uint) (entity *models.Module, err *e.ApiError) {
+func (m *ModuleDao) Get(id uuid.UUID, version uint) (entity *models.Module, err *e.ApiError) {
 	return getVersionedOrError[models.Module](m.repo, id, version)
 }
 
 // Returns module by id with highest version
-func (m *ModuleDao) GetLatest(id uint) (entity *models.Module, err *e.ApiError) {
+func (m *ModuleDao) GetLatest(id uuid.UUID) (entity *models.Module, err *e.ApiError) {
 	return getLatestVersionedOrError[models.Module](m.repo, id)
 }
 
@@ -498,12 +499,12 @@ func (c *CourseDao) GetAll() (entities []models.Course, err *e.ApiError) {
 }
 
 // Returns course by id and version
-func (c *CourseDao) Get(id, version uint) (entity *models.Course, err *e.ApiError) {
+func (c *CourseDao) Get(id uuid.UUID, version uint) (entity *models.Course, err *e.ApiError) {
 	return getVersionedOrError[models.Course](c.repo, id, version)
 }
 
 // Returns course by id with highest version
-func (c *CourseDao) GetLatest(id uint) (entity *models.Course, err *e.ApiError) {
+func (c *CourseDao) GetLatest(id uuid.UUID) (entity *models.Course, err *e.ApiError) {
 	return getLatestVersionedOrError[models.Course](c.repo, id)
 }
 
@@ -531,7 +532,7 @@ func (c *CourseDao) Update(entity models.Course) *e.ApiError {
 }
 
 // Deletes a course by id and version
-func (c *CourseDao) Delete(id, version uint) *e.ApiError {
+func (c *CourseDao) Delete(id uuid.UUID, version uint) *e.ApiError {
 	internalError := c.repo.DeleteVersioned(id, version)
 	if internalError != nil {
 		return e.NewDaoDbError()
