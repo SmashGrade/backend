@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"fmt"
 	"reflect"
 	"time"
 
@@ -20,6 +21,7 @@ type Repository interface {
 type IdRepository interface {
 	GetId(id uint) (any, error)
 	DeleteId(id uint) error
+	GetLatestId() (uint, error)
 }
 
 // Repository methods for models with id and version
@@ -228,4 +230,9 @@ func (r *BaseRepository) DeleteId(id uint) error {
 	newEntity := r.getInterface()
 
 	return r.Provider.DB().Delete(newEntity, id).Error
+}
+
+// returns currently highest used id
+func (r *BaseRepository) GetLatestId() (uint, error) {
+	return 0, fmt.Errorf("not implemented")
 }

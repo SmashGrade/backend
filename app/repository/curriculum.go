@@ -36,3 +36,14 @@ func (r *CurriculumRepository) DeleteTimed(id uint, startDate time.Time, entity 
 		Where("id = ? AND start_validity = ?", id, startDate).
 		Delete(newEntity).Error
 }
+
+// returns highest currently used id
+func (r *CurriculumRepository) GetLatestId() (uint, error) {
+	newEntity := &models.Curriculum{}
+	result := r.Provider.DB().Order("id desc").First(newEntity)
+	if result.Error != nil {
+		return 0, result.Error
+	}
+
+	return newEntity.ID, nil
+}

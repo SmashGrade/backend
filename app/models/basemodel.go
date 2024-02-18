@@ -38,3 +38,12 @@ func (v *VersionedBasemodel) GenerateIdIfEmpty() bool {
 	}
 	return false
 }
+
+// TerminatedBasemodel is the base model for all models with a start time
+type TerminatedBasemodel struct {
+	ID            uint           `gorm:"primaryKey;autoincrement:false" json:"id"`
+	StartValidity time.Time      `gorm:"primarykey;autoincrement:false" json:"startvalidity"`
+	CreatedAt     time.Time      `json:"created"`
+	UpdatedAt     time.Time      `json:"updated"`
+	DeletedAt     gorm.DeletedAt `gorm:"index" json:"deleted,omitempty"`
+}

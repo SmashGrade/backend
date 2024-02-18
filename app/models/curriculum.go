@@ -3,8 +3,7 @@ package models
 import "time"
 
 type Curriculum struct {
-	Basemodel
-	StartValidity    time.Time      `gorm:"primarykey" json:"startValidity"`
+	TerminatedBasemodel
 	FocusID          uint           `json:"-"`
 	Focus            Focus          `json:"focus"`
 	CurriculumtypeID uint           `json:"-"`

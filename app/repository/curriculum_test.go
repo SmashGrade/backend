@@ -2,7 +2,9 @@ package repository
 
 import (
 	"testing"
+	"time"
 
+	"github.com/SmashGrade/backend/app/config"
 	"github.com/SmashGrade/backend/app/db"
 	"github.com/SmashGrade/backend/app/models"
 	"github.com/go-test/deep"
@@ -85,4 +87,39 @@ func Test_Curriculum_DeleteId(t *testing.T) {
 
 	require.NoError(t, err)
 	require.Nil(t, deep.Equal(afterCreateLength-1, afterDeleteLength))
+}
+
+// create two same id curriculum and different times
+// create two different id curriculum and same time
+func TestCurriculumCreateWithStartyear(t *testing.T) {
+	repository := NewCurriculumRepository(db.NewProvider(config.NewAPIConfig()))
+
+	timeCheck := time.Now()
+
+	curriculum1 := &models.Curriculum{}
+	curriculum1.ID = 15
+	curriculum1.StartValidity = timeCheck
+
+	_, err := repository.Create(curriculum1)
+	require.NoError(t, err)
+
+	curriculum1.StartValidity = timeCheck.Add(time.Hour)
+
+	_, err = repository.Create(curriculum1)
+	require.NoError(t, err)
+
+	curriculum1 = &models.Curriculum{}
+	curriculum1.ID, err = repository.GetLatestId()
+	require.NoError(t, err)
+	curriculum1.ID += 1
+
+	_, err = repository.Create(curriculum1)
+	require.NoError(t, err)
+
+	curriculum1.ID, err = repository.GetLatestId()
+	require.NoError(t, err)
+	curriculum1.ID += 1
+
+	_, err = repository.Create(curriculum1)
+	require.NoError(t, err)
 }
