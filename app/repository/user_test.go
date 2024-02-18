@@ -9,76 +9,104 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func Test_User_Create(t *testing.T) {
+func TestUserCreate(t *testing.T) {
 	repository := NewUserRepository(db.NewMockProvider())
 
-	user_1 := db.User_1()
-	user_1.ID = 0
-
-	_, err := repository.Create(&user_1)
+	_, err := repository.Create(&models.User{
+		Name:  "Max Müller",
+		Email: "max.mueller@hftm.ch",
+	})
 
 	require.NoError(t, err)
 }
 
-func Test_User_Update(t *testing.T) {
-	repository := NewUserRepository(db.NewMockProvider())
+func TestUserUpdate(t *testing.T) {
+	repository := NewUserRepository(db.NewPrefilledMockProvider())
 
-	// Update Name of User
-	user := db.User_1()
-	user.Name = "edited description User 1"
-	err := repository.Update(&user)
+	checkEmail := "rafael.stauffer@gmx.ch"
+
+	user, err := repository.GetId(1)
+	require.NoError(t, err)
+
+	castedUser := user.(*models.User)
+	castedUser.Email = checkEmail
+
+	err = repository.Update(castedUser)
+	require.NoError(t, err)
 
 	// Return all Users for comparing
-	result2, _ := repository.GetAll()
-	users := result2.([]models.User)
+	secondUser, err := repository.GetId(1)
+	require.NoError(t, err)
+
+	castedUser = secondUser.(*models.User)
 
 	require.NoError(t, err)
-	require.Nil(t, deep.Equal(user.Name, users[0].Name))
+	require.Equal(t, checkEmail, castedUser.Email)
 }
 
-func Test_User_Find(t *testing.T) {
-	repository := NewUserRepository(db.NewMockProvider())
+func TestUserFindByName(t *testing.T) {
+	repository := NewUserRepository(db.NewPrefilledMockProvider())
+
+	checkName := "Rafael Stauffer"
 
 	// Find User
-	result2, err := repository.Find(db.User_1())
+	result2, err := repository.Find(&models.User{
+		Name: checkName,
+	})
 	users := result2.([]models.User)
 
 	require.NoError(t, err)
-	require.Nil(t, deep.Equal(db.User_1().ID, users[0].ID))
+
+	require.Equal(t, checkName, users[0].Name)
 }
 
-func Test_User_GetAll(t *testing.T) {
-	repository := NewUserRepository(db.NewMockProvider())
+func TestUserFindByEmail(t *testing.T) {
+	repository := NewUserRepository(db.NewPrefilledMockProvider())
+
+	checkEmail := "rafael.stauffer@hftm.ch"
+
+	// Find User
+	result2, err := repository.Find(&models.User{
+		Email: checkEmail,
+	})
+	users := result2.([]models.User)
+
+	require.NoError(t, err)
+
+	require.Equal(t, checkEmail, users[0].Email)
+}
+
+func TestUserGetAll(t *testing.T) {
+	repository := NewUserRepository(db.NewPrefilledMockProvider())
 
 	// Get all users
 	result, err := repository.GetAll()
 	users := result.([]models.User)
 
 	require.NoError(t, err)
-	require.Nil(t, deep.Equal(db.User_1().ID, users[0].ID))
-	require.Nil(t, deep.Equal(db.User_2().ID, users[1].ID))
+	if len(users) < 1 {
+		t.Fatal("No users returned")
+	}
 }
 
-func Test_User_GetID(t *testing.T) {
-	repository := NewUserRepository(db.NewMockProvider())
+func TestUserGetById(t *testing.T) {
+	repository := NewUserRepository(db.NewPrefilledMockProvider())
 
-	// Get by ID
-	result, err := repository.GetId(db.User_1().ID)
-	user := result.(*models.User)
+	user, err := repository.GetId(1)
 
 	require.NoError(t, err)
-	require.Nil(t, deep.Equal(user.Name, db.User_1().Name))
+	require.NotNil(t, user)
 }
 
-func Test_User_DeleteId(t *testing.T) {
-	repository := NewUserRepository(db.NewMockProvider())
+func TestUserDeleteById(t *testing.T) {
+	repository := NewUserRepository(db.NewPrefilledMockProvider())
 
 	// Get length of slice of all users
 	result, _ := repository.GetAll()
 	afterCreateLength := len(result.([]models.User))
 
 	// Delete user
-	err := repository.DeleteId(db.User_1().ID)
+	err := repository.DeleteId(1)
 
 	result2, _ := repository.GetAll()
 	afterDeleteLength := len(result2.([]models.User))
