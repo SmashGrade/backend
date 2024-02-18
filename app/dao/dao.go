@@ -617,3 +617,26 @@ func (u *UserDao) GetCoursesForYear(uid uint, startYear time.Time) (courses []mo
 func (u *UserDao) GetExamEvaluationsForYear(uid uint, startYear time.Time) {
 	// TODO
 }
+
+func (u *UserDao) Create(entity models.User) (returnEntity *models.User, err *e.ApiError) {
+	return createOrError(u.repo, entity)
+}
+
+// returns first match for an email
+func (u *UserDao) GetByEmail(email string) (entity *models.User, err *e.ApiError) {
+	entities, internalError := u.repo.Find(&models.User{Email: email})
+	if internalError != nil {
+		return nil, e.NewDaoDbError()
+	}
+
+	userEntities, assertionOk := entities.([]models.User)
+	if !assertionOk {
+		return nil, e.NewDaoDbError()
+	}
+
+	if len(userEntities) < 1 {
+		return nil, e.NewDaoDbError()
+	}
+
+	return &userEntities[0], nil
+}

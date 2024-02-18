@@ -186,3 +186,23 @@ func TestCreateFieldAndFocus(t *testing.T) {
 		}
 	}
 }
+
+func TestGetByEmail(t *testing.T) {
+	provider := db.NewPrefilledMockProvider()
+
+	dao := NewUserDao(repository.NewUserRepository(provider))
+
+	r1, err := dao.GetByEmail("rafael.stauffer@hftm.ch")
+	if err != nil {
+		t.Fatal("no user found")
+	}
+
+	if r1.Name != "Rafael Stauffer" {
+		t.Fatalf("username %v does not match expected", r1.Name)
+	}
+
+	r2, err := dao.GetByEmail("does.not@exist.ch")
+	if r2 != nil {
+		t.Fatal("we found a non existant user")
+	}
+}
