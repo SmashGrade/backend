@@ -10,7 +10,7 @@ import (
 )
 
 func Test_State_Create(t *testing.T) {
-	repository := NewStateRepository(db.NewMockProvider())
+	repository := NewStateRepository(db.NewPrefilledMockProvider())
 
 	state_1 := db.State_1()
 	state_1.ID = 0
@@ -21,7 +21,7 @@ func Test_State_Create(t *testing.T) {
 }
 
 func Test_State_Update(t *testing.T) {
-	repository := NewStateRepository(db.NewMockProvider())
+	repository := NewStateRepository(db.NewPrefilledMockProvider())
 
 	// Update Description of State
 	state := db.State_1()
@@ -37,7 +37,7 @@ func Test_State_Update(t *testing.T) {
 }
 
 func Test_State_Find(t *testing.T) {
-	repository := NewStateRepository(db.NewMockProvider())
+	repository := NewStateRepository(db.NewPrefilledMockProvider())
 
 	// Find State
 	result2, err := repository.Find(db.State_1())
@@ -48,7 +48,7 @@ func Test_State_Find(t *testing.T) {
 }
 
 func Test_State_GetAll(t *testing.T) {
-	repository := NewStateRepository(db.NewMockProvider())
+	repository := NewStateRepository(db.NewPrefilledMockProvider())
 
 	// Get all states
 	result, err := repository.GetAll()
@@ -60,7 +60,7 @@ func Test_State_GetAll(t *testing.T) {
 }
 
 func Test_State_GetID(t *testing.T) {
-	repository := NewStateRepository(db.NewMockProvider())
+	repository := NewStateRepository(db.NewPrefilledMockProvider())
 
 	// Get by ID
 	result, err := repository.GetId(db.State_1().ID)
@@ -71,7 +71,7 @@ func Test_State_GetID(t *testing.T) {
 }
 
 func Test_State_DeleteId(t *testing.T) {
-	repository := NewStateRepository(db.NewMockProvider())
+	repository := NewStateRepository(db.NewPrefilledMockProvider())
 
 	// Get length of slice of all states
 	result, _ := repository.GetAll()

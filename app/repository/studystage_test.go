@@ -10,7 +10,7 @@ import (
 )
 
 func Test_StudyStage_Create(t *testing.T) {
-	repository := NewStudyStageRepository(db.NewMockProvider())
+	repository := NewStudyStageRepository(db.NewPrefilledMockProvider())
 
 	studyStage_1 := db.StudyStage_1()
 	studyStage_1.ID = 0
@@ -21,7 +21,7 @@ func Test_StudyStage_Create(t *testing.T) {
 }
 
 func Test_StudyStage_Update(t *testing.T) {
-	repository := NewStudyStageRepository(db.NewMockProvider())
+	repository := NewStudyStageRepository(db.NewPrefilledMockProvider())
 
 	// Update Description of StudyStage
 	studyStage := db.StudyStage_1()
@@ -37,7 +37,7 @@ func Test_StudyStage_Update(t *testing.T) {
 }
 
 func Test_StudyStage_Find(t *testing.T) {
-	repository := NewStudyStageRepository(db.NewMockProvider())
+	repository := NewStudyStageRepository(db.NewPrefilledMockProvider())
 
 	// Find StudyStage
 	result2, err := repository.Find(db.StudyStage_1())
@@ -48,7 +48,7 @@ func Test_StudyStage_Find(t *testing.T) {
 }
 
 func Test_StudyStage_GetAll(t *testing.T) {
-	repository := NewStudyStageRepository(db.NewMockProvider())
+	repository := NewStudyStageRepository(db.NewPrefilledMockProvider())
 
 	// Get all studyStages
 	result, err := repository.GetAll()
@@ -60,7 +60,7 @@ func Test_StudyStage_GetAll(t *testing.T) {
 }
 
 func Test_StudyStage_GetID(t *testing.T) {
-	repository := NewStudyStageRepository(db.NewMockProvider())
+	repository := NewStudyStageRepository(db.NewPrefilledMockProvider())
 
 	// Get by ID
 	result, err := repository.GetId(db.StudyStage_1().ID)
@@ -71,7 +71,7 @@ func Test_StudyStage_GetID(t *testing.T) {
 }
 
 func Test_StudyStage_DeleteId(t *testing.T) {
-	repository := NewStudyStageRepository(db.NewMockProvider())
+	repository := NewStudyStageRepository(db.NewPrefilledMockProvider())
 
 	// Get length of slice of all studyStages
 	result, _ := repository.GetAll()

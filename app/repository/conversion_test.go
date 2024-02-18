@@ -10,7 +10,7 @@ import (
 )
 
 func Test_Conversion_Create(t *testing.T) {
-	repository := NewConversionRepository(db.NewMockProvider())
+	repository := NewConversionRepository(db.NewPrefilledMockProvider())
 
 	conversion_1 := db.Conversion_1()
 	conversion_1.ID = 0
@@ -21,7 +21,7 @@ func Test_Conversion_Create(t *testing.T) {
 }
 
 func Test_Conversion_Update(t *testing.T) {
-	repository := NewConversionRepository(db.NewMockProvider())
+	repository := NewConversionRepository(db.NewPrefilledMockProvider())
 
 	// Update Description of Field
 	conversion := db.Conversion_1()
@@ -37,7 +37,7 @@ func Test_Conversion_Update(t *testing.T) {
 }
 
 func Test_Conversion_Find(t *testing.T) {
-	repository := NewConversionRepository(db.NewMockProvider())
+	repository := NewConversionRepository(db.NewPrefilledMockProvider())
 
 	// Find Field
 	result2, err := repository.Find(db.Conversion_1())
@@ -48,7 +48,7 @@ func Test_Conversion_Find(t *testing.T) {
 }
 
 func Test_Conversion_GetAll(t *testing.T) {
-	repository := NewConversionRepository(db.NewMockProvider())
+	repository := NewConversionRepository(db.NewPrefilledMockProvider())
 
 	// Get all fields
 	result, err := repository.GetAll()
@@ -60,7 +60,7 @@ func Test_Conversion_GetAll(t *testing.T) {
 }
 
 func Test_Field_GetTimed(t *testing.T) {
-	repository := NewConversionRepository(db.NewMockProvider())
+	repository := NewConversionRepository(db.NewPrefilledMockProvider())
 
 	// Get by ID and Start year
 	result, err := repository.GetTimed(db.Conversion_1().ID, db.Conversion_1().EESelectedCourseClassStartyear)
@@ -71,7 +71,7 @@ func Test_Field_GetTimed(t *testing.T) {
 }
 
 func Test_Field_DeleteTimed(t *testing.T) {
-	repository := NewConversionRepository(db.NewMockProvider())
+	repository := NewConversionRepository(db.NewPrefilledMockProvider())
 
 	// Get length of slice of all conversions
 	result, _ := repository.GetAll()

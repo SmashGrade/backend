@@ -11,7 +11,7 @@ import (
 )
 
 func Test_Course_Create(t *testing.T) {
-	repository := NewCourseRepository(db.NewMockProvider())
+	repository := NewCourseRepository(db.NewPrefilledMockProvider())
 
 	course_1 := db.Course_1()
 	course_1.ID = uuid.UUID{}
@@ -22,7 +22,7 @@ func Test_Course_Create(t *testing.T) {
 }
 
 func Test_Course_Update(t *testing.T) {
-	repository := NewCourseRepository(db.NewMockProvider())
+	repository := NewCourseRepository(db.NewPrefilledMockProvider())
 
 	// Update Description of Field
 	course := db.Course_1()
@@ -38,7 +38,7 @@ func Test_Course_Update(t *testing.T) {
 }
 
 func Test_Course_Find(t *testing.T) {
-	repository := NewCourseRepository(db.NewMockProvider())
+	repository := NewCourseRepository(db.NewPrefilledMockProvider())
 
 	// Find Field
 	result2, err := repository.Find(db.Course_1())
@@ -49,7 +49,7 @@ func Test_Course_Find(t *testing.T) {
 }
 
 func Test_Course_GetAll(t *testing.T) {
-	repository := NewCourseRepository(db.NewMockProvider())
+	repository := NewCourseRepository(db.NewPrefilledMockProvider())
 
 	// Get all fields
 	result, err := repository.GetAll()
@@ -61,7 +61,7 @@ func Test_Course_GetAll(t *testing.T) {
 }
 
 func Test_Course_GetVersioned(t *testing.T) {
-	repository := NewCourseRepository(db.NewMockProvider())
+	repository := NewCourseRepository(db.NewPrefilledMockProvider())
 
 	// Get by ID
 	result, err := repository.GetVersioned(db.Course_1().ID, db.Course_1().Version)
@@ -72,7 +72,7 @@ func Test_Course_GetVersioned(t *testing.T) {
 }
 
 func Test_Course_DeleteVersioned(t *testing.T) {
-	repository := NewCourseRepository(db.NewMockProvider())
+	repository := NewCourseRepository(db.NewPrefilledMockProvider())
 
 	// Get length of slice of all fields
 	result, _ := repository.GetAll()
@@ -89,7 +89,7 @@ func Test_Course_DeleteVersioned(t *testing.T) {
 }
 
 func Test_Course_GetLatestVersioned(t *testing.T) {
-	repository := NewCourseRepository(db.NewMockProvider())
+	repository := NewCourseRepository(db.NewPrefilledMockProvider())
 
 	// Get latest Version
 	result, err := repository.GetLatestVersioned(db.Course_2_1().ID)

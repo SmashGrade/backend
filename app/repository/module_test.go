@@ -11,7 +11,7 @@ import (
 )
 
 func Test_Module_Create(t *testing.T) {
-	repository := NewModuleRepository(db.NewMockProvider())
+	repository := NewModuleRepository(db.NewPrefilledMockProvider())
 
 	module_1 := db.Module_1()
 	module_1.ID = uuid.UUID{}
@@ -22,7 +22,7 @@ func Test_Module_Create(t *testing.T) {
 }
 
 func Test_Module_Update(t *testing.T) {
-	repository := NewModuleRepository(db.NewMockProvider())
+	repository := NewModuleRepository(db.NewPrefilledMockProvider())
 
 	// Update Description of Field
 	module := db.Module_1()
@@ -38,7 +38,7 @@ func Test_Module_Update(t *testing.T) {
 }
 
 func Test_Module_Find(t *testing.T) {
-	repository := NewModuleRepository(db.NewMockProvider())
+	repository := NewModuleRepository(db.NewPrefilledMockProvider())
 
 	// Find Field
 	result2, err := repository.Find(db.Module_1())
@@ -49,7 +49,7 @@ func Test_Module_Find(t *testing.T) {
 }
 
 func Test_Module_GetAll(t *testing.T) {
-	repository := NewModuleRepository(db.NewMockProvider())
+	repository := NewModuleRepository(db.NewPrefilledMockProvider())
 
 	// Get all fields
 	result, err := repository.GetAll()
@@ -61,7 +61,7 @@ func Test_Module_GetAll(t *testing.T) {
 }
 
 func Test_Module_GetVersioned(t *testing.T) {
-	repository := NewModuleRepository(db.NewMockProvider())
+	repository := NewModuleRepository(db.NewPrefilledMockProvider())
 
 	// Get by ID
 	result, err := repository.GetVersioned(db.Module_1().ID, db.Module_1().Version)
@@ -72,7 +72,7 @@ func Test_Module_GetVersioned(t *testing.T) {
 }
 
 func Test_Module_DeleteVersioned(t *testing.T) {
-	repository := NewModuleRepository(db.NewMockProvider())
+	repository := NewModuleRepository(db.NewPrefilledMockProvider())
 
 	// Get length of slice of all fields
 	result, _ := repository.GetAll()
@@ -89,7 +89,7 @@ func Test_Module_DeleteVersioned(t *testing.T) {
 }
 
 func Test_Module_GetLatestVersioned(t *testing.T) {
-	repository := NewModuleRepository(db.NewMockProvider())
+	repository := NewModuleRepository(db.NewPrefilledMockProvider())
 
 	// Get latest Version
 	result, err := repository.GetLatestVersioned(db.Module_2_1().ID)

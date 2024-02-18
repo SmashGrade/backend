@@ -10,7 +10,7 @@ import (
 )
 
 func Test_Gradetype_Create(t *testing.T) {
-	repository := NewGradetypeRepository(db.NewMockProvider())
+	repository := NewGradetypeRepository(db.NewPrefilledMockProvider())
 
 	gradetype_1 := db.Gradetype_1()
 	gradetype_1.ID = 0
@@ -21,7 +21,7 @@ func Test_Gradetype_Create(t *testing.T) {
 }
 
 func Test_Gradetype_Update(t *testing.T) {
-	repository := NewGradetypeRepository(db.NewMockProvider())
+	repository := NewGradetypeRepository(db.NewPrefilledMockProvider())
 
 	// Update Description of Gradetype
 	gradetype := db.Gradetype_1()
@@ -37,7 +37,7 @@ func Test_Gradetype_Update(t *testing.T) {
 }
 
 func Test_Gradetype_Find(t *testing.T) {
-	repository := NewGradetypeRepository(db.NewMockProvider())
+	repository := NewGradetypeRepository(db.NewPrefilledMockProvider())
 
 	// Find Gradetype
 	result2, err := repository.Find(db.Gradetype_1())
@@ -48,7 +48,7 @@ func Test_Gradetype_Find(t *testing.T) {
 }
 
 func Test_Gradetype_GetAll(t *testing.T) {
-	repository := NewGradetypeRepository(db.NewMockProvider())
+	repository := NewGradetypeRepository(db.NewPrefilledMockProvider())
 
 	// Get all gradetypes
 	result, err := repository.GetAll()
@@ -60,7 +60,7 @@ func Test_Gradetype_GetAll(t *testing.T) {
 }
 
 func Test_Gradetype_GetID(t *testing.T) {
-	repository := NewGradetypeRepository(db.NewMockProvider())
+	repository := NewGradetypeRepository(db.NewPrefilledMockProvider())
 
 	// Get by ID
 	result, err := repository.GetId(db.Gradetype_1().ID)
@@ -71,7 +71,7 @@ func Test_Gradetype_GetID(t *testing.T) {
 }
 
 func Test_Gradetype_DeleteId(t *testing.T) {
-	repository := NewGradetypeRepository(db.NewMockProvider())
+	repository := NewGradetypeRepository(db.NewPrefilledMockProvider())
 
 	// Get length of slice of all gradetypes
 	result, _ := repository.GetAll()

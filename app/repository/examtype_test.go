@@ -10,7 +10,7 @@ import (
 )
 
 func Test_Examtype_Create(t *testing.T) {
-	repository := NewExamtypeRepository(db.NewMockProvider())
+	repository := NewExamtypeRepository(db.NewPrefilledMockProvider())
 
 	examtype_1 := db.Examtype_1()
 	examtype_1.ID = 0
@@ -21,7 +21,7 @@ func Test_Examtype_Create(t *testing.T) {
 }
 
 func Test_Examtype_Update(t *testing.T) {
-	repository := NewExamtypeRepository(db.NewMockProvider())
+	repository := NewExamtypeRepository(db.NewPrefilledMockProvider())
 
 	// Update Description of Examtype
 	examtype := db.Examtype_1()
@@ -37,7 +37,7 @@ func Test_Examtype_Update(t *testing.T) {
 }
 
 func Test_Examtype_Find(t *testing.T) {
-	repository := NewExamtypeRepository(db.NewMockProvider())
+	repository := NewExamtypeRepository(db.NewPrefilledMockProvider())
 
 	// Find Examtype
 	result2, err := repository.Find(db.Examtype_1())
@@ -48,7 +48,7 @@ func Test_Examtype_Find(t *testing.T) {
 }
 
 func Test_Examtype_GetAll(t *testing.T) {
-	repository := NewExamtypeRepository(db.NewMockProvider())
+	repository := NewExamtypeRepository(db.NewPrefilledMockProvider())
 
 	// Get all examtypes
 	result, err := repository.GetAll()
@@ -60,7 +60,7 @@ func Test_Examtype_GetAll(t *testing.T) {
 }
 
 func Test_Examtype_GetID(t *testing.T) {
-	repository := NewExamtypeRepository(db.NewMockProvider())
+	repository := NewExamtypeRepository(db.NewPrefilledMockProvider())
 
 	// Get by ID
 	result, err := repository.GetId(db.Examtype_1().ID)
@@ -71,7 +71,7 @@ func Test_Examtype_GetID(t *testing.T) {
 }
 
 func Test_Examtype_DeleteId(t *testing.T) {
-	repository := NewExamtypeRepository(db.NewMockProvider())
+	repository := NewExamtypeRepository(db.NewPrefilledMockProvider())
 
 	// Get length of slice of all examtypes
 	result, _ := repository.GetAll()

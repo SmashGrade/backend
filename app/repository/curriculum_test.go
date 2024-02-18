@@ -10,7 +10,7 @@ import (
 )
 
 func Test_Curriculum_Create(t *testing.T) {
-	repository := NewCurriculumRepository(db.NewMockProvider())
+	repository := NewCurriculumRepository(db.NewPrefilledMockProvider())
 
 	curriculum_1 := db.Curriculum_1()
 	curriculum_1.ID = 0
@@ -21,7 +21,7 @@ func Test_Curriculum_Create(t *testing.T) {
 }
 
 func Test_Curriculum_Update(t *testing.T) {
-	repository := NewCurriculumRepository(db.NewMockProvider())
+	repository := NewCurriculumRepository(db.NewPrefilledMockProvider())
 
 	// Update Description of Curriculum
 	curriculum := db.Curriculum_1()
@@ -37,7 +37,7 @@ func Test_Curriculum_Update(t *testing.T) {
 }
 
 func Test_Curriculum_Find(t *testing.T) {
-	repository := NewCurriculumRepository(db.NewMockProvider())
+	repository := NewCurriculumRepository(db.NewPrefilledMockProvider())
 
 	// Find Curriculum
 	result2, err := repository.Find(db.Curriculum_1())
@@ -48,7 +48,7 @@ func Test_Curriculum_Find(t *testing.T) {
 }
 
 func Test_Curriculum_GetAll(t *testing.T) {
-	repository := NewCurriculumRepository(db.NewMockProvider())
+	repository := NewCurriculumRepository(db.NewPrefilledMockProvider())
 
 	// Get all fields
 	result, err := repository.GetAll()
@@ -60,7 +60,7 @@ func Test_Curriculum_GetAll(t *testing.T) {
 }
 
 func Test_Curriculum_GetID(t *testing.T) {
-	repository := NewCurriculumRepository(db.NewMockProvider())
+	repository := NewCurriculumRepository(db.NewPrefilledMockProvider())
 
 	// Get by ID
 	result, err := repository.GetId(db.Curriculum_1().ID)
@@ -71,7 +71,7 @@ func Test_Curriculum_GetID(t *testing.T) {
 }
 
 func Test_Curriculum_DeleteId(t *testing.T) {
-	repository := NewCurriculumRepository(db.NewMockProvider())
+	repository := NewCurriculumRepository(db.NewPrefilledMockProvider())
 
 	// Get length of slice of all curriculum
 	result, _ := repository.GetAll()

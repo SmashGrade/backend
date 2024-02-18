@@ -10,7 +10,7 @@ import (
 )
 
 func Test_Focus_Create(t *testing.T) {
-	repository := NewFocusRepository(db.NewMockProvider())
+	repository := NewFocusRepository(db.NewPrefilledMockProvider())
 
 	focus_1 := db.Focus_1()
 	focus_1.ID = 0
@@ -21,7 +21,7 @@ func Test_Focus_Create(t *testing.T) {
 }
 
 func Test_Focus_Update(t *testing.T) {
-	repository := NewFocusRepository(db.NewMockProvider())
+	repository := NewFocusRepository(db.NewPrefilledMockProvider())
 
 	// Update Description of Focus
 	focus := db.Focus_1()
@@ -37,7 +37,7 @@ func Test_Focus_Update(t *testing.T) {
 }
 
 func Test_Focus_Find(t *testing.T) {
-	repository := NewFocusRepository(db.NewMockProvider())
+	repository := NewFocusRepository(db.NewPrefilledMockProvider())
 
 	// Find Focus
 	result2, err := repository.Find(db.Focus_1())
@@ -48,7 +48,7 @@ func Test_Focus_Find(t *testing.T) {
 }
 
 func Test_Focus_GetAll(t *testing.T) {
-	repository := NewFocusRepository(db.NewMockProvider())
+	repository := NewFocusRepository(db.NewPrefilledMockProvider())
 
 	// Get all focuses
 	result, err := repository.GetAll()
@@ -60,7 +60,7 @@ func Test_Focus_GetAll(t *testing.T) {
 }
 
 func Test_Focus_GetID(t *testing.T) {
-	repository := NewFocusRepository(db.NewMockProvider())
+	repository := NewFocusRepository(db.NewPrefilledMockProvider())
 
 	// Get by ID
 	result, err := repository.GetId(db.Focus_1().ID)
@@ -71,7 +71,7 @@ func Test_Focus_GetID(t *testing.T) {
 }
 
 func Test_Focus_DeleteId(t *testing.T) {
-	repository := NewFocusRepository(db.NewMockProvider())
+	repository := NewFocusRepository(db.NewPrefilledMockProvider())
 
 	// Get length of slice of all focuses
 	result, _ := repository.GetAll()

@@ -11,7 +11,7 @@ import (
 )
 
 func Test_SelectedCourse_Create(t *testing.T) {
-	repository := NewSelectedCourseRepository(db.NewMockProvider())
+	repository := NewSelectedCourseRepository(db.NewPrefilledMockProvider())
 
 	selectedCourse_1 := db.SelectedCourse_1()
 	selectedCourse_1.UserID = 2
@@ -22,7 +22,7 @@ func Test_SelectedCourse_Create(t *testing.T) {
 }
 
 func Test_SelectedCourse_Update(t *testing.T) {
-	repository := NewSelectedCourseRepository(db.NewMockProvider())
+	repository := NewSelectedCourseRepository(db.NewPrefilledMockProvider())
 
 	// Update Description of SelectedCourse
 	selectedCourse := db.SelectedCourse_1()
@@ -38,7 +38,7 @@ func Test_SelectedCourse_Update(t *testing.T) {
 }
 
 func Test_SelectedCourse_Find(t *testing.T) {
-	repository := NewSelectedCourseRepository(db.NewMockProvider())
+	repository := NewSelectedCourseRepository(db.NewPrefilledMockProvider())
 
 	// Find SelectedCourse
 	result2, err := repository.Find(db.SelectedCourse_1())
@@ -49,7 +49,7 @@ func Test_SelectedCourse_Find(t *testing.T) {
 }
 
 func Test_SelectedCourse_GetAll(t *testing.T) {
-	repository := NewSelectedCourseRepository(db.NewMockProvider())
+	repository := NewSelectedCourseRepository(db.NewPrefilledMockProvider())
 
 	// Get all selectedCourses
 	result, err := repository.GetAll()
@@ -61,7 +61,7 @@ func Test_SelectedCourse_GetAll(t *testing.T) {
 }
 
 func Test_SelectedCourse_GetSelectedCourse(t *testing.T) {
-	repository := NewSelectedCourseRepository(db.NewMockProvider())
+	repository := NewSelectedCourseRepository(db.NewPrefilledMockProvider())
 
 	result, err := repository.GetSelectedCourse(1, 1, 1, time.Date(2024, time.January, 1, 0, 0, 0, 0, time.UTC))
 
@@ -70,7 +70,7 @@ func Test_SelectedCourse_GetSelectedCourse(t *testing.T) {
 }
 
 func Test_SelectedCourse_DeleteSelectedCourse(t *testing.T) {
-	repository := NewSelectedCourseRepository(db.NewMockProvider())
+	repository := NewSelectedCourseRepository(db.NewPrefilledMockProvider())
 
 	// Get length of slice of all selectedcourse
 	result, _ := repository.GetAll()

@@ -10,7 +10,7 @@ import (
 )
 
 func Test_Role_Create(t *testing.T) {
-	repository := NewRoleRepository(db.NewMockProvider())
+	repository := NewRoleRepository(db.NewPrefilledMockProvider())
 
 	role_1 := db.Role_1()
 	role_1.ID = 0
@@ -21,7 +21,7 @@ func Test_Role_Create(t *testing.T) {
 }
 
 func Test_Role_Update(t *testing.T) {
-	repository := NewRoleRepository(db.NewMockProvider())
+	repository := NewRoleRepository(db.NewPrefilledMockProvider())
 
 	// Update Description of Role
 	role := db.Role_1()
@@ -37,7 +37,7 @@ func Test_Role_Update(t *testing.T) {
 }
 
 func Test_Role_Find(t *testing.T) {
-	repository := NewRoleRepository(db.NewMockProvider())
+	repository := NewRoleRepository(db.NewPrefilledMockProvider())
 
 	// Find Role
 	result2, err := repository.Find(db.Role_1())
@@ -48,7 +48,7 @@ func Test_Role_Find(t *testing.T) {
 }
 
 func Test_Role_GetAll(t *testing.T) {
-	repository := NewRoleRepository(db.NewMockProvider())
+	repository := NewRoleRepository(db.NewPrefilledMockProvider())
 
 	// Get all roles
 	result, err := repository.GetAll()
@@ -60,7 +60,7 @@ func Test_Role_GetAll(t *testing.T) {
 }
 
 func Test_Role_GetID(t *testing.T) {
-	repository := NewRoleRepository(db.NewMockProvider())
+	repository := NewRoleRepository(db.NewPrefilledMockProvider())
 
 	// Get by ID
 	result, err := repository.GetId(db.Role_1().ID)
@@ -71,7 +71,7 @@ func Test_Role_GetID(t *testing.T) {
 }
 
 func Test_Role_DeleteId(t *testing.T) {
-	repository := NewRoleRepository(db.NewMockProvider())
+	repository := NewRoleRepository(db.NewPrefilledMockProvider())
 
 	// Get length of slice of all roles
 	result, _ := repository.GetAll()

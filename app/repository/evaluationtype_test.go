@@ -10,7 +10,7 @@ import (
 )
 
 func Test_Evaluationtype_Create(t *testing.T) {
-	repository := NewEvaluationtypeRepository(db.NewMockProvider())
+	repository := NewEvaluationtypeRepository(db.NewPrefilledMockProvider())
 
 	evaluationtype_1 := db.Evaluationtype_1()
 	evaluationtype_1.ID = 0
@@ -21,7 +21,7 @@ func Test_Evaluationtype_Create(t *testing.T) {
 }
 
 func Test_Evaluationtype_Update(t *testing.T) {
-	repository := NewEvaluationtypeRepository(db.NewMockProvider())
+	repository := NewEvaluationtypeRepository(db.NewPrefilledMockProvider())
 
 	// Update Description of Evaluationtype
 	evaluationtype := db.Evaluationtype_1()
@@ -37,7 +37,7 @@ func Test_Evaluationtype_Update(t *testing.T) {
 }
 
 func Test_Evaluationtype_Find(t *testing.T) {
-	repository := NewEvaluationtypeRepository(db.NewMockProvider())
+	repository := NewEvaluationtypeRepository(db.NewPrefilledMockProvider())
 
 	// Find Evaluationtype
 	result2, err := repository.Find(db.Evaluationtype_1())
@@ -48,7 +48,7 @@ func Test_Evaluationtype_Find(t *testing.T) {
 }
 
 func Test_Evaluationtype_GetAll(t *testing.T) {
-	repository := NewEvaluationtypeRepository(db.NewMockProvider())
+	repository := NewEvaluationtypeRepository(db.NewPrefilledMockProvider())
 
 	// Get all evaluationtyes
 	result, err := repository.GetAll()
@@ -60,7 +60,7 @@ func Test_Evaluationtype_GetAll(t *testing.T) {
 }
 
 func Test_Evaluationtype_GetID(t *testing.T) {
-	repository := NewEvaluationtypeRepository(db.NewMockProvider())
+	repository := NewEvaluationtypeRepository(db.NewPrefilledMockProvider())
 
 	// Get by ID
 	result, err := repository.GetId(db.Evaluationtype_1().ID)
@@ -71,7 +71,7 @@ func Test_Evaluationtype_GetID(t *testing.T) {
 }
 
 func Test_Evaluationtype_DeleteId(t *testing.T) {
-	repository := NewEvaluationtypeRepository(db.NewMockProvider())
+	repository := NewEvaluationtypeRepository(db.NewPrefilledMockProvider())
 
 	// Get length of slice of all evaluationtypes
 	result, _ := repository.GetAll()

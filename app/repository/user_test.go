@@ -10,7 +10,7 @@ import (
 )
 
 func TestUserCreate(t *testing.T) {
-	repository := NewUserRepository(db.NewMockProvider())
+	repository := NewUserRepository(db.NewPrefilledMockProvider())
 
 	_, err := repository.Create(&models.User{
 		Name:  "Max Müller",

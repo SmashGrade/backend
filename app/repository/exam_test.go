@@ -10,7 +10,7 @@ import (
 )
 
 func Test_Exam_Create(t *testing.T) {
-	repository := NewExamRepository(db.NewMockProvider())
+	repository := NewExamRepository(db.NewPrefilledMockProvider())
 
 	exam_1 := db.Exam_1()
 	exam_1.ID = 0
@@ -21,7 +21,7 @@ func Test_Exam_Create(t *testing.T) {
 }
 
 func Test_Exam_Update(t *testing.T) {
-	repository := NewExamRepository(db.NewMockProvider())
+	repository := NewExamRepository(db.NewPrefilledMockProvider())
 
 	// Update Description of Exam
 	exam := db.Exam_1()
@@ -37,7 +37,7 @@ func Test_Exam_Update(t *testing.T) {
 }
 
 func Test_Exam_Find(t *testing.T) {
-	repository := NewExamRepository(db.NewMockProvider())
+	repository := NewExamRepository(db.NewPrefilledMockProvider())
 
 	// Find Exam
 	result2, err := repository.Find(db.Exam_1())
@@ -48,7 +48,7 @@ func Test_Exam_Find(t *testing.T) {
 }
 
 func Test_Exam_GetAll(t *testing.T) {
-	repository := NewExamRepository(db.NewMockProvider())
+	repository := NewExamRepository(db.NewPrefilledMockProvider())
 
 	// Get all exams
 	result, err := repository.GetAll()
@@ -60,7 +60,7 @@ func Test_Exam_GetAll(t *testing.T) {
 }
 
 func Test_Exam_GetID(t *testing.T) {
-	repository := NewExamRepository(db.NewMockProvider())
+	repository := NewExamRepository(db.NewPrefilledMockProvider())
 
 	// Get by ID
 	result, err := repository.GetId(db.Exam_1().ID)
@@ -71,7 +71,7 @@ func Test_Exam_GetID(t *testing.T) {
 }
 
 func Test_Exam_DeleteId(t *testing.T) {
-	repository := NewExamRepository(db.NewMockProvider())
+	repository := NewExamRepository(db.NewPrefilledMockProvider())
 
 	// Get length of slice of all exams
 	result, _ := repository.GetAll()

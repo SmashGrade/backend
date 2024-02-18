@@ -10,7 +10,7 @@ import (
 )
 
 func Test_ExamEvaluation_Create(t *testing.T) {
-	repository := NewExamEvaluationRepository(db.NewMockProvider())
+	repository := NewExamEvaluationRepository(db.NewPrefilledMockProvider())
 
 	examEvaluation_1 := db.ExamEvaluation_1()
 	examEvaluation_1.ID = 0
@@ -21,7 +21,7 @@ func Test_ExamEvaluation_Create(t *testing.T) {
 }
 
 func Test_ExamEvaluation_Update(t *testing.T) {
-	repository := NewExamEvaluationRepository(db.NewMockProvider())
+	repository := NewExamEvaluationRepository(db.NewPrefilledMockProvider())
 
 	// Update OriginalValue of ExamEvaluation
 	examEvaluation := db.ExamEvaluation_1()
@@ -37,7 +37,7 @@ func Test_ExamEvaluation_Update(t *testing.T) {
 }
 
 func Test_ExamEvaluation_Find(t *testing.T) {
-	repository := NewExamEvaluationRepository(db.NewMockProvider())
+	repository := NewExamEvaluationRepository(db.NewPrefilledMockProvider())
 
 	// Find ExamEvaluation
 	result2, err := repository.Find(db.ExamEvaluation_1())
@@ -48,7 +48,7 @@ func Test_ExamEvaluation_Find(t *testing.T) {
 }
 
 func Test_ExamEvaluation_GetAll(t *testing.T) {
-	repository := NewExamEvaluationRepository(db.NewMockProvider())
+	repository := NewExamEvaluationRepository(db.NewPrefilledMockProvider())
 
 	// Get all examEvaluations
 	result, err := repository.GetAll()
@@ -60,7 +60,7 @@ func Test_ExamEvaluation_GetAll(t *testing.T) {
 }
 
 func Test_ExamEvaluation_GetID(t *testing.T) {
-	repository := NewExamEvaluationRepository(db.NewMockProvider())
+	repository := NewExamEvaluationRepository(db.NewPrefilledMockProvider())
 
 	// Get by ID
 	result, err := repository.GetId(db.ExamEvaluation_1().ID)
@@ -71,7 +71,7 @@ func Test_ExamEvaluation_GetID(t *testing.T) {
 }
 
 func Test_ExamEvaluation_DeleteId(t *testing.T) {
-	repository := NewExamEvaluationRepository(db.NewMockProvider())
+	repository := NewExamEvaluationRepository(db.NewPrefilledMockProvider())
 
 	// Get length of slice of all examEvaluations
 	result, _ := repository.GetAll()

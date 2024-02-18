@@ -10,7 +10,7 @@ import (
 )
 
 func Test_Field_Create(t *testing.T) {
-	repository := NewFieldRepository(db.NewMockProvider())
+	repository := NewFieldRepository(db.NewPrefilledMockProvider())
 
 	field_1 := db.Field_1()
 	field_1.ID = 0
@@ -21,7 +21,7 @@ func Test_Field_Create(t *testing.T) {
 }
 
 func Test_Field_Update(t *testing.T) {
-	repository := NewFieldRepository(db.NewMockProvider())
+	repository := NewFieldRepository(db.NewPrefilledMockProvider())
 
 	// Update Description of Field
 	field := db.Field_1()
@@ -37,7 +37,7 @@ func Test_Field_Update(t *testing.T) {
 }
 
 func Test_Field_Find(t *testing.T) {
-	repository := NewFieldRepository(db.NewMockProvider())
+	repository := NewFieldRepository(db.NewPrefilledMockProvider())
 
 	// Find Field
 	result2, err := repository.Find(db.Field_1())
@@ -48,7 +48,7 @@ func Test_Field_Find(t *testing.T) {
 }
 
 func Test_Field_GetAll(t *testing.T) {
-	repository := NewFieldRepository(db.NewMockProvider())
+	repository := NewFieldRepository(db.NewPrefilledMockProvider())
 
 	// Get all fields
 	result, err := repository.GetAll()
@@ -60,7 +60,7 @@ func Test_Field_GetAll(t *testing.T) {
 }
 
 func Test_Field_GetID(t *testing.T) {
-	repository := NewFieldRepository(db.NewMockProvider())
+	repository := NewFieldRepository(db.NewPrefilledMockProvider())
 
 	// Get by ID
 	result, err := repository.GetId(db.Field_1().ID)
@@ -71,7 +71,7 @@ func Test_Field_GetID(t *testing.T) {
 }
 
 func Test_Field_DeleteId(t *testing.T) {
-	repository := NewFieldRepository(db.NewMockProvider())
+	repository := NewFieldRepository(db.NewPrefilledMockProvider())
 
 	// Get length of slice of all fields
 	result, _ := repository.GetAll()
