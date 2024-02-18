@@ -1,12 +1,12 @@
 package repository
 
 import (
-	"fmt"
+	"errors"
 	"reflect"
 	"time"
 
 	"github.com/SmashGrade/backend/app/db"
-	"github.com/google/uuid"
+	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
 
@@ -15,6 +15,8 @@ type Repository interface {
 	Update(entity any) error
 	Find(entity any) (any, error)
 	GetAll() (any, error)
+	GetLatestId() (uint, error)
+	GetNextId() (uint, error)
 }
 
 // Repository methods for models with only an id
@@ -22,21 +24,26 @@ type IdRepository interface {
 	GetId(id uint) (any, error)
 	DeleteId(id uint) error
 	GetLatestId() (uint, error)
+	GetNextId() (uint, error)
 }
 
 // Repository methods for models with id and version
 type VersionedRepository interface {
-	GetVersioned(id uuid.UUID, version uint) (any, error)
-	DeleteVersioned(id uuid.UUID, version uint) error
-	GetLatestVersioned(id uuid.UUID) (any, error)
-	GetLatestVersion(id uuid.UUID) (uint, error)
-	GetNextVersion(id uuid.UUID) (uint, error)
+	GetVersioned(id uint, version uint) (any, error)
+	DeleteVersioned(id uint, version uint) error
+	GetLatestVersioned(id uint) (any, error)
+	GetLatestVersion(id uint) (uint, error)
+	GetNextVersion(id uint) (uint, error)
+	GetLatestId() (uint, error)
+	GetNextId() (uint, error)
 }
 
 // Repository methods for models with id and start date
 type TimedRepository interface {
 	GetTimed(id uint, startDate time.Time) (any, error)
 	DeleteTimed(id uint, startDate time.Time) error
+	GetLatestId() (uint, error)
+	GetNextId() (uint, error)
 }
 
 // BaseRepository is a base repository
@@ -54,20 +61,21 @@ func NewBaseRepository(provider db.Provider, entity any) *BaseRepository {
 	}
 }
 
+// Return the type of the entity as a reflect.Type
+func (r *BaseRepository) GetType() reflect.Type {
+	return reflect.TypeOf(r.Type)
+}
+
 // Return the slice of the Type in the BaseRepository
 func (r *BaseRepository) getSliceInterface() any {
-	// Get the type of Type
-	dtype := reflect.TypeOf(r.Type)
 	// Create a new Slice of the entity type
-	return reflect.New(reflect.SliceOf(dtype)).Elem().Interface()
+	return reflect.New(reflect.SliceOf(r.GetType())).Elem().Interface()
 }
 
 // Return the interface of the Type in the BaseRepository
 func (r *BaseRepository) getInterface() any {
-	// Get the type of Type
-	dtype := reflect.TypeOf(r.Type)
 	// Create a new instance of the entity type
-	return reflect.New(dtype).Interface()
+	return reflect.New(r.GetType()).Interface()
 }
 
 /*
@@ -160,7 +168,7 @@ Usage (example with models.Course)
 	res, err := repository.GetVersioned(1, 2)
 	course := result.(*models.Course)
 */
-func (r *BaseRepository) GetVersioned(id uuid.UUID, version uint) (any, error) {
+func (r *BaseRepository) GetVersioned(id uint, version uint) (any, error) {
 	newEntity := r.getInterface()
 
 	result := r.Provider.DB().Preload(clause.Associations).Where("id = ? AND version = ?", id, version).First(newEntity)
@@ -195,7 +203,7 @@ Usage (example with models.Course):
 
 	err := respository.DeleteVersioned(1, 2)
 */
-func (r *BaseRepository) DeleteVersioned(id uuid.UUID, version uint) error {
+func (r *BaseRepository) DeleteVersioned(id uint, version uint) error {
 	newEntity := r.getInterface()
 
 	return r.Provider.DB().Where("id = ? AND version = ?", id, version).Delete(newEntity).Error
@@ -209,7 +217,7 @@ Usage (example with models.Course):
 	res, err := repository.GetLatestVersioned(1)
 	course := res.(*models.Course)
 */
-func (r *BaseRepository) GetLatestVersioned(id uuid.UUID) (any, error) {
+func (r *BaseRepository) GetLatestVersioned(id uint) (any, error) {
 	newEntity := r.getInterface()
 
 	result := r.Provider.DB().Where("id = ?", id).Order("version desc").First(newEntity)
@@ -234,5 +242,40 @@ func (r *BaseRepository) DeleteId(id uint) error {
 
 // returns currently highest used id
 func (r *BaseRepository) GetLatestId() (uint, error) {
-	return 0, fmt.Errorf("not implemented")
+	entity := r.getInterface()
+
+	result := r.Provider.DB().Order("id desc").First(entity)
+	// Check if the result is not found and return the first id for the table
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		return 0, nil
+	} else if result.Error != nil {
+		// Return the error if it is not nil
+		return 0, result.Error
+	}
+
+	// Reflect the entity to get the id field
+	// Check if its valid and of type uint
+	// Return its value
+	entityValueElement := reflect.ValueOf(entity).Elem()
+	entityValueElementIdField := entityValueElement.FieldByName("ID")
+	if !entityValueElementIdField.IsValid() {
+		return 0, errors.New("error: entity does not contain a id field to autoincrement")
+	}
+	if entityValueElementIdField.Kind() != reflect.Uint {
+		return 0, errors.New("error: entity id field is not of type uint")
+	}
+	id, ok := entityValueElementIdField.Interface().(uint)
+	if !ok {
+		return 0, errors.New("error: failed to convert id to uint")
+	}
+	return id, nil
+}
+
+// returns next possible id for the entity (manual autoincrement)
+func (r *BaseRepository) GetNextId() (uint, error) {
+	id, err := r.GetLatestId()
+	if err != nil {
+		return 0, err
+	}
+	return id + 1, nil
 }
