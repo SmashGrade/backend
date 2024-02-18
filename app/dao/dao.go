@@ -483,14 +483,17 @@ func (m *ModuleDao) GetLatest(id uint) (entity *models.Module, err *e.ApiError) 
 func (m *ModuleDao) Create(entity models.Module) (returnEntity *models.Module, err *e.ApiError) {
 	var internalError error
 
-	// First check if the id is zero, if yes generate it
-	if entity.GenerateIdIfEmpty() {
+	if entity.ID == 0 {
+		entity.ID, internalError = m.repo.GetNextId()
+		if internalError != nil {
+			return nil, e.NewDaoDbError()
+		}
 		entity.Version = 1 // set version to one on new id
 	} else {
 		if entity.Version == 0 { // generate new version if it is initial on existing id
 			entity.Version, internalError = m.repo.GetNextVersion(entity.ID)
 			if internalError != nil {
-				entity.Version = 1 // no previous version found
+				return nil, e.NewDaoDbError()
 			}
 		}
 	}
@@ -556,7 +559,11 @@ func (c *CourseDao) Create(entity models.Course) (returnEntity *models.Course, e
 	var internalError error
 
 	// First check if the id is zero, if yes generate it
-	if entity.GenerateIdIfEmpty() {
+	if entity.ID == 0 {
+		entity.ID, internalError = c.repo.GetNextId()
+		if internalError != nil {
+			return nil, e.NewDaoDbError()
+		}
 		entity.Version = 1 // set version to one on new id
 	} else {
 		if entity.Version == 0 { // generate new version if it is initial on existing id
