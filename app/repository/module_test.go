@@ -122,7 +122,7 @@ func TestModuleVersionIncrement(t *testing.T) {
 	currentEntity, err := repository.GetLatestVersioned(modules[0].ID)
 	require.NoError(t, err)
 
-	currentModule, ok := currentEntity.(models.Module)
+	currentModule, ok := currentEntity.(*models.Module)
 	require.True(t, ok, "type assertion failed")
 
 	currentModule.Version = nextVersion
@@ -130,7 +130,7 @@ func TestModuleVersionIncrement(t *testing.T) {
 	createdEntity, err := repository.Create(currentModule)
 	require.NoError(t, err)
 
-	createdModule, ok := createdEntity.(models.Module)
+	createdModule, ok := createdEntity.(*models.Module)
 	require.True(t, ok, "type assertion failed")
 
 	latestVersion, err = repository.GetLatestVersion(modules[0].ID)
