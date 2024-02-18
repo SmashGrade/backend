@@ -7,22 +7,23 @@ import (
 	_ "github.com/SmashGrade/backend/app/docs"
 	e "github.com/SmashGrade/backend/app/error"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	echoSwagger "github.com/swaggo/echo-swagger"
 	_ "gorm.io/gorm"
 )
 
-//	@title						Smashgrade Backend API
-//	@version					1.0
-//	@description				Backend API for Smashgrade, a web application for tracking your student grades.
-//	@termsOfService				http://swagger.io/terms/
-//	@contact.name				HFTM Grenchen
-//	@contact.url				https://www.hftm.ch
-//	@license.name				Closed
-//	@host						api.smashgrade.ch
-//	@securityDefinitions.apikey	Bearer
-//	@in							header
-//	@name						Authorization
-//	@description				Type "Bearer" followed by a space and JWT token.
+// @title						Smashgrade Backend API
+// @version					1.0
+// @description				Backend API for Smashgrade, a web application for tracking your student grades.
+// @termsOfService				http://swagger.io/terms/
+// @contact.name				HFTM Grenchen
+// @contact.url				https://www.hftm.ch
+// @license.name				Closed
+// @host						api.smashgrade.ch
+// @securityDefinitions.apikey	Bearer
+// @in							header
+// @name						Authorization
+// @description				Type "Bearer" followed by a space and JWT token.
 func main() {
 
 	// Load configuration
@@ -34,6 +35,9 @@ func main() {
 
 	// Add swagger documentation route
 	server.GET("/docs*", echoSwagger.WrapHandler)
+
+	// Enable Middleware
+	server.Use(middleware.Logger())
 
 	// Initialize the database provider
 	provider := db.NewProvider(config)

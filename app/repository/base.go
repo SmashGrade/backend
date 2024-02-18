@@ -208,7 +208,7 @@ func (r *BaseRepository) DeleteVersioned(id uint, version uint) error {
 }
 
 /*
-Get entity with the highst version, providing the id
+Get entity with the highest version, providing the id
 
 Usage (example with models.Course):
 
