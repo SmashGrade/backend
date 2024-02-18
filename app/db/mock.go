@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/SmashGrade/backend/app/models"
+	"github.com/google/uuid"
 )
 
 // Fill MockDB with prefill functions
@@ -91,7 +92,7 @@ func Course_1() models.Course {
 	course.Description = "Course 1"
 	course.Number = "NR01"
 	course.Version = 1
-	course.ID = 1
+	course.ID, _ = uuid.Parse("071e2e14-88d8-497a-aa20-c67539655686")
 	return course
 }
 
@@ -101,7 +102,7 @@ func Course_2_1() models.Course {
 	course.Description = "Course 2"
 	course.Number = "NR02"
 	course.Version = 1
-	course.ID = 2
+	course.ID, _ = uuid.Parse("6dd6ac96-9f30-408a-90b5-dd1cec955808")
 	return course
 }
 
@@ -111,7 +112,7 @@ func Course_2_2() models.Course {
 	course.Description = "Course 2"
 	course.Number = "NR02"
 	course.Version = 2
-	course.ID = 2
+	course.ID, _ = uuid.Parse("6dd6ac96-9f30-408a-90b5-dd1cec955808")
 	return course
 }
 
@@ -323,7 +324,7 @@ func Module_1() models.Module {
 	module.Description = "Module 1"
 	module.Number = "NR02"
 	module.Version = 1
-	module.ID = 1
+	module.ID, _ = uuid.Parse("0c256c99-4c64-4747-ac1a-d0362fc75319")
 	return module
 }
 
@@ -333,7 +334,7 @@ func Module_2_1() models.Module {
 	module.Description = "Module 2"
 	module.Number = "NR02"
 	module.Version = 1
-	module.ID = 2
+	module.ID, _ = uuid.Parse("4c14f1db-82e2-41f3-96cc-71e3b3d52d13")
 	return module
 }
 
@@ -343,7 +344,7 @@ func Module_2_2() models.Module {
 	module.Description = "Module 2"
 	module.Number = "NR02"
 	module.Version = 2
-	module.ID = 2
+	module.ID, _ = uuid.Parse("4c14f1db-82e2-41f3-96cc-71e3b3d52d13")
 	return module
 }
 

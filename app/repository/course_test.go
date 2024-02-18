@@ -6,6 +6,7 @@ import (
 	"github.com/SmashGrade/backend/app/db"
 	"github.com/SmashGrade/backend/app/models"
 	"github.com/go-test/deep"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 )
 
@@ -13,7 +14,7 @@ func Test_Course_Create(t *testing.T) {
 	repository := NewCourseRepository(db.NewMockProvider())
 
 	course_1 := db.Course_1()
-	course_1.ID = 0
+	course_1.ID = uuid.UUID{}
 
 	_, err := repository.Create(&course_1)
 

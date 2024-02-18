@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/SmashGrade/backend/app/db"
+	"github.com/google/uuid"
 	"gorm.io/gorm/clause"
 )
 
@@ -23,8 +24,8 @@ type IdRepository interface {
 
 // Repository methods for models with id and version
 type VersionedRepository interface {
-	GetVersioned(id, version uint) (any, error)
-	DeleteVersioned(id, version uint) error
+	GetVersioned(id uuid.UUID, version uint) (any, error)
+	DeleteVersioned(id uuid.UUID, version uint) error
 	GetLatestVersioned(id uint) (any, error)
 }
 
@@ -155,7 +156,7 @@ Usage (example with models.Course)
 	res, err := repository.GetVersioned(1, 2)
 	course := result.(*models.Course)
 */
-func (r *BaseRepository) GetVersioned(id, version uint) (any, error) {
+func (r *BaseRepository) GetVersioned(id uuid.UUID, version uint) (any, error) {
 	newEntity := r.getInterface()
 
 	result := r.Provider.DB().Preload(clause.Associations).Where("id = ? AND version = ?", id, version).First(newEntity)
@@ -190,7 +191,7 @@ Usage (example with models.Course):
 
 	err := respository.DeleteVersioned(1, 2)
 */
-func (r *BaseRepository) DeleteVersioned(id, version uint) error {
+func (r *BaseRepository) DeleteVersioned(id uuid.UUID, version uint) error {
 	newEntity := r.getInterface()
 
 	return r.Provider.DB().Where("id = ? AND version = ?", id, version).Delete(newEntity).Error
@@ -204,7 +205,7 @@ Usage (example with models.Course):
 	res, err := repository.GetLatestVersioned(1)
 	course := res.(*models.Course)
 */
-func (r *BaseRepository) GetLatestVersioned(id uint) (any, error) {
+func (r *BaseRepository) GetLatestVersioned(id uuid.UUID) (any, error) {
 	newEntity := r.getInterface()
 
 	result := r.Provider.DB().Where("id = ?", id).Order("version desc").First(newEntity)

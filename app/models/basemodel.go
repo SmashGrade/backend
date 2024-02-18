@@ -3,6 +3,7 @@ package models
 import (
 	"time"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -16,6 +17,9 @@ type Basemodel struct {
 
 // VersionedBasemodel is the base model for all models with versioning
 type VersionedBasemodel struct {
-	Basemodel
-	Version uint `gorm:"primarykey" json:"version"`
+	ID        uuid.UUID      `gorm:"type:uuid;primarykey;" json:"id"`
+	CreatedAt time.Time      `json:"created"`
+	UpdatedAt time.Time      `json:"updated"`
+	DeletedAt gorm.DeletedAt `gorm:"index" json:"deleted,omitempty"`
+	Version   uint           `gorm:"primarykey" json:"version"`
 }
