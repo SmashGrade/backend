@@ -187,10 +187,18 @@ func NewMockProvider() Provider {
 	var mockConfig *c.APIConfig = c.NewAPIConfig()
 	// Override connection string
 	mockConfig.DBConnectionStr = "sqlite://:memory:"
-	// Ensure that DB in memory is always migrate
+	// Ensure that DB in memory is always migrated
 	mockConfig.AutoMigrate = true
 	provider := NewProvider(mockConfig)
-	// TODO: Add entities that are always the same
+
+	return provider
+}
+
+// Returns an in memory provider for mocking and testing with prefilled data
+func NewPrefilledMockProvider() Provider {
+
+	provider := NewMockProvider()
+
 	// e.g Users, Courses
 	prefillMockDB(provider)
 
