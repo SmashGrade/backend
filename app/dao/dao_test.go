@@ -230,7 +230,7 @@ func TestCreateCourseVersion(t *testing.T) {
 	require.NotEqual(t, testCourse.ID, createdCourse.ID)
 	require.Equal(t, uint(1), createdCourse.Version)
 
-	testCourse.ID = uuid.New()
+	testCourse.ID = 0                                 //uuid.New()
 	createdCourse, err = courseDao.Create(testCourse) // set id, no version, set version 1
 
 	require.Nil(t, err)
@@ -244,7 +244,7 @@ func TestCreateCourseVersion(t *testing.T) {
 	require.Equal(t, testCourse.ID, createdCourse.ID)
 	require.Equal(t, uint(2), createdCourse.Version)
 
-	testCourse.ID = uuid.UUID{}
+	testCourse.ID = 0 //uuid.UUID{}
 	testCourse.Version = 5
 	createdCourse, err = courseDao.Create(testCourse) // initial id, set version, generate random id and version 1
 
@@ -266,7 +266,7 @@ func TestModuleCRUD(t *testing.T) {
 		Description: testDescr,
 	})
 	require.Nil(t, err)
-	require.NotEqual(t, uuid.UUID{}, retModule.ID)
+	require.NotEqual(t, uint(0), retModule.ID)
 	require.Equal(t, testDescr, retModule.Description)
 
 	// Read
@@ -316,7 +316,7 @@ func TestExamCRUD(t *testing.T) {
 		Description: testDescr,
 	})
 	require.Nil(t, err)
-	require.NotEqual(t, uuid.UUID{}, retExam.ID)
+	require.NotEqual(t, uint(0), retExam.ID)
 	require.Equal(t, testDescr, retExam.Description)
 
 	// Read
