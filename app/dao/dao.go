@@ -524,8 +524,19 @@ func (c *CourseDao) GetLatest(id uuid.UUID) (entity *models.Course, err *e.ApiEr
 // Will create a new course if neither id nor version are set
 // Will create a new course version if only id is set
 func (c *CourseDao) Create(entity models.Course) (returnEntity *models.Course, err *e.ApiError) {
+	var internalError error
 
-	entity.GenerateIdIfEmpty()
+	// First check if the id is zero, if yes generate it
+	if entity.GenerateIdIfEmpty() {
+		entity.Version = 1 // set version to one on new id
+	} else {
+		if entity.Version == 0 { // generate new version if it is initial on existing id
+			entity.Version, internalError = c.repo.GetNextVersion(entity.ID)
+			if internalError != nil {
+				entity.Version = 1 // no previous version found
+			}
+		}
+	}
 
 	internalEntity, internalError := c.repo.Create(&entity)
 

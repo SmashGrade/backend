@@ -210,3 +210,42 @@ func TestGetByEmail(t *testing.T) {
 		t.Fatal("we found a non existant user")
 	}
 }
+
+func TestCreateCourseVersion(t *testing.T) {
+	provider := db.NewMockProvider()
+
+	courseDao := NewCourseDao(repository.NewCourseRepository(provider))
+
+	testCourse := models.Course{
+		Description: "testcourse",
+	}
+
+	createdCourse, err := courseDao.Create(testCourse) // no id, no version, generate random id and version 1
+
+	require.Nil(t, err)
+	require.NotEqual(t, testCourse.ID, createdCourse.ID)
+	require.Equal(t, uint(1), createdCourse.Version)
+
+	testCourse.ID = uuid.New()
+	createdCourse, err = courseDao.Create(testCourse) // set id, no version, set version 1
+
+	require.Nil(t, err)
+	require.Equal(t, testCourse.ID, createdCourse.ID)
+	require.Equal(t, uint(1), createdCourse.Version)
+
+	testCourse.Version = 2
+	createdCourse, err = courseDao.Create(testCourse) // set id, set version, just create
+
+	require.Nil(t, err)
+	require.Equal(t, testCourse.ID, createdCourse.ID)
+	require.Equal(t, uint(2), createdCourse.Version)
+
+	testCourse.ID = uuid.UUID{}
+	testCourse.Version = 5
+	createdCourse, err = courseDao.Create(testCourse) // initial id, set version, generate random id and version 1
+
+	require.Nil(t, err)
+	require.NotEqual(t, testCourse.ID, createdCourse.ID)
+	require.NotEqual(t, testCourse.Version, createdCourse.Version)
+	require.Equal(t, uint(1), createdCourse.Version)
+}

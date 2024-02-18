@@ -29,10 +29,12 @@ func (v *VersionedBasemodel) GenerateId() {
 	v.ID = uuid.New()
 }
 
-// sets id to random uuid if it is initial
-func (v *VersionedBasemodel) GenerateIdIfEmpty() {
+// sets id to random uuid if it is initial, returns true if id is generated
+func (v *VersionedBasemodel) GenerateIdIfEmpty() bool {
 	var emptyUUID = uuid.UUID{}
 	if v.ID == emptyUUID {
 		v.GenerateId()
+		return true
 	}
+	return false
 }
