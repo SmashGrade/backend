@@ -221,13 +221,13 @@ func TestCreateCourseVersion(t *testing.T) {
 		Description: "testcourse",
 	}
 
-	createdCourse, err := courseDao.Create(testCourse) // no id, no version, generate random id and version 1
+	createdCourse, err := courseDao.Create(testCourse) // no id, no version, generate id and version 1
 
 	require.Nil(t, err)
 	require.NotEqual(t, testCourse.ID, createdCourse.ID)
 	require.Equal(t, uint(1), createdCourse.Version)
 
-	testCourse.ID = 0                                 //uuid.New()
+	testCourse.ID = 66                                //uuid.New()
 	createdCourse, err = courseDao.Create(testCourse) // set id, no version, set version 1
 
 	require.Nil(t, err)

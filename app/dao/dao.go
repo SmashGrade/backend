@@ -569,7 +569,7 @@ func (c *CourseDao) Create(entity models.Course) (returnEntity *models.Course, e
 		if entity.Version == 0 { // generate new version if it is initial on existing id
 			entity.Version, internalError = c.repo.GetNextVersion(entity.ID)
 			if internalError != nil {
-				entity.Version = 1 // no previous version found
+				return nil, e.NewDaoDbError()
 			}
 		}
 	}
