@@ -15,8 +15,6 @@ type Repository interface {
 	Update(entity any) error
 	Find(entity any) (any, error)
 	GetAll() (any, error)
-	GetLatestId() (uint, error)
-	GetNextId() (uint, error)
 }
 
 // Repository methods for models with only an id
@@ -32,10 +30,10 @@ type VersionedRepository interface {
 	GetVersioned(id uint, version uint) (any, error)
 	DeleteVersioned(id uint, version uint) error
 	GetLatestVersioned(id uint) (any, error)
-	GetLatestVersion(id uint) (uint, error)
-	GetNextVersion(id uint) (uint, error)
 	GetLatestId() (uint, error)
 	GetNextId() (uint, error)
+	GetLatestVersion(id uint) (uint, error)
+	GetNextVersion(id uint) (uint, error)
 }
 
 // Repository methods for models with id and start date
@@ -272,10 +270,10 @@ func (r *BaseRepository) GetNextId() (uint, error) {
 }
 
 // returns currently highest used version
-func (r *BaseRepository) GetLatestVersion() (uint, error) {
+func (r *BaseRepository) GetLatestVersion(id uint) (uint, error) {
 	entity := r.getInterface()
 
-	result := r.Provider.DB().Order("version desc").First(entity)
+	result := r.Provider.DB().Where("id = ?", id).Order("version desc").First(entity)
 	// Check if the result is not found and return the first id for the table
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return 0, nil
@@ -294,8 +292,8 @@ func (r *BaseRepository) GetLatestVersion() (uint, error) {
 }
 
 // returns next possible version for the entity (manual autoincrement)
-func (r *BaseRepository) GetNextVersion() (uint, error) {
-	id, err := r.GetLatestVersion()
+func (r *BaseRepository) GetNextVersion(id uint) (uint, error) {
+	id, err := r.GetLatestVersion(id)
 	if err != nil {
 		return 0, err
 	}
