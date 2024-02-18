@@ -11,6 +11,7 @@ import (
 
 func Test_Course_Create(t *testing.T) {
 	repository := NewCourseRepository(db.NewPrefilledMockProvider())
+	//repository := NewCourseRepository(db.NewProvider(config.NewAPIConfig()))
 
 	var err error
 
