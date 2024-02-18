@@ -609,7 +609,7 @@ type ExamDao struct {
 }
 
 // Create new exam dao with all used providers
-func NewExamDoa(examRepository *repository.ExamRepository, courseRepository *repository.CourseRepository) *ExamDao {
+func NewExamDao(examRepository *repository.ExamRepository, courseRepository *repository.CourseRepository) *ExamDao {
 	return &ExamDao{
 		examRepo:   examRepository,
 		courseRepo: courseRepository,
