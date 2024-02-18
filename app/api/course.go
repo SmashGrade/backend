@@ -44,7 +44,7 @@ func (c *CourseController) Courses(ctx echo.Context) error {
 // @Summary		Get a specific course
 // @Description	Get a specific course
 // @Tags			courses
-// @Param			id		path	uint	true	"Course ID"
+// @Param			id		path	string	true	"Course ID"
 // @Param			version	path	uint	true	"Course Version"
 // @Produce		json
 // @Success		200	{object}	models.Course
