@@ -460,26 +460,14 @@ func prefillStudyStage(p Provider) {
 	p.DB().Table("study_stages").Create(&studyStage_2)
 }
 
-// User that will be added to the mock DB
-func User_1() models.User {
-	var user models.User
-	user.Name = "User Name 1"
-	user.ID = 1
-	return user
-}
-
-// User that will be added to the mock DB
-func User_2() models.User {
-	var user models.User
-	user.Name = "User Name 2"
-	user.ID = 2
-	return user
-}
-
 // add all the users to the users table of the mockDB
 func prefillUser(p Provider) {
-	user_1 := User_1()
-	user_2 := User_2()
-	p.DB().Table("users").Create(&user_1)
-	p.DB().Table("users").Create(&user_2)
+	p.DB().Table("users").Create(&models.User{
+		Name:  "Jakob Ferber",
+		Email: "jakob.ferber@hftm.ch",
+	})
+	p.DB().Table("users").Create(&models.User{
+		Name:  "Rafael Stauffer",
+		Email: "rafael.stauffer@hftm.ch",
+	})
 }
