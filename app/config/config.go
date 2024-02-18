@@ -8,6 +8,7 @@ import (
 type APIConfig struct {
 	Host                string                     `yaml:"host"`                // Host is the address of the server
 	Port                int                        `yaml:"port"`                // Port is the port of the server
+	AuthConfig          AuthConfig                 `yaml:"auth"`                // AuthConfig is the configuration for authentication
 	AutoMigrate         bool                       `yaml:"autoMigrate"`         // AutoMigrate is a flag to determine if the database should be migrated automatically
 	Connect             bool                       `yaml:"connect"`             // Connect is a flag to determine if the database should be connected automatically
 	DBConnectionStr     string                     `yaml:"dbConnectionStr"`     // DBConnectionStr is the connection string for the database
@@ -18,22 +19,33 @@ type APIConfig struct {
 	CurriculumTypes     []CurriculumTypeConfig     `yaml:"curriculumTypes"`     // CurriculumTypes is the list of curriculum types
 }
 
+// Configuration for Authentication
+type AuthConfig struct {
+	OAuthKeyDiscoveryURL string `yaml:"oAuthKeyDiscoveryURL"` // OAuthKeyDiscoveryURL is the URL to discover the OAuth keys
+}
+
+// Predefined exam evaluation types
 type ExamEvaluationTypeConfig struct {
 	Code        string `yaml:"code"`        // code is the code of the evaluation type
 	Description string `yaml:"description"` // description is the description of the evaluation type
 }
 
+// Predefined curriculum types
 type CurriculumTypeConfig struct {
 	Description   string `yaml:"description"`
 	DurationYears uint   `yaml:"durationyears"`
 }
 
 // Returns a new configuration with default values
+// This is used to create the config file if it does not exist
 func NewAPIConfig() *APIConfig {
 	return &APIConfig{
-		Host:            "0.0.0.0",
-		Port:            9000,
-		Connect:         true,
+		Host:    "0.0.0.0",
+		Port:    9000,
+		Connect: true,
+		AuthConfig: AuthConfig{
+			OAuthKeyDiscoveryURL: "https://login.microsoftonline.com/common/discovery/keys",
+		},
 		AutoMigrate:     true,
 		DBConnectionStr: "sqlite://data.db",
 		ExamTypes:       []string{"Mündliche oder schriftliche Prüfung ", "Präsentationen", "Lernbericht", "schriftliche Arbeit", "Lernjournal"},
