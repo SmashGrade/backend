@@ -205,7 +205,7 @@ func TestGetByEmail(t *testing.T) {
 		t.Fatalf("username %v does not match expected", r1.Name)
 	}
 
-	r2, err := dao.GetByEmail("does.not@exist.ch")
+	r2, _ := dao.GetByEmail("does.not@exist.ch")
 	if r2 != nil {
 		t.Fatal("we found a non existant user")
 	}
