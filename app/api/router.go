@@ -13,6 +13,7 @@ type Router struct {
 	auth   *auth.AuthProvider
 	course *CourseController
 	output *OutputController
+	user   *UserController
 }
 
 // NewRouter creates a new router
@@ -22,6 +23,7 @@ func NewRouter(e *echo.Echo, p db.Provider) *Router {
 		auth:   auth.NewAuthProvider(p.Config()),
 		course: NewCourseController(p),
 		output: NewOutputController(p),
+		user:   NewUserController(p),
 	}
 }
 
@@ -35,4 +37,5 @@ func (r *Router) RegisterV1() {
 	// Register all v1 routes
 	RegisterV1Courses(v1, r.course)
 	RegisterV1Output(v1, r.output)
+	RegisterV1User(v1, r.user)
 }
