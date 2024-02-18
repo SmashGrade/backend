@@ -627,6 +627,11 @@ func (ex *ExamDao) Get(id uint) (entity *models.Exam, err *e.ApiError) {
 	return getOrError[models.Exam](ex.examRepo, id)
 }
 
+// Returns all examn
+func (ex *ExamDao) GetAll() (entities []models.Exam, err *e.ApiError) {
+	return getAllOrError[models.Exam](ex.examRepo)
+}
+
 // Creates a new exam for a course
 func (ex *ExamDao) Create(entity models.Exam) (returnEntity *models.Exam, err *e.ApiError) {
 	return createOrError(ex.examRepo, entity)
