@@ -6,17 +6,18 @@ import (
 	"github.com/SmashGrade/backend/app/db"
 	"github.com/SmashGrade/backend/app/models"
 	"github.com/go-test/deep"
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 )
 
 func Test_Module_Create(t *testing.T) {
 	repository := NewModuleRepository(db.NewPrefilledMockProvider())
 
+	var err error
 	module_1 := db.Module_1()
-	module_1.ID = uuid.UUID{}
+	module_1.ID, err = repository.GetNextId()
+	require.NoError(t, err)
 
-	_, err := repository.Create(&module_1)
+	_, err = repository.Create(&module_1)
 
 	require.NoError(t, err)
 }

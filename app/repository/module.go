@@ -3,7 +3,6 @@ package repository
 import (
 	"github.com/SmashGrade/backend/app/db"
 	"github.com/SmashGrade/backend/app/models"
-	"github.com/google/uuid"
 )
 
 type ModuleRepository struct {
@@ -17,7 +16,7 @@ func NewModuleRepository(provider db.Provider) *ModuleRepository {
 }
 
 // Returns currently highest used version
-func (r *ModuleRepository) GetLatestVersion(id uuid.UUID) (uint, error) {
+func (r *ModuleRepository) GetLatestVersion(id uint) (uint, error) {
 
 	ret, err := r.GetLatestVersioned(id)
 	if err != nil {
@@ -29,7 +28,7 @@ func (r *ModuleRepository) GetLatestVersion(id uuid.UUID) (uint, error) {
 }
 
 // Returns next free version
-func (r *ModuleRepository) GetNextVersion(id uuid.UUID) (uint, error) {
+func (r *ModuleRepository) GetNextVersion(id uint) (uint, error) {
 	currentId, err := r.GetLatestVersion(id)
 	if err == nil {
 		currentId += 1

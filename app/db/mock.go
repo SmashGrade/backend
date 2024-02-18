@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/SmashGrade/backend/app/models"
-	"github.com/google/uuid"
 )
 
 // Fill MockDB with prefill functions
@@ -102,7 +101,7 @@ func Course_2_1() models.Course {
 	course.Description = "Course 2"
 	course.Number = "NR02"
 	course.Version = 1
-	course.ID, _ = uuid.Parse("6dd6ac96-9f30-408a-90b5-dd1cec955808")
+	course.ID = 2
 	return course
 }
 
@@ -112,7 +111,7 @@ func Course_2_2() models.Course {
 	course.Description = "Course 2"
 	course.Number = "NR02"
 	course.Version = 2
-	course.ID, _ = uuid.Parse("6dd6ac96-9f30-408a-90b5-dd1cec955808")
+	course.ID = 2
 	return course
 }
 
