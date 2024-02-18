@@ -44,6 +44,13 @@ func HandleEchoError(err error, c echo.Context) {
 	c.JSON(500, map[string]any{"error": "Internal server error"})
 }
 
+func NewUnauthorizedError() *ApiError {
+	return &ApiError{
+		Status: 401,
+		Msg:    "Unauthorized. Please use a valid bearer token",
+	}
+}
+
 func NewDaoUnimplementedError() *ApiError {
 	return &ApiError{
 		Status: 501,
@@ -54,6 +61,6 @@ func NewDaoUnimplementedError() *ApiError {
 func NewDaoDbError() *ApiError {
 	return &ApiError{
 		Status: 500,
-		Msg:    "DB Error",
+		Msg:    "Database error",
 	}
 }

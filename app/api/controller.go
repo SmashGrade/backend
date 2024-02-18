@@ -3,19 +3,26 @@ package api
 import (
 	"strconv"
 
+	"github.com/SmashGrade/backend/app/dao"
 	"github.com/SmashGrade/backend/app/db"
+	e "github.com/SmashGrade/backend/app/error"
+	"github.com/SmashGrade/backend/app/models"
+	"github.com/SmashGrade/backend/app/repository"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
 )
 
 // Controller is the base controller for all API controllers
 type BaseController struct {
 	Provider db.Provider
+	UserDao  *dao.UserDao
 }
 
 // Constructor for BaseController
 func NewBaseController(provider db.Provider) *BaseController {
 	return &BaseController{
 		Provider: provider,
+		UserDao:  dao.NewUserDao(repository.NewUserRepository(provider)),
 	}
 }
 
@@ -44,4 +51,33 @@ func (c *BaseController) GetPathParamInt(ctx echo.Context, param string) int {
 	}
 	// Return value
 	return res
+}
+
+// Retrieves the user from the requests bearer token
+// Ensures that the user is authenticated and exists in the database
+// Handles the unauthorized and forbidden errors
+func (c *BaseController) GetUser(ctx echo.Context) (*models.User, error) {
+	userRaw := ctx.Get("user")
+	// Middleware does not have a user key, so we return unauthorized
+	if userRaw == nil {
+		ctx.Logger().Info("Authorized endpoint called without a bearer token. Request denied.")
+		return nil, e.NewUnauthorizedError()
+	}
+	// Check if the user key is a valid jwt token
+	user, ok := userRaw.(*jwt.Token)
+	if !ok {
+		ctx.Logger().Info("Authorized endpoint called without a valid bearer token. Request denied.")
+		return nil, e.NewUnauthorizedError()
+	}
+	// Check if the user is valid
+	claims, ok := user.Claims.(jwt.MapClaims)
+	if !ok {
+		ctx.Logger().Info("Authorized endpoint called without valid claims. Request denied.")
+		return nil, e.NewUnauthorizedError()
+	}
+	// Print claims for debugging
+	ctx.Logger().Info("Claims: ", claims)
+
+	// TODO: Finish this function
+	return &models.User{}, nil
 }
