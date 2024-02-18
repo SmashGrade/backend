@@ -251,13 +251,13 @@ func (r *BaseRepository) GetLatestId() (uint, error) {
 		return 0, result.Error
 	}
 	// Get the id from the result
-	var ids *[]uint
+	var ids []uint
 	err := result.Pluck("id", &ids)
 	if err.Error != nil {
 		return 0, err.Error
 	}
 	// Expecting the first id to be the largest since we ordered the query
-	largestId := (*ids)[0]
+	largestId := (ids)[0]
 	return largestId, nil
 }
 
@@ -283,13 +283,13 @@ func (r *BaseRepository) GetLatestVersion(id uint) (uint, error) {
 		return 0, result.Error
 	}
 	// Get the id from the result
-	var versions *[]uint
+	var versions []uint
 	err := result.Pluck("version", &versions)
 	if err.Error != nil {
 		return 0, err.Error
 	}
 	// Expecting the first id to be the largest since we ordered the query
-	largestVersion := (*versions)[0]
+	largestVersion := (versions)[0]
 	return largestVersion, nil
 }
 
