@@ -307,7 +307,7 @@ func TestModuleCRUD(t *testing.T) {
 func TestExamCRUD(t *testing.T) {
 	provider := db.NewPrefilledMockProvider()
 
-	dao := NewExamDoa(repository.NewExamRepository(provider), repository.NewCourseRepository(provider))
+	dao := NewExamDao(repository.NewExamRepository(provider), repository.NewCourseRepository(provider))
 
 	testDescr := "testdescr"
 
