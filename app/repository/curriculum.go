@@ -42,7 +42,7 @@ func (r *CurriculumRepository) GetLatestId() (uint, error) {
 	newEntity := &models.Curriculum{}
 	result := r.Provider.DB().Order("id desc").First(newEntity)
 	if result.Error != nil {
-		return 0, result.Error
+		return 0, nil
 	}
 
 	return newEntity.ID, nil

@@ -148,6 +148,8 @@ func TestCreateDefaults(t *testing.T) {
 func TestCreateFieldAndFocus(t *testing.T) {
 	provider := db.NewMockProvider()
 
+	//provider := db.NewProvider(config.NewAPIConfig())
+
 	fieldRepo := repository.NewFieldRepository(provider)
 
 	fielDao := NewFieldDao(fieldRepo)
@@ -213,6 +215,8 @@ func TestGetByEmail(t *testing.T) {
 
 func TestCreateCourseVersion(t *testing.T) {
 	provider := db.NewMockProvider()
+
+	//provider := db.NewProvider(config.NewAPIConfig())
 
 	courseDao := NewCourseDao(repository.NewCourseRepository(provider))
 
@@ -297,5 +301,47 @@ func TestModuleCRUD(t *testing.T) {
 	err = dao.Delete(retModule.ID, retModule.Version)
 	require.Nil(t, err)
 	_, err = dao.Get(retModule.ID, retModule.Version)
+	require.NotNil(t, err)
+}
+
+func TestExamCRUD(t *testing.T) {
+	provider := db.NewPrefilledMockProvider()
+
+	dao := NewExamDoa(repository.NewExamRepository(provider), repository.NewCourseRepository(provider))
+
+	testDescr := "testdescr"
+
+	// Create
+	retExam, err := dao.Create(models.Exam{
+		Description: testDescr,
+	})
+	require.Nil(t, err)
+	require.NotEqual(t, uuid.UUID{}, retExam.ID)
+	require.Equal(t, testDescr, retExam.Description)
+
+	// Read
+	readExamGet, err := dao.Get(retExam.ID)
+	require.Nil(t, err)
+	require.Equal(t, retExam.ID, readExamGet.ID)
+
+	// Update
+	newTestDescr := "wowee"
+	newExam := models.Exam{
+		Description: newTestDescr,
+	}
+	newExam.ID = retExam.ID
+
+	err = dao.Update(newExam)
+	require.Nil(t, err)
+
+	updatedModule, err := dao.Get(retExam.ID)
+	require.Nil(t, err)
+	require.Equal(t, retExam.ID, readExamGet.ID)
+	require.Equal(t, newTestDescr, updatedModule.Description)
+
+	// Delete
+	err = dao.Delete(retExam.ID)
+	require.Nil(t, err)
+	_, err = dao.Get(retExam.ID)
 	require.NotNil(t, err)
 }

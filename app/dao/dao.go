@@ -612,27 +612,38 @@ func NewExamDoa(examRepository *repository.ExamRepository, courseRepository *rep
 
 // Returns a list of exams for a specific course
 func (ex *ExamDao) GetForCourse(courseId, courseVersion uint) (entities []models.Exam, err *e.ApiError) {
+	// courseEnt, err := ex.courseRepo.GetVersioned(courseId, courseVersion) // TODO: waiting for uuid fix
 	return nil, e.NewDaoUnimplementedError()
 }
 
-// Returns a single exam for a course selected by id
-func (ex *ExamDao) Get(courseId, courseVersion, examId uint) (entity *models.Exam, err *e.ApiError) {
-	return nil, e.NewDaoUnimplementedError()
+// Returns a single exam by id
+func (ex *ExamDao) Get(id uint) (entity *models.Exam, err *e.ApiError) {
+	return getOrError[models.Exam](ex.examRepo, id)
 }
 
 // Creates a new exam for a course
 func (ex *ExamDao) Create(entity models.Exam) (returnEntity *models.Exam, err *e.ApiError) {
-	return nil, e.NewDaoUnimplementedError()
+	return createOrError(ex.examRepo, entity)
 }
 
 // Updates an existing exam for a course
 func (ex *ExamDao) Update(entity models.Exam) *e.ApiError {
-	return e.NewDaoUnimplementedError()
+	internalError := ex.examRepo.Update(entity)
+	if internalError != nil {
+		return e.NewDaoDbError()
+	}
+
+	return nil
 }
 
-// Deletes exam for a course
-func (ex *ExamDao) Delete(courseId, courseVersion, examId uint) *e.ApiError {
-	return e.NewDaoUnimplementedError()
+// Deletes exam
+func (ex *ExamDao) Delete(id uint) *e.ApiError {
+	internalError := ex.examRepo.DeleteId(id)
+	if internalError != nil {
+		return e.NewDaoDbError()
+	}
+
+	return nil
 }
 
 type UserDao struct {
