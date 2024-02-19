@@ -37,11 +37,18 @@ func HandleEchoError(err error, c echo.Context) {
 	e, ok := err.(*ApiError)
 	if ok {
 		c.JSON(e.Status, map[string]any{"error": e.Msg})
-		return
+	} else if err == echo.ErrNotFound {
+		c.JSON(404, map[string]any{"error": "Not found"})
+	} else if err == echo.ErrUnauthorized {
+		c.JSON(401, map[string]any{"error": "Unauthorized"})
+	} else if err == echo.ErrForbidden {
+		c.JSON(403, map[string]any{"error": "Forbidden"})
+	} else {
+		// This handles any other error as a 500 internal server error
+		// Therefore we do not expose any internal error details to the client
+		c.JSON(500, map[string]any{"error": "Internal server error"})
 	}
-	// This handles any other error as a 500 internal server error
-	// Therefore we do not expose any internal error details to the client
-	c.JSON(500, map[string]any{"error": "Internal server error"})
+	// TODO Log the error properly
 }
 
 func NewUnauthorizedError() *ApiError {

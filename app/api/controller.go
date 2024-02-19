@@ -56,7 +56,7 @@ func (c *BaseController) GetPathParamInt(ctx echo.Context, param string) int {
 // Retrieves the user from the requests bearer token
 // Ensures that the user is authenticated and exists in the database
 // Handles the unauthorized and forbidden errors
-func (c *BaseController) GetUser(ctx echo.Context) (*models.User, error) {
+func (c *BaseController) GetUser(ctx echo.Context) (*models.User, *e.ApiError) {
 	userRaw := ctx.Get("user")
 	// Middleware does not have a user key, so we return unauthorized
 	if userRaw == nil {

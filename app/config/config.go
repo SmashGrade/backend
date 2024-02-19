@@ -21,6 +21,7 @@ type APIConfig struct {
 
 // Configuration for Authentication
 type AuthConfig struct {
+	Enabled              bool   `yaml:"enabled"`              // Enabled is a flag to determine if authentication is enabled
 	OAuthKeyDiscoveryURL string `yaml:"oAuthKeyDiscoveryURL"` // OAuthKeyDiscoveryURL is the URL to discover the OAuth keys
 }
 
@@ -44,6 +45,7 @@ func NewAPIConfig() *APIConfig {
 		Port:    9000,
 		Connect: true,
 		AuthConfig: AuthConfig{
+			Enabled:              false,
 			OAuthKeyDiscoveryURL: "https://login.microsoftonline.com/common/discovery/keys",
 		},
 		AutoMigrate:     true,
@@ -66,4 +68,13 @@ func NewAPIConfig() *APIConfig {
 // Returns the server address as a string
 func (c *APIConfig) ServerAddress() string {
 	return fmt.Sprintf("%s:%d", c.Host, c.Port)
+}
+
+// Returns a new configuration with default values for production
+func NewProdAPIConfig() *APIConfig {
+	c := NewAPIConfig()
+	// Enable authentication
+	c.AuthConfig.Enabled = true
+
+	return c
 }
