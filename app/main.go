@@ -1,74 +1,54 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/SmashGrade/backend/app/api"
-	v1 "github.com/SmashGrade/backend/app/api/v1"
-	"github.com/SmashGrade/backend/app/api/v1/schemas"
-	"github.com/SmashGrade/backend/app/dao"
-	"github.com/SmashGrade/backend/app/provider"
+	c "github.com/SmashGrade/backend/app/config"
+	"github.com/SmashGrade/backend/app/db"
+	_ "github.com/SmashGrade/backend/app/docs"
+	e "github.com/SmashGrade/backend/app/error"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+	echoSwagger "github.com/swaggo/echo-swagger"
+	_ "gorm.io/gorm"
 )
 
-// generates minimal testdata at startup for checking
-func generateTestdata(db *dao.Database) {
-	field, _ := db.CreateField("xField")
-
-	focus, _ := db.CreateFocus("focus", field.ID)
-
-	curriculumType, _ := db.CreateCurriculumType("type", 3) // number of years not relevant
-
-	curriculumRef := &schemas.CurriculumReq{
-		Focus:           focus.Description,
-		Field:           field.Description,
-		CurriculumType:  curriculumType.Description,
-		IsActive:        true,
-		StartDate:       "01.01.2025",
-		EndDate:         "01.01.2028",
-		FieldmanagerRef: []uint{},
-		ModulesRef:      []uint{},
-	}
-
-	_, _ = db.CreateCurriculum(curriculumRef)
-}
-
+// @title						Smashgrade Backend API
+// @version					1.0
+// @description				Backend API for Smashgrade, a web application for tracking your student grades.
+// @termsOfService				http://swagger.io/terms/
+// @contact.name				HFTM Grenchen
+// @contact.url				https://www.hftm.ch
+// @license.name				Closed
+// @host						api.smashgrade.ch
+// @securityDefinitions.apikey	Bearer
+// @in							header
+// @name						Authorization
+// @description				Type "Bearer" followed by a space and JWT token.
 func main() {
 
-	ctx := api.NewServer()
+	// Load configuration
+	config := c.NewAPIConfig()
 
-	// add all versions
-	v1.RoutesV1(ctx)
-	// v2...
-	// v3...
-	// v4...
+	server := echo.New()
+	// Assign the custom error handler to the server
+	server.HTTPErrorHandler = e.HandleEchoError
 
-	prov := &provider.SqliteProvider{}
-	prov.Connect()
-	stuff := &dao.Database{}
-	stuff.Db = prov.Db
+	// Add swagger documentation route
+	server.GET("/docs*", echoSwagger.WrapHandler)
 
-	generateTestdata(stuff)
+	// Enable Middleware
+	server.Use(middleware.Logger())
 
-	/*
-			user := schemas.User{}
-			user.Name = "User5"
-			user.Role = "schueler"
-			stuff.PostUser(&user)
+	// Initialize the database provider
+	provider := db.NewProvider(config)
 
-		users := []schemas.User{}
-		stuff.ListUsers(&users)
+	// Initialize the router
+	router := api.NewRouter(server, provider)
+	// Register all v1 routes
+	router.RegisterV1()
 
-			exam2 := entity.Exam{}
-			exam2.Description = "more stuff"
-			stuff.EditExam(&exam2, 2)
-
-			exam3 := entity.Exam{}
-			stuff.GetExam(&exam3, 2)
-	*/
-	// start server at Port :9000
-	err := ctx.Run(9000)
-	if err != nil {
-		fmt.Println(err) // TODO: handle error
-	}
+	// Start the server
+	// Any returned error is fatal
+	server.Logger.Fatal(server.Start(config.ServerAddress()))
 
 }

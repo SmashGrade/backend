@@ -1,0 +1,574 @@
+definitions:
+  error.ApiError:
+    properties:
+      msg:
+        type: string
+      status:
+        type: integer
+    type: object
+  gorm.DeletedAt:
+    properties:
+      time:
+        type: string
+      valid:
+        description: Valid is true if Time is not NULL
+        type: boolean
+    type: object
+  models.Course:
+    properties:
+      created:
+        type: string
+      deleted:
+        $ref: '#/definitions/gorm.DeletedAt'
+      description:
+        type: string
+      id:
+        type: integer
+      modules:
+        items:
+          $ref: '#/definitions/models.Module'
+        type: array
+      number:
+        type: string
+      selectedCourses:
+        items:
+          $ref: '#/definitions/models.SelectedCourse'
+        type: array
+      teachedBy:
+        items:
+          $ref: '#/definitions/models.User'
+        type: array
+      updated:
+        type: string
+      version:
+        type: integer
+    type: object
+  models.Curriculum:
+    properties:
+      created:
+        type: string
+      curriculumType:
+        $ref: '#/definitions/models.Curriculumtype'
+      deleted:
+        $ref: '#/definitions/gorm.DeletedAt'
+      description:
+        type: string
+      endValidity:
+        type: string
+      focus:
+        $ref: '#/definitions/models.Focus'
+      id:
+        type: integer
+      modules:
+        items:
+          $ref: '#/definitions/models.Module'
+        type: array
+      startValidity:
+        type: string
+      state:
+        $ref: '#/definitions/models.State'
+      updated:
+        type: string
+    type: object
+  models.Curriculumtype:
+    properties:
+      created:
+        type: string
+      deleted:
+        $ref: '#/definitions/gorm.DeletedAt'
+      description:
+        type: string
+      durationYears:
+        type: integer
+      id:
+        type: integer
+      updated:
+        type: string
+    type: object
+  models.Evaluationtype:
+    properties:
+      code:
+        type: string
+      created:
+        type: string
+      deleted:
+        $ref: '#/definitions/gorm.DeletedAt'
+      description:
+        type: string
+      id:
+        type: integer
+      updated:
+        type: string
+    type: object
+  models.Examtype:
+    properties:
+      created:
+        type: string
+      deleted:
+        $ref: '#/definitions/gorm.DeletedAt'
+      description:
+        type: string
+      id:
+        type: integer
+      updated:
+        type: string
+    type: object
+  models.Field:
+    properties:
+      created:
+        type: string
+      deleted:
+        $ref: '#/definitions/gorm.DeletedAt'
+      description:
+        type: string
+      id:
+        type: integer
+      updated:
+        type: string
+      users:
+        items:
+          $ref: '#/definitions/models.User'
+        type: array
+    type: object
+  models.Focus:
+    properties:
+      created:
+        type: string
+      deleted:
+        $ref: '#/definitions/gorm.DeletedAt'
+      description:
+        type: string
+      field:
+        $ref: '#/definitions/models.Field'
+      id:
+        type: integer
+      updated:
+        type: string
+    type: object
+  models.Gradetype:
+    properties:
+      created:
+        type: string
+      deleted:
+        $ref: '#/definitions/gorm.DeletedAt'
+      description:
+        type: string
+      id:
+        type: integer
+      updated:
+        type: string
+    type: object
+  models.Module:
+    properties:
+      courses:
+        items:
+          $ref: '#/definitions/models.Course'
+        type: array
+      created:
+        type: string
+      curriculums:
+        items:
+          $ref: '#/definitions/models.Curriculum'
+        type: array
+      deleted:
+        $ref: '#/definitions/gorm.DeletedAt'
+      description:
+        type: string
+      evaluationType:
+        $ref: '#/definitions/models.Evaluationtype'
+      id:
+        type: integer
+      number:
+        type: string
+      state:
+        $ref: '#/definitions/models.State'
+      studyStage:
+        $ref: '#/definitions/models.StudyStage'
+      updated:
+        type: string
+      version:
+        type: integer
+    type: object
+  models.Role:
+    properties:
+      created:
+        type: string
+      deleted:
+        $ref: '#/definitions/gorm.DeletedAt'
+      description:
+        type: string
+      id:
+        type: integer
+      updated:
+        type: string
+      users:
+        items:
+          $ref: '#/definitions/models.User'
+        type: array
+    type: object
+  models.SelectedCourse:
+    properties:
+      classStartYear:
+        type: string
+      courseId:
+        type: integer
+      courseVersion:
+        type: integer
+      dispensed:
+        type: boolean
+      userId:
+        type: integer
+    type: object
+  models.State:
+    properties:
+      created:
+        type: string
+      deleted:
+        $ref: '#/definitions/gorm.DeletedAt'
+      description:
+        type: string
+      id:
+        type: integer
+      moduleID:
+        type: integer
+      updated:
+        type: string
+    type: object
+  models.StudyStage:
+    properties:
+      created:
+        type: string
+      deleted:
+        $ref: '#/definitions/gorm.DeletedAt'
+      description:
+        type: string
+      id:
+        type: integer
+      moduleID:
+        type: integer
+      updated:
+        type: string
+    type: object
+  models.User:
+    properties:
+      classStartYear:
+        type: string
+      created:
+        type: string
+      deleted:
+        $ref: '#/definitions/gorm.DeletedAt'
+      email:
+        type: string
+      fields:
+        items:
+          $ref: '#/definitions/models.Field'
+        type: array
+      id:
+        type: integer
+      name:
+        type: string
+      roles:
+        items:
+          $ref: '#/definitions/models.Role'
+        type: array
+      selectedCourses:
+        items:
+          $ref: '#/definitions/models.SelectedCourse'
+        type: array
+      teachesCourses:
+        items:
+          $ref: '#/definitions/models.Course'
+        type: array
+      updated:
+        type: string
+    type: object
+host: api.smashgrade.ch
+info:
+  contact:
+    name: HFTM Grenchen
+    url: https://www.hftm.ch
+  description: Backend API for Smashgrade, a web application for tracking your student
+    grades.
+  license:
+    name: Closed
+  termsOfService: http://swagger.io/terms/
+  title: Smashgrade Backend API
+  version: "1.0"
+paths:
+  /courses:
+    get:
+      description: Get all courses
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Course'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.ApiError'
+      security:
+      - Bearer: []
+      summary: Get all courses
+      tags:
+      - courses
+  /courses/{id}/{version}:
+    get:
+      description: Get a specific course
+      parameters:
+      - description: Course ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Course Version
+        in: path
+        name: version
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Course'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.ApiError'
+      security:
+      - Bearer: []
+      summary: Get a specific course
+      tags:
+      - courses
+  /curriculumtypes:
+    get:
+      description: Get all curriculum types
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Curriculumtype'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.ApiError'
+      security:
+      - Bearer: []
+      summary: Get all curriculum types
+      tags:
+      - curriculumtypes
+  /evaluationtypes:
+    get:
+      description: Get all evaluation types
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Evaluationtype'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.ApiError'
+      security:
+      - Bearer: []
+      summary: Get all evaluation types
+      tags:
+      - evaluationtypes
+  /examtypes:
+    get:
+      description: Get all exam types
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Examtype'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.ApiError'
+      security:
+      - Bearer: []
+      summary: Get all exam types
+      tags:
+      - examtypes
+  /fields:
+    get:
+      description: Get all fields
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Field'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.ApiError'
+      security:
+      - Bearer: []
+      summary: Get all fields
+      tags:
+      - fields
+  /focuses:
+    get:
+      description: Get all focuses
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Focus'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.ApiError'
+      security:
+      - Bearer: []
+      summary: Get all focuses
+      tags:
+      - focuses
+  /gradetypes:
+    get:
+      description: Get all grade types
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Gradetype'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.ApiError'
+      security:
+      - Bearer: []
+      summary: Get all grade types
+      tags:
+      - gradetypes
+  /states:
+    get:
+      description: Get all states
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.State'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.ApiError'
+      security:
+      - Bearer: []
+      summary: Get all states
+      tags:
+      - states
+securityDefinitions:
+  Bearer:
+    description: Type "Bearer" followed by a space and JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
