@@ -24,6 +24,9 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y ca-certificates && \ 
     rm -rf /var/lib/{apt,dpkg,cache,log}/
 
+ENV ENV dev
+ENV API_DB_CONNECTION_STR "sqlite:///app/data/data.db"
+
 EXPOSE 9000
 VOLUME ["/app/data"]
 
