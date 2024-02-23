@@ -1,7 +1,7 @@
 package db
 
 import (
-	"log"
+	"fmt"
 	"strings"
 
 	c "github.com/SmashGrade/backend/app/config"
@@ -58,7 +58,6 @@ func (s *SQLiteProvider) Connect() error {
 	}
 	// Fix the connection string, remove the sqlite:// prefix
 	connectionStr := strings.TrimPrefix(s.config.DBConnectionStr, "sqlite://")
-	log.Printf("Connecting to SQLite database at: %s", s.config.DBConnectionStr)
 	// Open the database connection
 	db, err := gorm.Open(sqlite.Open(connectionStr))
 	if err != nil {
@@ -67,7 +66,7 @@ func (s *SQLiteProvider) Connect() error {
 	// Assign the database connection
 	s.Db = db
 	s.isConnected = true
-	log.Print("Connected to SQLite database")
+	s.config.Logger().Info(fmt.Sprintf("Connected to database %s", s.config.DBConnectionStr))
 	// Migrate the database
 	err = Migrate(s)
 	if err != nil {
@@ -108,14 +107,15 @@ func Migrate(p Provider) error {
 	}
 	// Migrate all models if autoMigrateAtConnect is true
 	if p.Config().AutoMigrate {
-		log.Println("Auto migrating database...")
 		for _, model := range models {
 			err := p.DB().AutoMigrate(model)
 			if err != nil {
 				return err
 			}
 		}
-		log.Println("Migration completed successfully")
+		p.Config().Logger().Info(fmt.Sprintf("Database %s migrated successfully", p.Config().DBConnectionStr))
+	} else {
+		p.Config().Logger().Warn("Database migration is disabled")
 	}
 	return nil
 }
@@ -175,7 +175,7 @@ func NewProvider(config *c.APIConfig) Provider {
 	if config.Connect {
 		err := provider.Connect()
 		if err != nil {
-			log.Fatalf("Failed to connect to database: %s", err)
+			config.Logger().Fatal(fmt.Sprintf("Failed to connect to database %s: %s", config.DBConnectionStr, err))
 		}
 	}
 	return provider

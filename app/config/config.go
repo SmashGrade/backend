@@ -2,11 +2,12 @@ package config
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"strconv"
 	"strings"
 	"time"
+
+	e "github.com/SmashGrade/backend/app/error"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -32,6 +33,7 @@ type APIConfig struct {
 	MaxBodySize         string                     `yaml:"maxBodySize"`         // BodySize is the maximum size of the request body
 	RateLimit           RateLimitConfig            `yaml:"rateLimit"`           // RateLimit is the configuration for rate limiting
 	LogLevel            string                     `yaml:"logLevel"`            // LogLevel is the preferred log level
+	logger              *e.ApiLogger               `yaml:"-"`                   // Logger is the instance of the slog logger for the API, this field is not serialized
 }
 
 // Configuration for CORS
@@ -115,15 +117,30 @@ func NewAPIConfig() *APIConfig {
 	}
 }
 
+// Initializes the logger with the correct log level
+func (c *APIConfig) Logger() *e.ApiLogger {
+	// Initialize the instance if it is not set
+	if c.logger == nil {
+		// Call constructor with the configuration log level
+		c.logger = e.NewApiLogger(c.LogLevel)
+	}
+	// Return the instance
+	return c.logger
+}
+
 // Returns the server address as a string
 func (c *APIConfig) ServerAddress() string {
 	return fmt.Sprintf("%s:%d", c.Host, c.Port)
 }
 
 // Returns the echo logger configuration based on the API configuration
-func (c *APIConfig) GetEchoLoggerConfig() middleware.LoggerConfig {
-	return middleware.LoggerConfig{
-		Format: "method=${method}, uri=${uri}, status=${status}, error=${error}\n",
+func (c *APIConfig) GetEchoLoggerConfig() middleware.RequestLoggerConfig {
+	return middleware.RequestLoggerConfig{
+		LogStatus:     true,
+		LogURI:        true,
+		LogError:      true,
+		HandleError:   true,
+		LogValuesFunc: c.Logger().HandleValues,
 	}
 }
 
@@ -150,27 +167,41 @@ func (c *APIConfig) GetRateLimitConfig() middleware.RateLimiterConfig {
 
 // Overwrites the current configuration with environment variables
 func (c *APIConfig) FromEnv() {
-	log.Println("Overwriting configuration from environment variables...")
+	// Check for the log level so we can log the configuration changes
+	if logLevel, ok := os.LookupEnv("API_LOG_LEVEL"); ok {
+		// Update the log level
+		c.LogLevel = logLevel
+		// Reinitialize the logger with the new log level
+		c.logger = e.NewApiLogger(c.LogLevel)
+		// Log the change
+		c.Logger().Debug(fmt.Sprintf("Replacing log level from environment variable: %s", logLevel))
+	}
 	// Check for production environment first, some variables may be overwritten later
 	if env, ok := os.LookupEnv("ENV"); ok {
 		if strings.ToLower(env) == "prod" {
-
+			c.Logger().Info("Production environment detected, setting production configuration")
 			// Enable authentication in production environment
 			c.AuthConfig.Enabled = true
 			// Enable automatic connection to the database in production environment
 			c.Connect = true
 			// Enable automatic migration of the database in production environment
 			c.AutoMigrate = true
+		} else {
+			c.Logger().Info("Development environment detected, setting development configuration")
 		}
+	} else {
+		c.Logger().Info("No environment detected, setting development configuration")
 	}
 	// Check for environment variables and overwrite the configuration
 	if host, ok := os.LookupEnv("API_HOST"); ok {
+		c.Logger().Debug(fmt.Sprintf("Replacing host configuration from environment variable: %s", host))
 		c.Host = host
 	}
 	if port, ok := os.LookupEnv("API_PORT"); ok {
 		// Check if the port is a valid integer and set it
 		v, err := strconv.Atoi(port)
 		if err == nil {
+			c.Logger().Debug(fmt.Sprintf("Replacing port configuration from environment variable: %s", port))
 			c.Port = v
 		}
 	}
@@ -178,6 +209,7 @@ func (c *APIConfig) FromEnv() {
 		// Check if the connect flag is a valid boolean and set it
 		v, err := strconv.ParseBool(connect)
 		if err == nil {
+			c.Logger().Debug(fmt.Sprintf("Replacing connect flag from environment variable: %s", connect))
 			c.Connect = v
 		}
 	}
@@ -185,6 +217,7 @@ func (c *APIConfig) FromEnv() {
 		// Check if the auto migrate flag is a valid boolean and set it
 		v, err := strconv.ParseBool(autoMigrate)
 		if err == nil {
+			c.Logger().Debug(fmt.Sprintf("Replacing auto migrate flag from environment variable: %s", autoMigrate))
 			c.AutoMigrate = v
 		}
 	}
@@ -192,35 +225,34 @@ func (c *APIConfig) FromEnv() {
 		// Check if the auth enabled flag is a valid boolean and set it
 		v, err := strconv.ParseBool(authEnabled)
 		if err == nil {
+			c.Logger().Debug(fmt.Sprintf("Replacing auth enabled flag from environment variable: %s", authEnabled))
 			c.AuthConfig.Enabled = v
 		}
 	}
 	if dbConnectionStr, ok := os.LookupEnv("API_DB_CONNECTION_STR"); ok {
+		c.Logger().Debug(fmt.Sprintf("Replacing Database connection string from environment variable: %s", dbConnectionStr))
 		c.DBConnectionStr = dbConnectionStr
 	}
 	if oAuthKeyDiscoveryURL, ok := os.LookupEnv("API_AUTH_OAUTH_KEY_DISCOVERY_URL"); ok {
+		c.Logger().Debug(fmt.Sprintf("Replacing OAuth key discovery URL from environment variable: %s", oAuthKeyDiscoveryURL))
 		c.AuthConfig.OAuthKeyDiscoveryURL = oAuthKeyDiscoveryURL
 	}
-	log.Println("Configuration overwritten successfully")
 }
 
 // Loads the configuration from a file
 // Attempts to write default configuration to file if file does not exist
 func FromFile(path string) *APIConfig {
-	log.Println("Loading default configuration...")
 	config := NewAPIConfig()
-	log.Printf("Loading configuration from file: %s...\n", path)
 	cf, err := os.ReadFile(path)
 	if err == nil {
 		err = yaml.Unmarshal(cf, config)
 		if err != nil {
-			log.Println("Configuration loaded successfully")
+			config.Logger().Info(fmt.Sprintf("Configuration loaded from file: %s", path))
 		} else {
-			log.Println("Error loading configuration from file: could not decode configuration from YAML")
+			config.Logger().Error("Error loading configuration from file: %s: %s", path, err)
 		}
 	} else {
-		log.Println("Error loading configuration from file: Could not open file for reading or file does not exist")
-		log.Println("Attempting to save default configuration to file...")
+		config.Logger().Warn(fmt.Sprintf("Error loading configuration from file: %s. File does not exist or is not readable", path))
 		ToFile(path, config)
 	}
 	// Update the configuration with environment variables
@@ -231,16 +263,15 @@ func FromFile(path string) *APIConfig {
 
 // Saves the configuration to a file
 func ToFile(path string, config *APIConfig) {
-	log.Printf("Saving configuration to file: %s...", path)
 	cf, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
 	if err == nil {
 		err = yaml.NewEncoder(cf).Encode(config)
 		if err != nil {
-			log.Println("Configuration saved successfully")
+			config.Logger().Info(fmt.Sprintf("Configuration saved to file: %s", path))
 		} else {
-			log.Println("Error saving configuration to file: could not encode configuration as YAML")
+			config.Logger().Error("Error writing configuration to file: %s: %s", path, err)
 		}
 	} else {
-		log.Println("Error saving configuration to file: could not open file for writing")
+		config.Logger().Warn(fmt.Sprintf("Error writing configuration to file: %s. Path does not exist or is not writable", path))
 	}
 }
