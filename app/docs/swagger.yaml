@@ -1,3 +1,4 @@
+basePath: /v1
 definitions:
   error.ApiError:
     properties:
@@ -63,7 +64,7 @@ definitions:
         items:
           $ref: '#/definitions/models.Module'
         type: array
-      startValidity:
+      startvalidity:
         type: string
       state:
         $ref: '#/definitions/models.State'
@@ -99,6 +100,29 @@ definitions:
         type: integer
       updated:
         type: string
+    type: object
+  models.Exam:
+    properties:
+      course:
+        $ref: '#/definitions/models.Course'
+      courseId:
+        type: integer
+      courseVersion:
+        type: integer
+      created:
+        type: string
+      deleted:
+        $ref: '#/definitions/gorm.DeletedAt'
+      description:
+        type: string
+      examtype:
+        $ref: '#/definitions/models.Examtype'
+      id:
+        type: integer
+      updated:
+        type: string
+      weighting:
+        type: number
     type: object
   models.Examtype:
     properties:
@@ -290,7 +314,8 @@ info:
   description: Backend API for Smashgrade, a web application for tracking your student
     grades.
   license:
-    name: Closed
+    name: Affero General Public License
+    url: https://www.gnu.org/licenses/agpl-3.0.html
   termsOfService: http://swagger.io/terms/
   title: Smashgrade Backend API
   version: "1.0"
@@ -420,6 +445,68 @@ paths:
       summary: Get all evaluation types
       tags:
       - evaluationtypes
+  /exams:
+    get:
+      description: Get all exams
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Exam'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.ApiError'
+      security:
+      - Bearer: []
+      summary: Get all exams
+      tags:
+      - exams
+  /exams/{id}:
+    get:
+      description: Get a specific exam
+      parameters:
+      - description: Exam ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Exam'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.ApiError'
+      security:
+      - Bearer: []
+      summary: Get a specific exam
+      tags:
+      - exams
   /examtypes:
     get:
       description: Get all exam types
@@ -536,6 +623,73 @@ paths:
       summary: Get all grade types
       tags:
       - gradetypes
+  /modules:
+    get:
+      description: Get all modules
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Module'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.ApiError'
+      security:
+      - Bearer: []
+      summary: Get all modules
+      tags:
+      - modules
+  /modules/{id}/{version}:
+    get:
+      description: Get a specific module
+      parameters:
+      - description: Module ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Module Version
+        in: path
+        name: version
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Module'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.ApiError'
+      security:
+      - Bearer: []
+      summary: Get a specific module
+      tags:
+      - modules
   /states:
     get:
       description: Get all states
@@ -565,6 +719,33 @@ paths:
       summary: Get all states
       tags:
       - states
+  /user:
+    get:
+      description: Get the current user (from Bearer token)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.User'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.ApiError'
+      security:
+      - Bearer: []
+      summary: Get the current user
+      tags:
+      - users
 securityDefinitions:
   Bearer:
     description: Type "Bearer" followed by a space and JWT token.

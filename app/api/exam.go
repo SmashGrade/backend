@@ -22,16 +22,16 @@ func NewExamController(provider db.Provider) *ExamController {
 	}
 }
 
-// @Summary		Get all exams
-// @Description	Get all exams
-// @Tags			exams
-// @Produce		json
-// @Success		200	{array}		models.Exam
-// @Failure		401	{object}	error.ApiError
-// @Failure		403	{object}	error.ApiError
-// @Failure		500	{object}	error.ApiError
-// @Router			/exams [get]
-// @Security		Bearer
+//	@Summary		Get all exams
+//	@Description	Get all exams
+//	@Tags			exams
+//	@Produce		json
+//	@Success		200	{array}		models.Exam
+//	@Failure		401	{object}	error.ApiError
+//	@Failure		403	{object}	error.ApiError
+//	@Failure		500	{object}	error.ApiError
+//	@Router			/exams [get]
+//	@Security		Bearer
 func (c *ExamController) Exams(ctx echo.Context) error {
 	res, err := c.Dao.GetAll()
 	if err != nil {
@@ -40,17 +40,17 @@ func (c *ExamController) Exams(ctx echo.Context) error {
 	return c.Yeet(ctx, res)
 }
 
-// @Summary		Get a specific exam
-// @Description	Get a specific exam
-// @Tags			exams
-// @Param			id		path	uint	true	"Exam ID"
-// @Produce		json
-// @Success		200	{object}	models.Exam
-// @Failure		401	{object}	error.ApiError
-// @Failure		403	{object}	error.ApiError
-// @Failure		500	{object}	error.ApiError
-// @Router			/exams/{id} [get]
-// @Security		Bearer
+//	@Summary		Get a specific exam
+//	@Description	Get a specific exam
+//	@Tags			exams
+//	@Param			id	path	uint	true	"Exam ID"
+//	@Produce		json
+//	@Success		200	{object}	models.Exam
+//	@Failure		401	{object}	error.ApiError
+//	@Failure		403	{object}	error.ApiError
+//	@Failure		500	{object}	error.ApiError
+//	@Router			/exams/{id} [get]
+//	@Security		Bearer
 func (c *ExamController) Exam(ctx echo.Context) error {
 	// Read id parameter from request
 	paramid := c.GetPathParamInt(ctx, "id")
