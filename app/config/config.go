@@ -15,6 +15,9 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// Version of the API
+const VERSION string = "0.5.0"
+
 // APIConfig is used to define the configuration of the API
 type APIConfig struct {
 	Host                string                     `yaml:"host"`                // Host is the address of the server
@@ -237,6 +240,20 @@ func (c *APIConfig) FromEnv() {
 		c.Logger().Debug(fmt.Sprintf("Replacing OAuth key discovery URL from environment variable: %s", oAuthKeyDiscoveryURL))
 		c.AuthConfig.OAuthKeyDiscoveryURL = oAuthKeyDiscoveryURL
 	}
+}
+
+// Shows the brand in the console application
+// It displays the logo on the console and information about the API like version and host / port
+func (c *APIConfig) ShowBrand() {
+	brand := ` _____               _                 _     
+|   __|_____ ___ ___| |_ ___ ___ ___ _| |___ 
+|__   |     | .'|_ -|   | . |  _| .'| . | -_|
+|_____|_|_|_|__,|___|_|_|_  |_| |__,|___|___|
+                        |___|
+Backend (v) %s - Running on http://%s:%d
+
+`
+	fmt.Printf(brand, VERSION, c.Host, c.Port)
 }
 
 // Loads the configuration from a file

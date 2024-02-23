@@ -35,8 +35,16 @@ func main() {
 
 	// Load configuration
 	config := c.NewAPIConfig()
+	// Show the branding banner
+	config.ShowBrand()
 
+	// Create a new echo server
 	server := echo.New()
+
+	// Remove echo banner
+	server.HideBanner = true
+	server.HidePort = true
+
 	// Assign the custom error handler to the server
 	server.HTTPErrorHandler = e.HandleEchoError
 
