@@ -10,11 +10,12 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
+// ApiLogger is a custom logger for the API
 type ApiLogger struct {
 	*slog.Logger
 }
 
-// HandleLogValues is a custom log handler for the echo logger middleware
+// HandleValues is a custom log handler for the echo logger middleware
 // It handles the log values and logs them into the slog logger sink
 func (l ApiLogger) HandleValues(c echo.Context, v middleware.RequestLoggerValues) error {
 	if v.Error == nil {
