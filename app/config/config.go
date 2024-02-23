@@ -6,7 +6,11 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+	"golang.org/x/time/rate"
 	"gopkg.in/yaml.v2"
 )
 
@@ -23,6 +27,29 @@ type APIConfig struct {
 	GradeTypes          []string                   `yaml:"gradeTypes"`          // GradeTypes is the list of grade types
 	States              []string                   `yaml:"states"`              // States is the list of states
 	CurriculumTypes     []CurriculumTypeConfig     `yaml:"curriculumTypes"`     // CurriculumTypes is the list of curriculum types
+	Roles               []RoleConfig               `yaml:"roles"`               // Roles is the list of roles
+	Cors                CorsConfig                 `yaml:"cors"`                // Cors is the configuration for CORS
+	MaxBodySize         string                     `yaml:"maxBodySize"`         // BodySize is the maximum size of the request body
+	RateLimit           RateLimitConfig            `yaml:"rateLimit"`           // RateLimit is the configuration for rate limiting
+	LogLevel            string                     `yaml:"logLevel"`            // LogLevel is the preferred log level
+}
+
+// Configuration for CORS
+type CorsConfig struct {
+	AllowedOrigins []string `yaml:"allowedOrigins"` // AllowedOrigins is the list of allowed origins
+	AllowedHeaders []string `yaml:"allowedHeaders"` // AllowedHeaders is the list of allowed headers
+}
+
+// Configuration for a role
+type RoleConfig struct {
+	Name    string   `yaml:"name"`    // Name of the role
+	Members []string `yaml:"members"` // Statically assigned members of the role
+}
+
+type RateLimitConfig struct {
+	Burst  int `yaml:"burst"`  // Burst is the maximum number of requests that can be made in a second (RPS)
+	Rate   int `yaml:"rate"`   // Rate is the usual number of requests that can be made in a second (RPS)
+	Expiry int `yaml:"expiry"` // Expiry is the time in seconds until the rate limit is reset
 }
 
 // Configuration for Authentication
@@ -68,12 +95,57 @@ func NewAPIConfig() *APIConfig {
 		CurriculumTypes: []CurriculumTypeConfig{
 			{Description: "Vollzeit", DurationYears: 2}, {Description: "Teilzeit", DurationYears: 3},
 		},
+		Roles: []RoleConfig{
+			{Name: "Kursadministrator", Members: []string{}},
+			{Name: "Fachbereichsleiter", Members: []string{}},
+			{Name: "Dozent", Members: []string{}},
+			{Name: "Student", Members: []string{}},
+		},
+		Cors: CorsConfig{
+			AllowedOrigins: []string{"https://localhost:9000", "api.smashgrade.ch"},
+			AllowedHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization},
+		},
+		MaxBodySize: "2M",
+		RateLimit: RateLimitConfig{
+			Burst:  20, // 20 requests per second
+			Rate:   10, // 10 requests per second
+			Expiry: 60, // 60 seconds
+		},
+		LogLevel: "INFO",
 	}
 }
 
 // Returns the server address as a string
 func (c *APIConfig) ServerAddress() string {
 	return fmt.Sprintf("%s:%d", c.Host, c.Port)
+}
+
+// Returns the echo logger configuration based on the API configuration
+func (c *APIConfig) GetEchoLoggerConfig() middleware.LoggerConfig {
+	return middleware.LoggerConfig{
+		Format: "method=${method}, uri=${uri}, status=${status}, error=${error}\n",
+	}
+}
+
+// Returns the echo CORS configuration based on the API configuration
+func (c *APIConfig) GetEchoCORSConfig() middleware.CORSConfig {
+	return middleware.CORSConfig{
+		AllowOrigins: c.Cors.AllowedOrigins,
+		AllowHeaders: c.Cors.AllowedHeaders,
+	}
+}
+
+// Returns the rate limiter configuration based on the API configuration
+func (c *APIConfig) GetRateLimitConfig() middleware.RateLimiterConfig {
+	// Use the default configuration
+	rc := middleware.DefaultRateLimiterConfig
+	// Update the store with the limits from the API configuration
+	rc.Store = middleware.NewRateLimiterMemoryStoreWithConfig(middleware.RateLimiterMemoryStoreConfig{
+		Rate:      rate.Limit(c.RateLimit.Rate),
+		Burst:     c.RateLimit.Burst,
+		ExpiresIn: time.Duration(c.RateLimit.Expiry) * time.Second,
+	})
+	return rc
 }
 
 // Overwrites the current configuration with environment variables

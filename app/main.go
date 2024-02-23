@@ -34,10 +34,13 @@ func main() {
 	server.HTTPErrorHandler = e.HandleEchoError
 
 	// Add swagger documentation route
-	server.GET("/docs*", echoSwagger.WrapHandler)
+	server.GET("/docs/*", echoSwagger.WrapHandler)
 
 	// Enable Middleware
-	server.Use(middleware.Logger())
+	server.Use(middleware.LoggerWithConfig(config.GetEchoLoggerConfig()))
+	server.Use(middleware.CORSWithConfig(config.GetEchoCORSConfig()))
+	server.Use(middleware.BodyLimit(config.MaxBodySize))
+	server.Use(middleware.RateLimiterWithConfig(config.GetRateLimitConfig()))
 
 	// Initialize the database provider
 	provider := db.NewProvider(config)
