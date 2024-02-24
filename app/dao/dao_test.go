@@ -17,7 +17,7 @@ func TestMagicSmoke(t *testing.T) {
 
 	repo := repository.NewCourseRepository(provider)
 
-	dao := NewCourseDao(repo)
+	dao := NewCourseDao(repo, repository.NewModuleRepository(provider))
 
 	courseEnt := models.Course{Description: "Lol"}
 
@@ -35,7 +35,7 @@ func TestGetAll(t *testing.T) {
 
 	repo := repository.NewCourseRepository(provider)
 
-	dao := NewCourseDao(repo)
+	dao := NewCourseDao(repo, repository.NewModuleRepository(provider))
 
 	courseEnt := models.Course{Description: "Lol"}
 
@@ -215,7 +215,7 @@ func TestCreateCourseVersion(t *testing.T) {
 
 	//provider := db.NewProvider(config.NewAPIConfig())
 
-	courseDao := NewCourseDao(repository.NewCourseRepository(provider))
+	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider))
 
 	testCourse := models.Course{
 		Description: "testcourse",
@@ -341,4 +341,43 @@ func TestExamCRUD(t *testing.T) {
 	require.Nil(t, err)
 	_, err = dao.Get(retExam.ID)
 	require.NotNil(t, err)
+}
+
+// Check if a full object is linked by gorm if only the key is set in it
+func TestLinkCourseObjectsByKey(t *testing.T) {
+	provider := db.NewMockProvider()
+
+	//provider := db.NewProvider(config.NewAPIConfig())
+
+	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider))
+	moduleDao := NewModuleDao(repository.NewModuleRepository(provider))
+
+	testModule := models.Module{
+		Description: "testmodule",
+	}
+
+	retEnt, err := moduleDao.Create(testModule)
+	require.Nil(t, err)
+
+	onlyIDModule := models.Module{}
+	onlyIDModule.ID = retEnt.ID
+	onlyIDModule.Version = retEnt.Version
+
+	testCourse := models.Course{
+		Description: "testcourse",
+	}
+
+	testCourse.Modules = append(testCourse.Modules, &onlyIDModule)
+
+	createdCourse, err := courseDao.Create(testCourse)
+	require.Nil(t, err)
+
+	require.Equal(t, retEnt.ID, createdCourse.Modules[0].ID)
+	require.Equal(t, retEnt.Version, createdCourse.Modules[0].Version)
+
+	t.Logf("Created Entity %v", retEnt)
+	t.Logf("Returnet Entity %v", createdCourse.Modules[0])
+
+	require.Equal(t, "testcourse", createdCourse.Description)
+	require.Equal(t, testModule.Description, createdCourse.Modules[0].Description)
 }

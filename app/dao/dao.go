@@ -528,13 +528,15 @@ func (m *ModuleDao) Delete(id, version uint) *e.ApiError {
 }
 
 type CourseDao struct {
-	repo *repository.CourseRepository
+	repo      *repository.CourseRepository
+	moduleDao *ModuleDao
 }
 
 // Create new dao with required repositories
-func NewCourseDao(courseRepository *repository.CourseRepository) *CourseDao {
+func NewCourseDao(courseRepository *repository.CourseRepository, moduleRepository *repository.ModuleRepository) *CourseDao {
 	return &CourseDao{
-		repo: courseRepository,
+		repo:      courseRepository,
+		moduleDao: NewModuleDao(moduleRepository),
 	}
 }
 
@@ -573,6 +575,18 @@ func (c *CourseDao) Create(entity models.Course) (returnEntity *models.Course, e
 			}
 		}
 	}
+
+	// get linked modules
+	var resolvedModuleList []*models.Module
+	for _, mod := range entity.Modules {
+		resMod, internalError := c.moduleDao.Get(mod.ID, mod.Version)
+		if internalError != nil {
+			return nil, e.NewDaoDbError()
+		}
+		resolvedModuleList = append(resolvedModuleList, resMod)
+	}
+
+	entity.Modules = resolvedModuleList
 
 	internalEntity, internalError := c.repo.Create(&entity)
 
