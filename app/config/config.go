@@ -84,7 +84,7 @@ func NewAPIConfig() *APIConfig {
 		Port:    9000,
 		Connect: true,
 		AuthConfig: AuthConfig{
-			Enabled:              false,
+			Enabled:              true,
 			OAuthKeyDiscoveryURL: "https://login.microsoftonline.com/common/discovery/keys",
 		},
 		AutoMigrate:     true,
