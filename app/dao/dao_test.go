@@ -401,3 +401,47 @@ func TestLinkCourseObjectsByKey(t *testing.T) {
 	require.Equal(t, retEntUser.ID, createdCourse.TeachedBy[0].ID)
 	require.Equal(t, retEntUser.Name, createdCourse.TeachedBy[0].Name)
 }
+
+// Check error if a reference is missing
+func TestErrorAtNonexistingLink(t *testing.T) {
+	provider := db.NewMockProvider()
+
+	//provider := db.NewProvider(config.NewAPIConfig())
+
+	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider))
+
+	nonexistantOnlyIDModule := models.Module{}
+	nonexistantOnlyIDModule.ID = 234
+	nonexistantOnlyIDModule.Version = 12
+
+	testCourse := models.Course{
+		Description: "testcourse",
+	}
+
+	testCourse.Modules = append(testCourse.Modules, &nonexistantOnlyIDModule)
+
+	retEnt, err := courseDao.Create(testCourse)
+	require.NotEmpty(t, err)
+	require.Empty(t, retEnt)
+	t.Logf("Error returned %v", err.Msg)
+}
+
+// Check error if a validation failed
+func TestErrorAtValidationError(t *testing.T) {
+	provider := db.NewMockProvider()
+
+	//provider := db.NewProvider(config.NewAPIConfig())
+
+	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider))
+
+	testCourse := models.Course{
+		Description: "testcourse",
+	}
+
+	testCourse.SelectedCourses = append(testCourse.SelectedCourses, models.SelectedCourse{})
+
+	retEnt, err := courseDao.Create(testCourse)
+	require.NotEmpty(t, err)
+	require.Empty(t, retEnt)
+	t.Logf("Error returned %v", err.Msg)
+}
