@@ -306,6 +306,54 @@ definitions:
       updated:
         type: string
     type: object
+  requestmodels.RefCourse:
+    properties:
+      description:
+        type: string
+      id:
+        type: integer
+      modules:
+        items:
+          $ref: '#/definitions/requestmodels.RefVersioned'
+        type: array
+      number:
+        type: string
+      selectedCourses:
+        items:
+          $ref: '#/definitions/requestmodels.RefSelectedCourse'
+        type: array
+      teachedBy:
+        items:
+          $ref: '#/definitions/requestmodels.RefId'
+        type: array
+      version:
+        type: integer
+    type: object
+  requestmodels.RefId:
+    properties:
+      id:
+        type: integer
+    type: object
+  requestmodels.RefSelectedCourse:
+    properties:
+      classStartYear:
+        type: string
+      courseId:
+        type: integer
+      courseVersion:
+        type: integer
+      dispensed:
+        type: boolean
+      userId:
+        type: integer
+    type: object
+  requestmodels.RefVersioned:
+    properties:
+      id:
+        type: integer
+      version:
+        type: integer
+    type: object
 host: api.smashgrade.ch
 info:
   contact:
@@ -347,6 +395,41 @@ paths:
       security:
       - Bearer: []
       summary: Get all courses
+      tags:
+      - courses
+    post:
+      consumes:
+      - application/json
+      description: Post a course
+      parameters:
+      - description: request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/requestmodels.RefCourse'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Course'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.ApiError'
+      security:
+      - Bearer: []
+      summary: Post a course
       tags:
       - courses
   /courses/{id}/{version}:
