@@ -530,13 +530,15 @@ func (m *ModuleDao) Delete(id, version uint) *e.ApiError {
 type CourseDao struct {
 	repo      *repository.CourseRepository
 	moduleDao *ModuleDao
+	userDao   *UserDao
 }
 
 // Create new dao with required repositories
-func NewCourseDao(courseRepository *repository.CourseRepository, moduleRepository *repository.ModuleRepository) *CourseDao {
+func NewCourseDao(courseRepository *repository.CourseRepository, moduleRepository *repository.ModuleRepository, userRepository *repository.UserRepository) *CourseDao {
 	return &CourseDao{
 		repo:      courseRepository,
 		moduleDao: NewModuleDao(moduleRepository),
+		userDao:   NewUserDao(userRepository),
 	}
 }
 
@@ -585,8 +587,18 @@ func (c *CourseDao) Create(entity models.Course) (returnEntity *models.Course, e
 		}
 		resolvedModuleList = append(resolvedModuleList, resMod)
 	}
-
 	entity.Modules = resolvedModuleList
+
+	// get linked teachers
+	var resolvedTecherList []*models.User
+	for _, teacher := range entity.TeachedBy {
+		resTeacher, internalError := c.userDao.Get(teacher.ID)
+		if internalError != nil {
+			return nil, e.NewDaoDbError()
+		}
+		resolvedTecherList = append(resolvedTecherList, resTeacher)
+	}
+	entity.TeachedBy = resolvedTecherList
 
 	internalEntity, internalError := c.repo.Create(&entity)
 
@@ -680,6 +692,10 @@ func NewUserDao(userRepository *repository.UserRepository) *UserDao {
 	return &UserDao{
 		repo: userRepository,
 	}
+}
+
+func (u *UserDao) Get(uid uint) (entity *models.User, err *e.ApiError) {
+	return getOrError[models.User](u.repo, uid)
 }
 
 // Returns a list of courses a user has assigned

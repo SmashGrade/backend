@@ -17,7 +17,7 @@ func TestMagicSmoke(t *testing.T) {
 
 	repo := repository.NewCourseRepository(provider)
 
-	dao := NewCourseDao(repo, repository.NewModuleRepository(provider))
+	dao := NewCourseDao(repo, repository.NewModuleRepository(provider), repository.NewUserRepository(provider))
 
 	courseEnt := models.Course{Description: "Lol"}
 
@@ -35,7 +35,7 @@ func TestGetAll(t *testing.T) {
 
 	repo := repository.NewCourseRepository(provider)
 
-	dao := NewCourseDao(repo, repository.NewModuleRepository(provider))
+	dao := NewCourseDao(repo, repository.NewModuleRepository(provider), repository.NewUserRepository(provider))
 
 	courseEnt := models.Course{Description: "Lol"}
 
@@ -215,7 +215,7 @@ func TestCreateCourseVersion(t *testing.T) {
 
 	//provider := db.NewProvider(config.NewAPIConfig())
 
-	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider))
+	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider))
 
 	testCourse := models.Course{
 		Description: "testcourse",
@@ -349,7 +349,9 @@ func TestLinkCourseObjectsByKey(t *testing.T) {
 
 	//provider := db.NewProvider(config.NewAPIConfig())
 
-	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider))
+	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider))
+
+	// create a module and link it indirectly with the course
 	moduleDao := NewModuleDao(repository.NewModuleRepository(provider))
 
 	testModule := models.Module{
@@ -363,21 +365,39 @@ func TestLinkCourseObjectsByKey(t *testing.T) {
 	onlyIDModule.ID = retEnt.ID
 	onlyIDModule.Version = retEnt.Version
 
+	// create a user to link as teacher
+	userDao := NewUserDao(repository.NewUserRepository(provider))
+
+	testUser := models.User{
+		Name: "Rafael Stauffer",
+	}
+
+	retEntUser, err := userDao.Create(testUser)
+	require.Nil(t, err)
+
+	onlyIDUser := models.User{}
+	onlyIDUser.ID = retEntUser.ID
+
+	// create a course and add all indirect key only structs to it
 	testCourse := models.Course{
 		Description: "testcourse",
 	}
 
 	testCourse.Modules = append(testCourse.Modules, &onlyIDModule)
+	testCourse.TeachedBy = append(testCourse.TeachedBy, &onlyIDUser)
 
 	createdCourse, err := courseDao.Create(testCourse)
 	require.Nil(t, err)
 
+	// check has our main course object kept its data
+	require.Equal(t, "testcourse", createdCourse.Description)
+
+	// check is our linked module complete
 	require.Equal(t, retEnt.ID, createdCourse.Modules[0].ID)
 	require.Equal(t, retEnt.Version, createdCourse.Modules[0].Version)
-
-	t.Logf("Created Entity %v", retEnt)
-	t.Logf("Returnet Entity %v", createdCourse.Modules[0])
-
-	require.Equal(t, "testcourse", createdCourse.Description)
 	require.Equal(t, testModule.Description, createdCourse.Modules[0].Description)
+
+	// check is our linked teacher complete
+	require.Equal(t, retEntUser.ID, createdCourse.TeachedBy[0].ID)
+	require.Equal(t, retEntUser.Name, createdCourse.TeachedBy[0].Name)
 }
