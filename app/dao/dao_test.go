@@ -18,7 +18,7 @@ func TestMagicSmoke(t *testing.T) {
 
 	repo := repository.NewCourseRepository(provider)
 
-	dao := NewCourseDao(repo, repository.NewModuleRepository(provider), repository.NewUserRepository(provider))
+	dao := NewCourseDao(repo, repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider))
 
 	courseEnt := requestmodels.RefCourse{Description: "Lol"}
 
@@ -36,7 +36,7 @@ func TestGetAll(t *testing.T) {
 
 	repo := repository.NewCourseRepository(provider)
 
-	dao := NewCourseDao(repo, repository.NewModuleRepository(provider), repository.NewUserRepository(provider))
+	dao := NewCourseDao(repo, repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider))
 
 	courseEnt := requestmodels.RefCourse{Description: "Lol"}
 
@@ -216,7 +216,7 @@ func TestCreateCourseVersion(t *testing.T) {
 
 	//provider := db.NewProvider(config.NewAPIConfig())
 
-	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider))
+	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider))
 
 	testCourse := requestmodels.RefCourse{
 		Description: "testcourse",
@@ -350,7 +350,7 @@ func TestLinkCourseObjectsByKey(t *testing.T) {
 
 	//provider := db.NewProvider(config.NewAPIConfig())
 
-	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider))
+	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider))
 
 	// create a module and link it indirectly with the course
 	moduleDao := NewModuleDao(repository.NewModuleRepository(provider))
@@ -402,7 +402,7 @@ func TestErrorAtNonexistingLink(t *testing.T) {
 
 	//provider := db.NewProvider(config.NewAPIConfig())
 
-	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider))
+	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider))
 
 	nonexistantOnlyIDModule := requestmodels.RefVersioned{}
 	nonexistantOnlyIDModule.ID = 234
@@ -426,7 +426,7 @@ func TestErrorAtValidationError(t *testing.T) {
 
 	//provider := db.NewProvider(config.NewAPIConfig())
 
-	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider))
+	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider))
 
 	testCourse := requestmodels.RefCourse{
 		Description: "testcourse",
@@ -446,7 +446,7 @@ func TestPreventCascadeDelete(t *testing.T) {
 
 	//provider := db.NewProvider(config.NewAPIConfig())
 
-	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider))
+	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider))
 
 	// create a module and link it indirectly with the course
 	moduleDao := NewModuleDao(repository.NewModuleRepository(provider))

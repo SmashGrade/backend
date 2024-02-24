@@ -100,3 +100,10 @@ func NewDaoReferenceIdError(referenceObjectName string, id uint) *ApiError {
 func NewDaoReferenceVersionedError(referenceObjectName string, id, version uint) *ApiError {
 	return NewDaoReferenceError(referenceObjectName, fmt.Sprintf("id: %v, version: %v", id, version))
 }
+
+func NewDaoNotExistingError(objectName, referenceKey string) *ApiError {
+	return &ApiError{
+		Status: 500,
+		Msg:    fmt.Sprintf("Object '%v' with key '%v' not found", objectName, referenceKey),
+	}
+}
