@@ -583,7 +583,7 @@ func (c *CourseDao) Create(entity models.Course) (returnEntity *models.Course, e
 	for _, mod := range entity.Modules {
 		resMod, internalError := c.moduleDao.Get(mod.ID, mod.Version)
 		if internalError != nil {
-			return nil, e.NewDaoDbError()
+			return nil, e.NewDaoReferenceVersionedError("module", mod.ID, mod.Version)
 		}
 		resolvedModuleList = append(resolvedModuleList, resMod)
 	}
@@ -594,11 +594,16 @@ func (c *CourseDao) Create(entity models.Course) (returnEntity *models.Course, e
 	for _, teacher := range entity.TeachedBy {
 		resTeacher, internalError := c.userDao.Get(teacher.ID)
 		if internalError != nil {
-			return nil, e.NewDaoDbError()
+			return nil, e.NewDaoReferenceIdError("teachedBy User", teacher.ID)
 		}
 		resolvedTecherList = append(resolvedTecherList, resTeacher)
 	}
 	entity.TeachedBy = resolvedTecherList
+
+	// check if a selected course is set already. this should not be possible
+	if len(entity.SelectedCourses) > 0 {
+		return nil, e.NewDaoValidationError("selected courses", "empty", "filled")
+	}
 
 	internalEntity, internalError := c.repo.Create(&entity)
 
