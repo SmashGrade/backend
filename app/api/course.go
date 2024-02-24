@@ -6,8 +6,8 @@ import (
 	"github.com/SmashGrade/backend/app/dao"
 	"github.com/SmashGrade/backend/app/db"
 	e "github.com/SmashGrade/backend/app/error"
-	"github.com/SmashGrade/backend/app/models"
 	"github.com/SmashGrade/backend/app/repository"
+	"github.com/SmashGrade/backend/app/requestmodels"
 	"github.com/labstack/echo/v4"
 )
 
@@ -83,14 +83,18 @@ func (c *CourseController) Course(ctx echo.Context) error {
 // @Description	Post a course
 // @Tags			courses
 // @Produce		json
-// @Success		200	{object}	models.Course
-// @Failure		401	{object}	error.ApiError
-// @Failure		403	{object}	error.ApiError
-// @Failure		500	{object}	error.ApiError
+// @Accept			json
+//
+// @Param			request	body		requestmodels.RefCourse	true	"request body"
+//
+// @Success		200		{object}	models.Course
+// @Failure		401		{object}	error.ApiError
+// @Failure		403		{object}	error.ApiError
+// @Failure		500		{object}	error.ApiError
 // @Router			/courses [post]
 // @Security		Bearer
 func (c *CourseController) Post(ctx echo.Context) error {
-	course := new(models.Course)
+	course := new(requestmodels.RefCourse)
 	// Read the request into Course
 	if err := ctx.Bind(course); err != nil {
 		return e.ErrorInvalidRequest("course")
