@@ -6,6 +6,7 @@ import (
 	e "github.com/SmashGrade/backend/app/error"
 	"github.com/SmashGrade/backend/app/models"
 	"github.com/SmashGrade/backend/app/repository"
+	"github.com/SmashGrade/backend/app/requestmodels"
 )
 
 // Asserts that an []any slice is a specific model slice via type assertion
@@ -557,10 +558,27 @@ func (c *CourseDao) GetLatest(id uint) (entity *models.Course, err *e.ApiError) 
 	return getLatestVersionedOrError[models.Course](c.repo, id)
 }
 
+func convertRefCourseToCourse(ent requestmodels.RefCourse) (retEnt models.Course) {
+	retEnt = models.Course{
+		Description: ent.Description,
+		Number:      ent.Number,
+	}
+	retEnt.ID = ent.ID
+	retEnt.Version = ent.Version
+	return
+}
+
 // Will create a new course if neither id nor version are set
 // Will create a new course version if only id is set
-func (c *CourseDao) Create(entity models.Course) (returnEntity *models.Course, err *e.ApiError) {
+func (c *CourseDao) Create(referenceEntity requestmodels.RefCourse) (returnEntity *models.Course, err *e.ApiError) {
 	var internalError error
+
+	// check if a selected course is set already. this should not be possible
+	if len(referenceEntity.SelectedCourses) > 0 {
+		return nil, e.NewDaoValidationError("selected courses", "empty", "filled")
+	}
+
+	entity := convertRefCourseToCourse(referenceEntity)
 
 	// First check if the id is zero, if yes generate it
 	if entity.ID == 0 {
@@ -580,7 +598,7 @@ func (c *CourseDao) Create(entity models.Course) (returnEntity *models.Course, e
 
 	// get linked modules
 	var resolvedModuleList []*models.Module
-	for _, mod := range entity.Modules {
+	for _, mod := range referenceEntity.Modules {
 		resMod, internalError := c.moduleDao.Get(mod.ID, mod.Version)
 		if internalError != nil {
 			return nil, e.NewDaoReferenceVersionedError("module", mod.ID, mod.Version)
@@ -591,7 +609,7 @@ func (c *CourseDao) Create(entity models.Course) (returnEntity *models.Course, e
 
 	// get linked teachers
 	var resolvedTecherList []*models.User
-	for _, teacher := range entity.TeachedBy {
+	for _, teacher := range referenceEntity.TeachedBy {
 		resTeacher, internalError := c.userDao.Get(teacher.ID)
 		if internalError != nil {
 			return nil, e.NewDaoReferenceIdError("teachedBy User", teacher.ID)
@@ -599,11 +617,6 @@ func (c *CourseDao) Create(entity models.Course) (returnEntity *models.Course, e
 		resolvedTecherList = append(resolvedTecherList, resTeacher)
 	}
 	entity.TeachedBy = resolvedTecherList
-
-	// check if a selected course is set already. this should not be possible
-	if len(entity.SelectedCourses) > 0 {
-		return nil, e.NewDaoValidationError("selected courses", "empty", "filled")
-	}
 
 	internalEntity, internalError := c.repo.Create(&entity)
 
@@ -615,7 +628,9 @@ func (c *CourseDao) Create(entity models.Course) (returnEntity *models.Course, e
 }
 
 // updates an existing course via id and version
-func (c *CourseDao) Update(entity models.Course) *e.ApiError {
+func (c *CourseDao) Update(referenceEntity requestmodels.RefCourse) *e.ApiError {
+	entity := convertRefCourseToCourse(referenceEntity)
+	// TODO references
 	internalError := c.repo.Update(entity)
 	if internalError != nil {
 		return e.NewDaoDbError()
