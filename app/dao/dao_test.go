@@ -445,3 +445,38 @@ func TestErrorAtValidationError(t *testing.T) {
 	require.Empty(t, retEnt)
 	t.Logf("Error returned %v", err.Msg)
 }
+
+// check if referenced objects are preserved if a course is deleted
+func TestPreventCascadeDelete(t *testing.T) {
+	provider := db.NewMockProvider()
+
+	//provider := db.NewProvider(config.NewAPIConfig())
+
+	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider))
+
+	// create a module and link it indirectly with the course
+	moduleDao := NewModuleDao(repository.NewModuleRepository(provider))
+
+	testModule := models.Module{
+		Description: "testmodule",
+	}
+
+	retEnt, err := moduleDao.Create(testModule)
+	require.Nil(t, err)
+
+	testCourse := models.Course{
+		Description: "testcourse",
+	}
+
+	testCourse.Modules = append(testCourse.Modules, retEnt)
+
+	retCourseEnt, err := courseDao.Create(testCourse)
+	require.Nil(t, err)
+
+	err = courseDao.Delete(retCourseEnt.ID, retCourseEnt.Version)
+	require.Nil(t, err)
+
+	retCheckModule, err := moduleDao.Get(retEnt.ID, retEnt.Version)
+	require.Nil(t, err)
+	require.Equal(t, testModule.Description, retCheckModule.Description)
+}
