@@ -17,6 +17,8 @@ API_PORT=9000
 API_CONNECT=true
 # Determines if the backend automatically migrates the database models
 API_AUTO_MIGRATE=true
+# Prefils database with test data if true
+API_MOCK_DATA=false
 # Enables authentification with Microsoft Entra ID in the backend (default enabled on prod, disabled on dev)
 API_AUTH_ENABLED=false
 # Sets the connection string for the database, supported: sqlite://, postgres:// or mysql://

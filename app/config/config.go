@@ -16,7 +16,7 @@ import (
 )
 
 // Version of the API
-const VERSION string = "0.5.0"
+const VERSION string = "0.5.1"
 
 // APIConfig is used to define the configuration of the API
 type APIConfig struct {
@@ -32,6 +32,7 @@ type APIConfig struct {
 	States              []string                   `yaml:"states"`              // States is the list of states
 	CurriculumTypes     []CurriculumTypeConfig     `yaml:"curriculumTypes"`     // CurriculumTypes is the list of curriculum types
 	Roles               []RoleConfig               `yaml:"roles"`               // Roles is the list of roles
+	MockData            bool                       `yaml:"mockData"`            // Add MockData at startup
 	Cors                CorsConfig                 `yaml:"cors"`                // Cors is the configuration for CORS
 	MaxBodySize         string                     `yaml:"maxBodySize"`         // BodySize is the maximum size of the request body
 	RateLimit           RateLimitConfig            `yaml:"rateLimit"`           // RateLimit is the configuration for rate limiting
@@ -106,6 +107,7 @@ func NewAPIConfig() *APIConfig {
 			{Name: "Dozent", Members: []string{}},
 			{Name: "Student", Members: []string{}},
 		},
+		MockData: false,
 		Cors: CorsConfig{
 			AllowedOrigins: []string{"https://localhost:9000", "api.smashgrade.ch"},
 			AllowedHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization},
@@ -222,6 +224,13 @@ func (c *APIConfig) FromEnv() {
 		if err == nil {
 			c.Logger().Debug(fmt.Sprintf("Replacing auto migrate flag from environment variable: %s", autoMigrate))
 			c.AutoMigrate = v
+		}
+	}
+	if mockData, ok := os.LookupEnv("API_MOCK_DATA"); ok {
+		v, err := strconv.ParseBool(mockData)
+		if err == nil {
+			c.Logger().Debug(fmt.Sprintf("Replacing mock data flag from environment variable: %s", mockData))
+			c.MockData = v
 		}
 	}
 	if authEnabled, ok := os.LookupEnv("API_AUTH_ENABLED"); ok {

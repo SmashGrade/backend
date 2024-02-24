@@ -178,6 +178,9 @@ func NewProvider(config *c.APIConfig) Provider {
 			config.Logger().Fatal(fmt.Sprintf("Failed to connect to database %s: %s", config.DBConnectionStr, err))
 		}
 	}
+	if config.MockData {
+		prefillMockDB(provider)
+	}
 	return provider
 }
 
@@ -197,10 +200,14 @@ func NewMockProvider() Provider {
 // Returns an in memory provider for mocking and testing with prefilled data
 func NewPrefilledMockProvider() Provider {
 
-	provider := NewMockProvider()
-
-	// e.g Users, Courses
-	prefillMockDB(provider)
+	// Override provider connection string with sqlite memory
+	var mockConfig *c.APIConfig = c.NewAPIConfig()
+	mockConfig.MockData = true
+	// Override connection string
+	mockConfig.DBConnectionStr = "sqlite://:memory:"
+	// Ensure that DB in memory is always migrated
+	mockConfig.AutoMigrate = true
+	provider := NewProvider(mockConfig)
 
 	return provider
 }
