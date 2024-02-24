@@ -528,13 +528,17 @@ func (m *ModuleDao) Delete(id, version uint) *e.ApiError {
 }
 
 type CourseDao struct {
-	repo *repository.CourseRepository
+	repo      *repository.CourseRepository
+	moduleDao *ModuleDao
+	userDao   *UserDao
 }
 
 // Create new dao with required repositories
-func NewCourseDao(courseRepository *repository.CourseRepository) *CourseDao {
+func NewCourseDao(courseRepository *repository.CourseRepository, moduleRepository *repository.ModuleRepository, userRepository *repository.UserRepository) *CourseDao {
 	return &CourseDao{
-		repo: courseRepository,
+		repo:      courseRepository,
+		moduleDao: NewModuleDao(moduleRepository),
+		userDao:   NewUserDao(userRepository),
 	}
 }
 
@@ -572,6 +576,33 @@ func (c *CourseDao) Create(entity models.Course) (returnEntity *models.Course, e
 				return nil, e.NewDaoDbError()
 			}
 		}
+	}
+
+	// get linked modules
+	var resolvedModuleList []*models.Module
+	for _, mod := range entity.Modules {
+		resMod, internalError := c.moduleDao.Get(mod.ID, mod.Version)
+		if internalError != nil {
+			return nil, e.NewDaoReferenceVersionedError("module", mod.ID, mod.Version)
+		}
+		resolvedModuleList = append(resolvedModuleList, resMod)
+	}
+	entity.Modules = resolvedModuleList
+
+	// get linked teachers
+	var resolvedTecherList []*models.User
+	for _, teacher := range entity.TeachedBy {
+		resTeacher, internalError := c.userDao.Get(teacher.ID)
+		if internalError != nil {
+			return nil, e.NewDaoReferenceIdError("teachedBy User", teacher.ID)
+		}
+		resolvedTecherList = append(resolvedTecherList, resTeacher)
+	}
+	entity.TeachedBy = resolvedTecherList
+
+	// check if a selected course is set already. this should not be possible
+	if len(entity.SelectedCourses) > 0 {
+		return nil, e.NewDaoValidationError("selected courses", "empty", "filled")
 	}
 
 	internalEntity, internalError := c.repo.Create(&entity)
@@ -666,6 +697,10 @@ func NewUserDao(userRepository *repository.UserRepository) *UserDao {
 	return &UserDao{
 		repo: userRepository,
 	}
+}
+
+func (u *UserDao) Get(uid uint) (entity *models.User, err *e.ApiError) {
+	return getOrError[models.User](u.repo, uid)
 }
 
 // Returns a list of courses a user has assigned

@@ -17,7 +17,7 @@ func TestMagicSmoke(t *testing.T) {
 
 	repo := repository.NewCourseRepository(provider)
 
-	dao := NewCourseDao(repo)
+	dao := NewCourseDao(repo, repository.NewModuleRepository(provider), repository.NewUserRepository(provider))
 
 	courseEnt := models.Course{Description: "Lol"}
 
@@ -35,7 +35,7 @@ func TestGetAll(t *testing.T) {
 
 	repo := repository.NewCourseRepository(provider)
 
-	dao := NewCourseDao(repo)
+	dao := NewCourseDao(repo, repository.NewModuleRepository(provider), repository.NewUserRepository(provider))
 
 	courseEnt := models.Course{Description: "Lol"}
 
@@ -215,7 +215,7 @@ func TestCreateCourseVersion(t *testing.T) {
 
 	//provider := db.NewProvider(config.NewAPIConfig())
 
-	courseDao := NewCourseDao(repository.NewCourseRepository(provider))
+	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider))
 
 	testCourse := models.Course{
 		Description: "testcourse",
@@ -341,4 +341,107 @@ func TestExamCRUD(t *testing.T) {
 	require.Nil(t, err)
 	_, err = dao.Get(retExam.ID)
 	require.NotNil(t, err)
+}
+
+// Check if a full object is linked by gorm if only the key is set in it
+func TestLinkCourseObjectsByKey(t *testing.T) {
+	provider := db.NewMockProvider()
+
+	//provider := db.NewProvider(config.NewAPIConfig())
+
+	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider))
+
+	// create a module and link it indirectly with the course
+	moduleDao := NewModuleDao(repository.NewModuleRepository(provider))
+
+	testModule := models.Module{
+		Description: "testmodule",
+	}
+
+	retEnt, err := moduleDao.Create(testModule)
+	require.Nil(t, err)
+
+	onlyIDModule := models.Module{}
+	onlyIDModule.ID = retEnt.ID
+	onlyIDModule.Version = retEnt.Version
+
+	// create a user to link as teacher
+	userDao := NewUserDao(repository.NewUserRepository(provider))
+
+	testUser := models.User{
+		Name: "Rafael Stauffer",
+	}
+
+	retEntUser, err := userDao.Create(testUser)
+	require.Nil(t, err)
+
+	onlyIDUser := models.User{}
+	onlyIDUser.ID = retEntUser.ID
+
+	// create a course and add all indirect key only structs to it
+	testCourse := models.Course{
+		Description: "testcourse",
+	}
+
+	testCourse.Modules = append(testCourse.Modules, &onlyIDModule)
+	testCourse.TeachedBy = append(testCourse.TeachedBy, &onlyIDUser)
+
+	createdCourse, err := courseDao.Create(testCourse)
+	require.Nil(t, err)
+
+	// check has our main course object kept its data
+	require.Equal(t, "testcourse", createdCourse.Description)
+
+	// check is our linked module complete
+	require.Equal(t, retEnt.ID, createdCourse.Modules[0].ID)
+	require.Equal(t, retEnt.Version, createdCourse.Modules[0].Version)
+	require.Equal(t, testModule.Description, createdCourse.Modules[0].Description)
+
+	// check is our linked teacher complete
+	require.Equal(t, retEntUser.ID, createdCourse.TeachedBy[0].ID)
+	require.Equal(t, retEntUser.Name, createdCourse.TeachedBy[0].Name)
+}
+
+// Check error if a reference is missing
+func TestErrorAtNonexistingLink(t *testing.T) {
+	provider := db.NewMockProvider()
+
+	//provider := db.NewProvider(config.NewAPIConfig())
+
+	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider))
+
+	nonexistantOnlyIDModule := models.Module{}
+	nonexistantOnlyIDModule.ID = 234
+	nonexistantOnlyIDModule.Version = 12
+
+	testCourse := models.Course{
+		Description: "testcourse",
+	}
+
+	testCourse.Modules = append(testCourse.Modules, &nonexistantOnlyIDModule)
+
+	retEnt, err := courseDao.Create(testCourse)
+	require.NotEmpty(t, err)
+	require.Empty(t, retEnt)
+	t.Logf("Error returned %v", err.Msg)
+}
+
+// Check error if a validation failed
+func TestErrorAtValidationError(t *testing.T) {
+	provider := db.NewMockProvider()
+
+	//provider := db.NewProvider(config.NewAPIConfig())
+
+	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider))
+
+	testCourse := models.Course{
+		Description: "testcourse",
+	}
+
+	testCourse.SelectedCourses = append(testCourse.SelectedCourses, models.SelectedCourse{})
+
+	retEnt, err := courseDao.Create(testCourse)
+	require.NotEmpty(t, err)
+	require.Empty(t, retEnt)
+	t.Logf("Error returned %v", err.Msg)
 }
