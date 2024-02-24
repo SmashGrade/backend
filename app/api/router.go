@@ -1,8 +1,6 @@
 package api
 
 import (
-	"log"
-
 	"github.com/SmashGrade/backend/app/auth"
 	"github.com/SmashGrade/backend/app/config"
 	"github.com/SmashGrade/backend/app/db"
@@ -40,12 +38,11 @@ func (r *Router) RegisterV1() {
 	// Create a new group for v1
 	v1 := r.echo.Group("/v1")
 	if r.config.AuthConfig.Enabled {
-		log.Println("Enabling authentication for v1 endpoints...")
 		// Enable authentication for v1 endpoints
 		v1.Use(echojwt.WithConfig(r.auth.GetJWTConfig()))
 	} else {
-		log.Println("Authentication is disabled for v1 endpoints...")
-		log.Println("This is not recommended for production environments!")
+		r.config.Logger().Warn("Authentication is disabled for v1 endpoints")
+		r.config.Logger().Warn("This is not recommended for production environments!")
 	}
 	// Register all v1 routes
 	RegisterV1Courses(v1, r.course)

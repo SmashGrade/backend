@@ -10,6 +10,7 @@ Configuration of the container can be managed either with the configuration file
 # Required environment variable (default: dev)
 ENV = prod
 
+API_LOG_LEVEL=info
 API_HOST=0.0.0.0
 API_PORT=9000
 # Determines if the backend connects to the database automatically when starting
