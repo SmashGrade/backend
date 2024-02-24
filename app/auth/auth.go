@@ -2,7 +2,7 @@ package auth
 
 import (
 	"context"
-	"log"
+	"fmt"
 
 	c "github.com/SmashGrade/backend/app/config"
 	"github.com/golang-jwt/jwt/v5"
@@ -19,12 +19,12 @@ type AuthProvider struct {
 // Creates a new AuthProvider
 // Downloads and caches the keys from the OAuthKeyDiscoveryURL
 func NewAuthProvider(config *c.APIConfig) *AuthProvider {
-	log.Printf("Fetching OAuth keys from %s\n", config.AuthConfig.OAuthKeyDiscoveryURL)
+
 	keySet, err := jwk.Fetch(context.Background(), config.AuthConfig.OAuthKeyDiscoveryURL)
 	if err != nil {
-		log.Fatalf("Failed to fetch the oauth keys from URL %s: %s", config.AuthConfig.OAuthKeyDiscoveryURL, err)
+		config.Logger().Fatal(fmt.Sprintf("Failed to fetch the oauth keys from URL %s: %s", config.AuthConfig.OAuthKeyDiscoveryURL, err))
 	}
-	log.Println("Fetching OAuth keys successfully")
+	config.Logger().Info(fmt.Sprintf("Fetched %d OAuth JWK keys from %s", keySet.Len(), config.AuthConfig.OAuthKeyDiscoveryURL))
 	// Return the new AuthProvider
 	return &AuthProvider{
 		config: config,
