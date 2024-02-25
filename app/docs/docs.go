@@ -67,6 +67,61 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Post a course",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "courses"
+                ],
+                "summary": "Post a course",
+                "parameters": [
+                    {
+                        "description": "request body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requestmodels.RefCourse"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Course"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    }
+                }
             }
         },
         "/courses/{id}/{version}": {
@@ -1162,6 +1217,80 @@ const docTemplate = `{
                 },
                 "updated": {
                     "type": "string"
+                }
+            }
+        },
+        "requestmodels.RefCourse": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "modules": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/requestmodels.RefVersioned"
+                    }
+                },
+                "number": {
+                    "type": "string"
+                },
+                "selectedCourses": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/requestmodels.RefSelectedCourse"
+                    }
+                },
+                "teachedBy": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/requestmodels.RefId"
+                    }
+                },
+                "version": {
+                    "type": "integer"
+                }
+            }
+        },
+        "requestmodels.RefId": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "requestmodels.RefSelectedCourse": {
+            "type": "object",
+            "properties": {
+                "classStartYear": {
+                    "type": "string"
+                },
+                "courseId": {
+                    "type": "integer"
+                },
+                "courseVersion": {
+                    "type": "integer"
+                },
+                "dispensed": {
+                    "type": "boolean"
+                },
+                "userId": {
+                    "type": "integer"
+                }
+            }
+        },
+        "requestmodels.RefVersioned": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "version": {
+                    "type": "integer"
                 }
             }
         }

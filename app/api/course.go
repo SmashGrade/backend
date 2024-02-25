@@ -7,6 +7,7 @@ import (
 	"github.com/SmashGrade/backend/app/db"
 	e "github.com/SmashGrade/backend/app/error"
 	"github.com/SmashGrade/backend/app/repository"
+	"github.com/SmashGrade/backend/app/requestmodels"
 	"github.com/labstack/echo/v4"
 )
 
@@ -20,7 +21,7 @@ type CourseController struct {
 func NewCourseController(provider db.Provider) *CourseController {
 	return &CourseController{
 		BaseController: NewBaseController(provider),
-		Dao:            dao.NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider)),
+		Dao:            dao.NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider)),
 	}
 }
 
@@ -78,8 +79,38 @@ func (c *CourseController) Course(ctx echo.Context) error {
 	return c.Yeet(ctx, res)
 }
 
+// @Summary		Post a course
+// @Description	Post a course
+// @Tags			courses
+// @Produce		json
+// @Accept			json
+//
+// @Param			request	body		requestmodels.RefCourse	true	"request body"
+//
+// @Success		200		{object}	models.Course
+// @Failure		401		{object}	error.ApiError
+// @Failure		403		{object}	error.ApiError
+// @Failure		500		{object}	error.ApiError
+// @Router			/courses [post]
+// @Security		Bearer
+func (c *CourseController) Post(ctx echo.Context) error {
+	course := new(requestmodels.RefCourse)
+	// Read the request into Course
+	if err := ctx.Bind(course); err != nil {
+		return e.ErrorInvalidRequest("course")
+	}
+	// Let dao create the Course
+	returnCourse, err := c.Dao.Create(*course)
+	if err != nil {
+		return err
+	}
+	// return the result from the Post
+	return c.Yeet(ctx, returnCourse)
+}
+
 // register all output endpoints to router
 func RegisterV1Courses(g *echo.Group, c *CourseController) {
 	g.GET("/courses", c.Courses)
 	g.GET("/courses/:id/:version", c.Course)
+	g.POST("courses", c.Post)
 }

@@ -1,11 +1,13 @@
 package dao
 
 import (
+	"fmt"
 	"time"
 
 	e "github.com/SmashGrade/backend/app/error"
 	"github.com/SmashGrade/backend/app/models"
 	"github.com/SmashGrade/backend/app/repository"
+	"github.com/SmashGrade/backend/app/requestmodels"
 )
 
 // Asserts that an []any slice is a specific model slice via type assertion
@@ -527,18 +529,40 @@ func (m *ModuleDao) Delete(id, version uint) *e.ApiError {
 	return nil
 }
 
+type SelectedCourseDao struct {
+	repo *repository.SelectedCourseRepository
+}
+
+// Create new selected course dao
+func NewSelectedCourseDao(selectedCourseRepository *repository.SelectedCourseRepository) *SelectedCourseDao {
+	return &SelectedCourseDao{
+		repo: selectedCourseRepository,
+	}
+}
+
+// Returns existing selected course
+func (c *SelectedCourseDao) Get(userId, courseId, courseVersion uint, classStartYear time.Time) (entity *models.SelectedCourse, err *e.ApiError) {
+	internalEntity, internalError := c.repo.GetSelectedCourse(userId, courseId, courseVersion, classStartYear)
+	if internalError != nil {
+		return nil, e.NewDaoDbError()
+	}
+	return &internalEntity, nil
+}
+
 type CourseDao struct {
-	repo      *repository.CourseRepository
-	moduleDao *ModuleDao
-	userDao   *UserDao
+	repo              *repository.CourseRepository
+	moduleDao         *ModuleDao
+	userDao           *UserDao
+	selectedCourseDao *SelectedCourseDao
 }
 
 // Create new dao with required repositories
-func NewCourseDao(courseRepository *repository.CourseRepository, moduleRepository *repository.ModuleRepository, userRepository *repository.UserRepository) *CourseDao {
+func NewCourseDao(courseRepository *repository.CourseRepository, moduleRepository *repository.ModuleRepository, userRepository *repository.UserRepository, selectedCourseRepository *repository.SelectedCourseRepository) *CourseDao {
 	return &CourseDao{
-		repo:      courseRepository,
-		moduleDao: NewModuleDao(moduleRepository),
-		userDao:   NewUserDao(userRepository),
+		repo:              courseRepository,
+		moduleDao:         NewModuleDao(moduleRepository),
+		userDao:           NewUserDao(userRepository),
+		selectedCourseDao: NewSelectedCourseDao(selectedCourseRepository),
 	}
 }
 
@@ -557,10 +581,67 @@ func (c *CourseDao) GetLatest(id uint) (entity *models.Course, err *e.ApiError) 
 	return getLatestVersionedOrError[models.Course](c.repo, id)
 }
 
+func (c *CourseDao) convertRefCourseToCourse(ent requestmodels.RefCourse) (retEnt models.Course, err *e.ApiError) {
+	retEnt = models.Course{
+		Description: ent.Description,
+		Number:      ent.Number,
+	}
+	retEnt.ID = ent.ID
+	retEnt.Version = ent.Version
+
+	// get linked modules
+	var resolvedModuleList []*models.Module
+	for _, mod := range ent.Modules {
+		resMod, internalError := c.moduleDao.Get(mod.ID, mod.Version)
+		if internalError != nil {
+			err = e.NewDaoReferenceVersionedError("module", mod.ID, mod.Version)
+			return
+		}
+		resolvedModuleList = append(resolvedModuleList, resMod)
+	}
+	retEnt.Modules = resolvedModuleList
+
+	// get linked teachers
+	var resolvedTecherList []*models.User
+	for _, teacher := range ent.TeachedBy {
+		resTeacher, internalError := c.userDao.Get(teacher.ID)
+		if internalError != nil {
+			err = e.NewDaoReferenceIdError("teachedBy User", teacher.ID)
+			return
+		}
+		resolvedTecherList = append(resolvedTecherList, resTeacher)
+	}
+	retEnt.TeachedBy = resolvedTecherList
+
+	// get linked selected courses
+	var resolvedSelectedCoursesList []models.SelectedCourse
+	for _, selCourse := range ent.SelectedCourses {
+		resSelCourse, internalError := c.selectedCourseDao.Get(selCourse.UserID, selCourse.CourseID, selCourse.CourseVersion, selCourse.ClassStartyear)
+		if internalError != nil {
+			err = e.NewDaoReferenceError("selected course", fmt.Sprintf("user id: %v, course id: %v, course version: %v, class start year: %v", selCourse.UserID, selCourse.CourseID, selCourse.CourseVersion, selCourse.ClassStartyear))
+			return
+		}
+		resolvedSelectedCoursesList = append(resolvedSelectedCoursesList, *resSelCourse)
+	}
+	retEnt.SelectedCourses = resolvedSelectedCoursesList
+
+	return
+}
+
 // Will create a new course if neither id nor version are set
 // Will create a new course version if only id is set
-func (c *CourseDao) Create(entity models.Course) (returnEntity *models.Course, err *e.ApiError) {
+func (c *CourseDao) Create(referenceEntity requestmodels.RefCourse) (returnEntity *models.Course, err *e.ApiError) {
 	var internalError error
+
+	// check if a selected course is set already. this should not be possible
+	if len(referenceEntity.SelectedCourses) > 0 {
+		return nil, e.NewDaoValidationError("selected courses", "empty", "filled")
+	}
+
+	entity, err := c.convertRefCourseToCourse(referenceEntity)
+	if err != nil {
+		return nil, err
+	}
 
 	// First check if the id is zero, if yes generate it
 	if entity.ID == 0 {
@@ -578,33 +659,6 @@ func (c *CourseDao) Create(entity models.Course) (returnEntity *models.Course, e
 		}
 	}
 
-	// get linked modules
-	var resolvedModuleList []*models.Module
-	for _, mod := range entity.Modules {
-		resMod, internalError := c.moduleDao.Get(mod.ID, mod.Version)
-		if internalError != nil {
-			return nil, e.NewDaoReferenceVersionedError("module", mod.ID, mod.Version)
-		}
-		resolvedModuleList = append(resolvedModuleList, resMod)
-	}
-	entity.Modules = resolvedModuleList
-
-	// get linked teachers
-	var resolvedTecherList []*models.User
-	for _, teacher := range entity.TeachedBy {
-		resTeacher, internalError := c.userDao.Get(teacher.ID)
-		if internalError != nil {
-			return nil, e.NewDaoReferenceIdError("teachedBy User", teacher.ID)
-		}
-		resolvedTecherList = append(resolvedTecherList, resTeacher)
-	}
-	entity.TeachedBy = resolvedTecherList
-
-	// check if a selected course is set already. this should not be possible
-	if len(entity.SelectedCourses) > 0 {
-		return nil, e.NewDaoValidationError("selected courses", "empty", "filled")
-	}
-
 	internalEntity, internalError := c.repo.Create(&entity)
 
 	if internalError != nil {
@@ -615,7 +669,22 @@ func (c *CourseDao) Create(entity models.Course) (returnEntity *models.Course, e
 }
 
 // updates an existing course via id and version
-func (c *CourseDao) Update(entity models.Course) *e.ApiError {
+func (c *CourseDao) Update(referenceEntity requestmodels.RefCourse) *e.ApiError {
+	existingEntity, err := c.Get(referenceEntity.ID, referenceEntity.Version)
+	if err != nil {
+		return e.NewDaoNotExistingError("course", fmt.Sprintf("id: %v, version: %v", referenceEntity.ID, referenceEntity.Version))
+	}
+
+	entity, err := c.convertRefCourseToCourse(referenceEntity)
+
+	// add in existing id and version
+	entity.ID = existingEntity.ID
+	entity.Version = existingEntity.Version
+
+	if err != nil {
+		return err
+	}
+
 	internalError := c.repo.Update(entity)
 	if internalError != nil {
 		return e.NewDaoDbError()

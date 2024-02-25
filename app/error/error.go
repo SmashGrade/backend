@@ -81,14 +81,14 @@ func NewDaoDbError() *ApiError {
 
 func NewDaoValidationError(referenceObjectName, dataExpected, dataGot string) *ApiError {
 	return &ApiError{
-		Status: 500,
+		Status: 404,
 		Msg:    fmt.Sprintf("Object '%v' invalid. Expected '%v' but got '%v'", referenceObjectName, dataExpected, dataGot),
 	}
 }
 
 func NewDaoReferenceError(referenceObjectName, referenceKey string) *ApiError {
 	return &ApiError{
-		Status: 500,
+		Status: 404,
 		Msg:    fmt.Sprintf("Reference object '%v' with key '%v' not found", referenceObjectName, referenceKey),
 	}
 }
@@ -99,4 +99,11 @@ func NewDaoReferenceIdError(referenceObjectName string, id uint) *ApiError {
 
 func NewDaoReferenceVersionedError(referenceObjectName string, id, version uint) *ApiError {
 	return NewDaoReferenceError(referenceObjectName, fmt.Sprintf("id: %v, version: %v", id, version))
+}
+
+func NewDaoNotExistingError(objectName, referenceKey string) *ApiError {
+	return &ApiError{
+		Status: 404,
+		Msg:    fmt.Sprintf("Object '%v' with key '%v' not found", objectName, referenceKey),
+	}
 }

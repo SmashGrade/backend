@@ -7,6 +7,7 @@ import (
 	_ "github.com/SmashGrade/backend/app/docs"
 	"github.com/SmashGrade/backend/app/models"
 	"github.com/SmashGrade/backend/app/repository"
+	"github.com/SmashGrade/backend/app/requestmodels"
 	"github.com/stretchr/testify/require"
 	_ "gorm.io/gorm"
 )
@@ -17,9 +18,9 @@ func TestMagicSmoke(t *testing.T) {
 
 	repo := repository.NewCourseRepository(provider)
 
-	dao := NewCourseDao(repo, repository.NewModuleRepository(provider), repository.NewUserRepository(provider))
+	dao := NewCourseDao(repo, repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider))
 
-	courseEnt := models.Course{Description: "Lol"}
+	courseEnt := requestmodels.RefCourse{Description: "Lol"}
 
 	retEnt, err := dao.Create(courseEnt)
 	if err != nil {
@@ -35,9 +36,9 @@ func TestGetAll(t *testing.T) {
 
 	repo := repository.NewCourseRepository(provider)
 
-	dao := NewCourseDao(repo, repository.NewModuleRepository(provider), repository.NewUserRepository(provider))
+	dao := NewCourseDao(repo, repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider))
 
-	courseEnt := models.Course{Description: "Lol"}
+	courseEnt := requestmodels.RefCourse{Description: "Lol"}
 
 	retEnt, err := dao.Create(courseEnt)
 	if err != nil {
@@ -215,9 +216,9 @@ func TestCreateCourseVersion(t *testing.T) {
 
 	//provider := db.NewProvider(config.NewAPIConfig())
 
-	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider))
+	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider))
 
-	testCourse := models.Course{
+	testCourse := requestmodels.RefCourse{
 		Description: "testcourse",
 	}
 
@@ -349,7 +350,7 @@ func TestLinkCourseObjectsByKey(t *testing.T) {
 
 	//provider := db.NewProvider(config.NewAPIConfig())
 
-	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider))
+	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider))
 
 	// create a module and link it indirectly with the course
 	moduleDao := NewModuleDao(repository.NewModuleRepository(provider))
@@ -361,10 +362,6 @@ func TestLinkCourseObjectsByKey(t *testing.T) {
 	retEnt, err := moduleDao.Create(testModule)
 	require.Nil(t, err)
 
-	onlyIDModule := models.Module{}
-	onlyIDModule.ID = retEnt.ID
-	onlyIDModule.Version = retEnt.Version
-
 	// create a user to link as teacher
 	userDao := NewUserDao(repository.NewUserRepository(provider))
 
@@ -375,16 +372,13 @@ func TestLinkCourseObjectsByKey(t *testing.T) {
 	retEntUser, err := userDao.Create(testUser)
 	require.Nil(t, err)
 
-	onlyIDUser := models.User{}
-	onlyIDUser.ID = retEntUser.ID
-
 	// create a course and add all indirect key only structs to it
-	testCourse := models.Course{
+	testCourse := requestmodels.RefCourse{
 		Description: "testcourse",
 	}
 
-	testCourse.Modules = append(testCourse.Modules, &onlyIDModule)
-	testCourse.TeachedBy = append(testCourse.TeachedBy, &onlyIDUser)
+	testCourse.Modules = append(testCourse.Modules, requestmodels.RefVersioned{ID: retEnt.ID, Version: retEnt.Version})
+	testCourse.TeachedBy = append(testCourse.TeachedBy, requestmodels.RefId{ID: retEntUser.ID})
 
 	createdCourse, err := courseDao.Create(testCourse)
 	require.Nil(t, err)
@@ -408,17 +402,17 @@ func TestErrorAtNonexistingLink(t *testing.T) {
 
 	//provider := db.NewProvider(config.NewAPIConfig())
 
-	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider))
+	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider))
 
-	nonexistantOnlyIDModule := models.Module{}
+	nonexistantOnlyIDModule := requestmodels.RefVersioned{}
 	nonexistantOnlyIDModule.ID = 234
 	nonexistantOnlyIDModule.Version = 12
 
-	testCourse := models.Course{
+	testCourse := requestmodels.RefCourse{
 		Description: "testcourse",
 	}
 
-	testCourse.Modules = append(testCourse.Modules, &nonexistantOnlyIDModule)
+	testCourse.Modules = append(testCourse.Modules, nonexistantOnlyIDModule)
 
 	retEnt, err := courseDao.Create(testCourse)
 	require.NotEmpty(t, err)
@@ -432,16 +426,51 @@ func TestErrorAtValidationError(t *testing.T) {
 
 	//provider := db.NewProvider(config.NewAPIConfig())
 
-	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider))
+	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider))
 
-	testCourse := models.Course{
+	testCourse := requestmodels.RefCourse{
 		Description: "testcourse",
 	}
 
-	testCourse.SelectedCourses = append(testCourse.SelectedCourses, models.SelectedCourse{})
+	testCourse.SelectedCourses = append(testCourse.SelectedCourses, requestmodels.RefSelectedCourse{})
 
 	retEnt, err := courseDao.Create(testCourse)
 	require.NotEmpty(t, err)
 	require.Empty(t, retEnt)
 	t.Logf("Error returned %v", err.Msg)
+}
+
+// check if referenced objects are preserved if a course is deleted
+func TestPreventCascadeDelete(t *testing.T) {
+	provider := db.NewMockProvider()
+
+	//provider := db.NewProvider(config.NewAPIConfig())
+
+	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider))
+
+	// create a module and link it indirectly with the course
+	moduleDao := NewModuleDao(repository.NewModuleRepository(provider))
+
+	testModule := models.Module{
+		Description: "testmodule",
+	}
+
+	retEnt, err := moduleDao.Create(testModule)
+	require.Nil(t, err)
+
+	testCourse := requestmodels.RefCourse{
+		Description: "testcourse",
+	}
+
+	testCourse.Modules = append(testCourse.Modules, requestmodels.RefVersioned{ID: retEnt.ID, Version: retEnt.Version})
+
+	retCourseEnt, err := courseDao.Create(testCourse)
+	require.Nil(t, err)
+
+	err = courseDao.Delete(retCourseEnt.ID, retCourseEnt.Version)
+	require.Nil(t, err)
+
+	retCheckModule, err := moduleDao.Get(retEnt.ID, retEnt.Version)
+	require.Nil(t, err)
+	require.Equal(t, testModule.Description, retCheckModule.Description)
 }
