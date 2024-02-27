@@ -7,328 +7,353 @@ import (
 )
 
 func prefillMockDB(p Provider) {
-	role1 := models.Role{
-		Description: "Student",
-	}
-	role2 := models.Role{
-		Description: "Dozent",
-	}
-	p.DB().Table("roles").Create(&role1)
-	p.DB().Table("roles").Create(&role2)
+	p.DB().Table("roles").Create(&Role1)
+	p.DB().Table("roles").Create(&Role2)
 
-	user1 := models.User{
-		Name:  "Kurt Munter",
-		Email: "kurt.munter@hftm.ch",
-		Roles: []*models.Role{
-			&role2,
-		},
-	}
-	user2 := models.User{
-		Name:           "Jakob Ferber",
-		Email:          "jakob.ferber@hftm.ch",
-		ClassStartyear: time.Date(2021, time.April, 1, 12, 0, 0, 0, time.UTC),
-		Roles: []*models.Role{
-			&role1,
-		},
-	}
-	user3 := models.User{
-		Name:           "Rafael Stauffer",
-		Email:          "rafael.stauffer@hftm.ch",
-		ClassStartyear: time.Date(2021, time.April, 1, 12, 0, 0, 0, time.UTC),
-		Roles: []*models.Role{
-			&role1,
-		},
-	}
-	user4 := models.User{
-		Name:  "Bruno Borer",
-		Email: "bruno.borer@hftm.ch",
-		Roles: []*models.Role{
-			&role2,
-		},
-	}
-	user5 := models.User{
-		Name:  "Simeon Liniger",
-		Email: "simeon.liniger@hftm.ch",
-		Roles: []*models.Role{
-			&role2,
-		},
-	}
-	p.DB().Table("users").Create(&user1)
-	p.DB().Table("users").Create(&user2)
-	p.DB().Table("users").Create(&user3)
-	p.DB().Table("users").Create(&user4)
-	p.DB().Table("users").Create(&user5)
+	p.DB().Table("users").Create(&User1)
+	p.DB().Table("users").Create(&User2)
+	p.DB().Table("users").Create(&User3)
+	p.DB().Table("users").Create(&User4)
+	p.DB().Table("users").Create(&User5)
 
-	field1 := models.Field{
-		Description: "Informatik",
-		Users: []*models.User{
-			&user1,
-		},
-	}
-	field2 := models.Field{
-		Description: "Elektrotechnik",
-		Users: []*models.User{
-			&user4,
-		},
-	}
-	p.DB().Table("fields").Create(&field1)
-	p.DB().Table("fields").Create(&field2)
+	p.DB().Table("fields").Create(&Field1)
+	p.DB().Table("fields").Create(&Field2)
 
-	curriculumTyp1 := models.Curriculumtype{
-		Description:   "Fix",
-		DurationYears: 2,
-	}
-	curriculumTyp2 := models.Curriculumtype{
-		Description:   "Vollzeit",
-		DurationYears: 2,
-	}
-	curriculumTyp3 := models.Curriculumtype{
-		Description:   "Berufsbegleitend",
-		DurationYears: 3,
-	}
-	p.DB().Table("curriculumtypes").Create(&curriculumTyp1)
-	p.DB().Table("curriculumtypes").Create(&curriculumTyp2)
-	p.DB().Table("curriculumtypes").Create(&curriculumTyp3)
+	p.DB().Table("curriculumtypes").Create(&CurriculumTyp3)
+	p.DB().Table("curriculumtypes").Create(&CurriculumTyp1)
+	p.DB().Table("curriculumtypes").Create(&CurriculumTyp2)
 
-	state1 := models.State{
-		Description: "Aktiv",
-	}
-	state2 := models.State{
-		Description: "Inaktiv",
-	}
-	p.DB().Table("states").Create(&state1)
-	p.DB().Table("states").Create(&state2)
+	p.DB().Table("states").Create(&State1)
+	p.DB().Table("states").Create(&State2)
 
-	focus1 := models.Focus{
-		Description: "Softwareentwicklung",
-		Field:       field1,
-	}
-	focus2 := models.Focus{
-		Description: "Wirtschaftsinformatik",
-		Field:       field1,
-	}
-	p.DB().Table("focus").Create(&focus1)
-	p.DB().Table("focus").Create(&focus2)
+	p.DB().Table("focus").Create(&Focus1)
+	p.DB().Table("focus").Create(&Focus2)
 
-	curriculum1 := models.Curriculum{
-		Description:    "Softwareentwicklung",
-		EndValidity:    time.Date(2024, time.April, 1, 12, 0, 0, 0, time.UTC),
-		Focus:          focus1,
-		Curriculumtype: curriculumTyp3,
-		State:          state1,
-		TerminatedBasemodel: models.TerminatedBasemodel{
-			StartValidity: time.Date(2021, time.April, 1, 12, 0, 0, 0, time.UTC),
-			ID:            1,
-		},
-	}
-	curriculum2 := models.Curriculum{
-		Description:    "Softwareentwicklung",
-		Focus:          focus2,
-		Curriculumtype: curriculumTyp2,
-		State:          state1,
-		EndValidity:    time.Date(2024, time.April, 1, 12, 0, 0, 0, time.UTC),
-		TerminatedBasemodel: models.TerminatedBasemodel{
-			StartValidity: time.Date(2021, time.April, 1, 12, 0, 0, 0, time.UTC),
-			ID:            2,
-		},
-	}
-	p.DB().Table("curriculums").Create(&curriculum1)
-	p.DB().Table("curriculums").Create(&curriculum2)
+	p.DB().Table("curriculums").Create(&Curriculum1)
+	p.DB().Table("curriculums").Create(&Curriculum2)
 
-	evaluationType1 := models.Evaluationtype{ // TODO: was sind evaluationtypes
-		Description: "F",
-		Code:        "F",
-	}
-	evaluationType2 := models.Evaluationtype{
-		Description: "D",
-		Code:        "D",
-	}
-	p.DB().Table("evaluationtypes").Create(&evaluationType1)
-	p.DB().Table("evaluationtypes").Create(&evaluationType2)
+	p.DB().Table("evaluationtypes").Create(&EvaluationType1)
+	p.DB().Table("evaluationtypes").Create(&EvaluationType2)
 
-	studyStage1 := models.StudyStage{
-		Description: "Grundstudium",
-	}
-	studyStage2 := models.StudyStage{
-		Description: "Fachstudium",
-	}
-	p.DB().Table("study_stages").Create(&studyStage1)
-	p.DB().Table("study_stages").Create(&studyStage2)
+	p.DB().Table("study_stages").Create(&StudyStage1)
+	p.DB().Table("study_stages").Create(&StudyStage2)
 
-	module1 := models.Module{
-		State:          state1,
-		StudyStage:     studyStage1,
-		EvaluationType: evaluationType1,
-		Description:    "Schnittstellen-Technologien",
-		Number:         "IN123",
-		Curriculums: []*models.Curriculum{
-			&curriculum1,
-			&curriculum2,
-		},
-		VersionedBasemodel: models.VersionedBasemodel{
-			Version: 1,
-			ID:      1,
-		},
-	}
-	module2 := models.Module{
-		State:          state1,
-		StudyStage:     studyStage1,
-		EvaluationType: evaluationType1,
-		Description:    "Requirements Engineering",
-		Number:         "AB123",
-		Curriculums: []*models.Curriculum{
-			&curriculum1,
-			&curriculum2,
-		},
-		VersionedBasemodel: models.VersionedBasemodel{
-			Version: 1,
-			ID:      2,
-		},
-	}
-	p.DB().Table("modules").Create(&module1)
-	p.DB().Table("modules").Create(&module2)
+	p.DB().Table("modules").Create(&Module1)
+	p.DB().Table("modules").Create(&Module2)
 
-	course1 := models.Course{
-		Description: "Datenbank Scripting",
-		Number:      "IN311",
-		Modules: []*models.Module{
-			&module1,
-		},
-		TeachedBy: []*models.User{
-			&user5,
-		},
-		VersionedBasemodel: models.VersionedBasemodel{
-			Version: 1,
-			ID:      1,
-		},
-	}
-	course2 := models.Course{
-		Description: "Modellieren von Softwaresystemen",
-		Number:      "IN000",
-		Modules: []*models.Module{
-			&module2,
-		},
-		TeachedBy: []*models.User{
-			&user1,
-		},
-		VersionedBasemodel: models.VersionedBasemodel{
-			Version: 1,
-			ID:      2,
-		},
-	}
-	course3 := models.Course{
-		Description: "Modellieren von Softwaresystemen",
-		Number:      "IN231",
-		Modules: []*models.Module{
-			&module2,
-		},
-		TeachedBy: []*models.User{
-			&user1,
-		},
-		VersionedBasemodel: models.VersionedBasemodel{
-			Version: 2,
-			ID:      2,
-		},
-	}
-	p.DB().Table("courses").Create(&course1)
-	p.DB().Table("courses").Create(&course2)
-	p.DB().Table("courses").Create(&course3)
+	p.DB().Table("courses").Create(&Course1)
+	p.DB().Table("courses").Create(&Course2)
+	p.DB().Table("courses").Create(&Course3)
 
-	selectedCourse1 := models.SelectedCourse{
-		UserID:         2,
-		CourseID:       2,
-		CourseVersion:  2,
-		ClassStartyear: time.Date(2021, time.April, 1, 12, 0, 0, 0, time.UTC),
-		Dispensed:      false,
-	}
-	selectedCourse2 := models.SelectedCourse{
-		UserID:         3,
-		CourseID:       2,
-		CourseVersion:  2,
-		ClassStartyear: time.Date(2021, time.April, 1, 12, 0, 0, 0, time.UTC),
-		Dispensed:      false,
-	}
-	p.DB().Table("selected_courses").Create(&selectedCourse1)
-	p.DB().Table("selected_courses").Create(&selectedCourse2)
+	p.DB().Table("selected_courses").Create(&SelectedCourse1)
+	p.DB().Table("selected_courses").Create(&SelectedCourse2)
 
-	examtype1 := models.Examtype{
-		Description: "Schriftlich",
-	}
-	examtype2 := models.Examtype{
-		Description: "Mündlich",
-	}
-	p.DB().Table("examtypes").Create(&examtype1)
-	p.DB().Table("examtypes").Create(&examtype2)
+	p.DB().Table("examtypes").Create(&Examtype1)
+	p.DB().Table("examtypes").Create(&Examtype2)
 
-	exam1 := models.Exam{
-		Description: "Erste Prüfung",
-		Weighting:   2,
-		Examtype:    examtype1,
-		Course:      course3,
-	}
-	exam2 := models.Exam{
-		Description: "Präsentation",
-		Weighting:   1,
-		Examtype:    examtype2,
-		Course:      course3,
-	}
-	p.DB().Table("exams").Create(&exam1)
-	p.DB().Table("exams").Create(&exam2)
+	p.DB().Table("exams").Create(&Exam1)
+	p.DB().Table("exams").Create(&Exam2)
 
-	gradeType1 := models.Gradetype{
-		Description: "CH-Noten",
-	}
-	gradeType2 := models.Gradetype{
-		Description: "Prozent",
-	}
-	p.DB().Table("gradetypes").Create(&gradeType1)
-	p.DB().Table("gradetypes").Create(&gradeType2)
+	p.DB().Table("gradetypes").Create(&GradeType1)
+	p.DB().Table("gradetypes").Create(&GradeType2)
 
-	examEvaluation1 := models.ExamEvaluation{
-		RegisteredBy:     user5,
-		SelectedCourse:   selectedCourse1,
-		Exam:             exam1,
-		OriginalValue:    "5.2",
-		OrignialGradeTyp: gradeType1,
-		EntryDate:        time.Date(2023, time.September, 1, 12, 0, 0, 0, time.UTC),
-	}
-	examEvaluation2 := models.ExamEvaluation{
-		RegisteredBy:     user5,
-		SelectedCourse:   selectedCourse2,
-		Exam:             exam1,
-		OriginalValue:    "5.0",
-		OrignialGradeTyp: gradeType1,
-		EntryDate:        time.Date(2023, time.September, 1, 12, 0, 0, 0, time.UTC),
-	}
-	p.DB().Table("exam_evaluations").Create(&examEvaluation1)
-	p.DB().Table("exam_evaluations").Create(&examEvaluation2)
+	p.DB().Table("exam_evaluations").Create(&ExamEvaluation1)
+	p.DB().Table("exam_evaluations").Create(&ExamEvaluation2)
+	p.DB().Table("exam_evaluations").Create(&ExamEvaluation3)
 
-	conversion1 := models.Conversion{
-		ID:             1,
-		ExamEvaluation: examEvaluation1,
-		Gradetype:      gradeType1,
-		Value:          5.2,
-	}
-	conversion2 := models.Conversion{
-		ID:             2,
-		ExamEvaluation: examEvaluation1,
-		Gradetype:      gradeType2,
-		Value:          84,
-	}
-	conversion3 := models.Conversion{
-		ID:             3,
-		ExamEvaluation: examEvaluation2,
-		Gradetype:      gradeType1,
-		Value:          5.0,
-	}
-	conversion4 := models.Conversion{
-		ID:             4,
-		ExamEvaluation: examEvaluation2,
-		Gradetype:      gradeType2,
-		Value:          80,
-	}
-	p.DB().Table("conversions").Create(&conversion1)
-	p.DB().Table("conversions").Create(&conversion2)
-	p.DB().Table("conversions").Create(&conversion3)
-	p.DB().Table("conversions").Create(&conversion4)
+	p.DB().Table("conversions").Create(&Conversion1)
+	p.DB().Table("conversions").Create(&Conversion2)
+	p.DB().Table("conversions").Create(&Conversion3)
+	p.DB().Table("conversions").Create(&Conversion4)
+}
+
+var Role1 = models.Role{
+	Description: "Student",
+}
+var Role2 = models.Role{
+	Description: "Dozent",
+}
+
+var User1 = models.User{
+	Name:  "Kurt Munter",
+	Email: "kurt.munter@hftm.ch",
+	Roles: []*models.Role{
+		&Role2,
+	},
+}
+var User2 = models.User{
+	Name:           "Jakob Ferber",
+	Email:          "jakob.ferber@hftm.ch",
+	ClassStartyear: time.Date(2021, time.April, 1, 12, 0, 0, 0, time.UTC),
+	Roles: []*models.Role{
+		&Role1,
+	},
+}
+var User3 = models.User{
+	Name:           "Rafael Stauffer",
+	Email:          "rafael.stauffer@hftm.ch",
+	ClassStartyear: time.Date(2021, time.April, 1, 12, 0, 0, 0, time.UTC),
+	Roles: []*models.Role{
+		&Role1,
+	},
+}
+var User4 = models.User{
+	Name:  "Bruno Borer",
+	Email: "bruno.borer@hftm.ch",
+	Roles: []*models.Role{
+		&Role2,
+	},
+}
+var User5 = models.User{
+	Name:  "Simeon Liniger",
+	Email: "simeon.liniger@hftm.ch",
+	Roles: []*models.Role{
+		&Role2,
+	},
+}
+
+var Field1 = models.Field{
+	Description: "Informatik",
+	Users: []*models.User{
+		&User1,
+	},
+}
+var Field2 = models.Field{
+	Description: "Elektrotechnik",
+	Users: []*models.User{
+		&User4,
+	},
+}
+
+var CurriculumTyp1 = models.Curriculumtype{
+	Description:   "Fix",
+	DurationYears: 2,
+}
+var CurriculumTyp2 = models.Curriculumtype{
+	Description:   "Vollzeit",
+	DurationYears: 2,
+}
+var CurriculumTyp3 = models.Curriculumtype{
+	Description:   "Berufsbegleitend",
+	DurationYears: 3,
+}
+
+var State1 = models.State{
+	Description: "Aktiv",
+}
+var State2 = models.State{
+	Description: "Inaktiv",
+}
+
+var Focus1 = models.Focus{
+	Description: "Softwareentwicklung",
+	Field:       Field1,
+}
+var Focus2 = models.Focus{
+	Description: "Wirtschaftsinformatik",
+	Field:       Field1,
+}
+
+var Curriculum1 = models.Curriculum{
+	Description:    "Softwareentwicklung",
+	EndValidity:    time.Date(2024, time.April, 1, 12, 0, 0, 0, time.UTC),
+	Focus:          Focus1,
+	Curriculumtype: CurriculumTyp3,
+	State:          State1,
+	TerminatedBasemodel: models.TerminatedBasemodel{
+		StartValidity: time.Date(2021, time.April, 1, 12, 0, 0, 0, time.UTC),
+		ID:            1,
+	},
+}
+var Curriculum2 = models.Curriculum{
+	Description:    "Softwareentwicklung",
+	Focus:          Focus2,
+	Curriculumtype: CurriculumTyp2,
+	State:          State1,
+	EndValidity:    time.Date(2024, time.April, 1, 12, 0, 0, 0, time.UTC),
+	TerminatedBasemodel: models.TerminatedBasemodel{
+		StartValidity: time.Date(2021, time.April, 1, 12, 0, 0, 0, time.UTC),
+		ID:            2,
+	},
+}
+
+var EvaluationType1 = models.Evaluationtype{ // TODO: was sind evaluationtypes
+	Description: "F",
+	Code:        "F",
+}
+var EvaluationType2 = models.Evaluationtype{
+	Description: "D",
+	Code:        "D",
+}
+
+var StudyStage1 = models.StudyStage{
+	Description: "Grundstudium",
+}
+var StudyStage2 = models.StudyStage{
+	Description: "Fachstudium",
+}
+
+var Module1 = models.Module{
+	State:          State1,
+	StudyStage:     StudyStage1,
+	EvaluationType: EvaluationType1,
+	Description:    "Schnittstellen-Technologien",
+	Number:         "IN123",
+	Curriculums: []*models.Curriculum{
+		&Curriculum1,
+		&Curriculum2,
+	},
+	VersionedBasemodel: models.VersionedBasemodel{
+		Version: 1,
+		ID:      1,
+	},
+}
+var Module2 = models.Module{
+	State:          State1,
+	StudyStage:     StudyStage1,
+	EvaluationType: EvaluationType1,
+	Description:    "Requirements Engineering",
+	Number:         "AB123",
+	Curriculums: []*models.Curriculum{
+		&Curriculum1,
+		&Curriculum2,
+	},
+	VersionedBasemodel: models.VersionedBasemodel{
+		Version: 1,
+		ID:      2,
+	},
+}
+
+var Course1 = models.Course{
+	Description: "Datenbank Scripting",
+	Number:      "IN311",
+	Modules: []*models.Module{
+		&Module1,
+	},
+	TeachedBy: []*models.User{
+		&User5,
+	},
+	VersionedBasemodel: models.VersionedBasemodel{
+		Version: 1,
+		ID:      1,
+	},
+}
+var Course2 = models.Course{
+	Description: "Modellieren von Softwaresystemen",
+	Number:      "IN000",
+	Modules: []*models.Module{
+		&Module2,
+	},
+	TeachedBy: []*models.User{
+		&User1,
+	},
+	VersionedBasemodel: models.VersionedBasemodel{
+		Version: 1,
+		ID:      2,
+	},
+}
+var Course3 = models.Course{
+	Description: "Modellieren von Softwaresystemen",
+	Number:      "IN231",
+	Modules: []*models.Module{
+		&Module2,
+	},
+	TeachedBy: []*models.User{
+		&User1,
+	},
+	VersionedBasemodel: models.VersionedBasemodel{
+		Version: 2,
+		ID:      2,
+	},
+}
+
+var SelectedCourse1 = models.SelectedCourse{
+	UserID:         2,
+	CourseID:       2,
+	CourseVersion:  2,
+	ClassStartyear: time.Date(2021, time.April, 1, 12, 0, 0, 0, time.UTC),
+	Dispensed:      false,
+}
+var SelectedCourse2 = models.SelectedCourse{
+	UserID:         3,
+	CourseID:       2,
+	CourseVersion:  2,
+	ClassStartyear: time.Date(2021, time.April, 1, 12, 0, 0, 0, time.UTC),
+	Dispensed:      false,
+}
+
+var Examtype1 = models.Examtype{
+	Description: "Schriftlich",
+}
+var Examtype2 = models.Examtype{
+	Description: "Mündlich",
+}
+
+var Exam1 = models.Exam{
+	Description: "Erste Prüfung",
+	Weighting:   2,
+	Examtype:    Examtype1,
+	Course:      Course3,
+}
+var Exam2 = models.Exam{
+	Description: "Präsentation",
+	Weighting:   1,
+	Examtype:    Examtype2,
+	Course:      Course3,
+}
+
+var GradeType1 = models.Gradetype{
+	Description: "CH-Noten",
+}
+var GradeType2 = models.Gradetype{
+	Description: "Prozent",
+}
+
+var ExamEvaluation1 = models.ExamEvaluation{
+	RegisteredBy:     User5,
+	SelectedCourse:   SelectedCourse1,
+	Exam:             Exam1,
+	OriginalValue:    "5.2",
+	OrignialGradeTyp: GradeType1,
+	EntryDate:        time.Date(2023, time.September, 1, 12, 0, 0, 0, time.UTC),
+}
+var ExamEvaluation2 = models.ExamEvaluation{
+	RegisteredBy:     User5,
+	SelectedCourse:   SelectedCourse2,
+	Exam:             Exam1,
+	OriginalValue:    "5.0",
+	OrignialGradeTyp: GradeType1,
+	EntryDate:        time.Date(2023, time.September, 1, 12, 0, 0, 0, time.UTC),
+}
+var ExamEvaluation3 = models.ExamEvaluation{
+	RegisteredBy:   User5,
+	SelectedCourse: SelectedCourse2,
+	Exam:           Exam2,
+	OriginalValue:  "4.8",
+	EntryDate:      time.Date(2023, time.September, 1, 12, 0, 0, 0, time.UTC),
+}
+
+var Conversion1 = models.Conversion{
+	ID:             1,
+	ExamEvaluation: ExamEvaluation1,
+	Gradetype:      GradeType1,
+	Value:          5.2,
+}
+var Conversion2 = models.Conversion{
+	ID:             2,
+	ExamEvaluation: ExamEvaluation1,
+	Gradetype:      GradeType2,
+	Value:          84,
+}
+var Conversion3 = models.Conversion{
+	ID:             3,
+	ExamEvaluation: ExamEvaluation2,
+	Gradetype:      GradeType1,
+	Value:          5.0,
+}
+var Conversion4 = models.Conversion{
+	ID:             4,
+	ExamEvaluation: ExamEvaluation2,
+	Gradetype:      GradeType2,
+	Value:          80,
 }
