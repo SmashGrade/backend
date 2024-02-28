@@ -123,7 +123,7 @@ func (c *CourseController) Create(ctx echo.Context) error {
 // @Failure		401		{object}	error.ApiError
 // @Failure		403		{object}	error.ApiError
 // @Failure		500		{object}	error.ApiError
-// @Router			/courses [post]
+// @Router			/courses/{id} [post]
 // @Security		Bearer
 func (c *CourseController) CreateVersion(ctx echo.Context) error {
 	// Read id parameter from request
@@ -165,7 +165,7 @@ func (c *CourseController) CreateVersion(ctx echo.Context) error {
 // @Failure		401		{object}	error.ApiError
 // @Failure		403		{object}	error.ApiError
 // @Failure		500		{object}	error.ApiError
-// @Router			/courses [put]
+// @Router			/courses/{id}/{version} [put]
 // @Security		Bearer
 func (c *CourseController) Update(ctx echo.Context) error {
 	// Read id parameter from request
@@ -210,7 +210,7 @@ func (c *CourseController) Update(ctx echo.Context) error {
 // @Failure		401		{object}	error.ApiError
 // @Failure		403		{object}	error.ApiError
 // @Failure		500		{object}	error.ApiError
-// @Router			/courses [delete]
+// @Router			/courses/{id}/{version} [delete]
 // @Security		Bearer
 func (c *CourseController) Delete(ctx echo.Context) error {
 	// Read id parameter from request
