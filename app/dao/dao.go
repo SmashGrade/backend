@@ -554,15 +554,17 @@ type CourseDao struct {
 	moduleDao         *ModuleDao
 	userDao           *UserDao
 	selectedCourseDao *SelectedCourseDao
+	examDao           *ExamDao
 }
 
 // Create new dao with required repositories
-func NewCourseDao(courseRepository *repository.CourseRepository, moduleRepository *repository.ModuleRepository, userRepository *repository.UserRepository, selectedCourseRepository *repository.SelectedCourseRepository) *CourseDao {
+func NewCourseDao(courseRepository *repository.CourseRepository, moduleRepository *repository.ModuleRepository, userRepository *repository.UserRepository, selectedCourseRepository *repository.SelectedCourseRepository, examRepository *repository.ExamRepository) *CourseDao {
 	return &CourseDao{
 		repo:              courseRepository,
 		moduleDao:         NewModuleDao(moduleRepository),
 		userDao:           NewUserDao(userRepository),
 		selectedCourseDao: NewSelectedCourseDao(selectedCourseRepository),
+		examDao:           NewExamDao(examRepository, courseRepository),
 	}
 }
 
@@ -624,6 +626,18 @@ func (c *CourseDao) convertRefCourseToCourse(ent requestmodels.RefCourse) (retEn
 		resolvedSelectedCoursesList = append(resolvedSelectedCoursesList, *resSelCourse)
 	}
 	retEnt.SelectedCourses = resolvedSelectedCoursesList
+
+	// get linked exams
+	var resolvedExamList []*models.Exam
+	for _, exm := range ent.Exams {
+		resExam, internalError := c.examDao.Get(exm.ID)
+		if internalError != nil {
+			err = e.NewDaoReferenceIdError("exam", exm.ID)
+			return
+		}
+		resolvedExamList = append(resolvedExamList, resExam)
+	}
+	retEnt.Exams = resolvedExamList
 
 	return
 }

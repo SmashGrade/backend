@@ -21,7 +21,13 @@ type CourseController struct {
 func NewCourseController(provider db.Provider) *CourseController {
 	return &CourseController{
 		BaseController: NewBaseController(provider),
-		Dao:            dao.NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider)),
+		Dao: dao.NewCourseDao(
+			repository.NewCourseRepository(provider),
+			repository.NewModuleRepository(provider),
+			repository.NewUserRepository(provider),
+			repository.NewSelectedCourseRepository(provider),
+			repository.NewExamRepository(provider),
+		),
 	}
 }
 
