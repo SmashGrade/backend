@@ -475,6 +475,7 @@ func TestPreventCascadeDelete(t *testing.T) {
 	require.Equal(t, testModule.Description, retCheckModule.Description)
 }
 
+// check if creating and deleting of exams is reflected in the course
 func TestCourseExamLink(t *testing.T) {
 	provider := db.NewMockProvider()
 
