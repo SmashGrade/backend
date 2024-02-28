@@ -18,7 +18,7 @@ func TestMagicSmoke(t *testing.T) {
 
 	repo := repository.NewCourseRepository(provider)
 
-	dao := NewCourseDao(repo, repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider))
+	dao := NewCourseDao(repo, repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider), repository.NewExamRepository(provider))
 
 	courseEnt := requestmodels.RefCourse{Description: "Lol"}
 
@@ -36,7 +36,7 @@ func TestGetAll(t *testing.T) {
 
 	repo := repository.NewCourseRepository(provider)
 
-	dao := NewCourseDao(repo, repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider))
+	dao := NewCourseDao(repo, repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider), repository.NewExamRepository(provider))
 
 	courseEnt := requestmodels.RefCourse{Description: "Lol"}
 
@@ -216,7 +216,7 @@ func TestCreateCourseVersion(t *testing.T) {
 
 	//provider := db.NewProvider(config.NewAPIConfig())
 
-	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider))
+	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider), repository.NewExamRepository(provider))
 
 	testCourse := requestmodels.RefCourse{
 		Description: "testcourse",
@@ -350,7 +350,7 @@ func TestLinkCourseObjectsByKey(t *testing.T) {
 
 	//provider := db.NewProvider(config.NewAPIConfig())
 
-	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider))
+	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider), repository.NewExamRepository(provider))
 
 	// create a module and link it indirectly with the course
 	moduleDao := NewModuleDao(repository.NewModuleRepository(provider))
@@ -402,7 +402,7 @@ func TestErrorAtNonexistingLink(t *testing.T) {
 
 	//provider := db.NewProvider(config.NewAPIConfig())
 
-	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider))
+	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider), repository.NewExamRepository(provider))
 
 	nonexistantOnlyIDModule := requestmodels.RefVersioned{}
 	nonexistantOnlyIDModule.ID = 234
@@ -426,7 +426,7 @@ func TestErrorAtValidationError(t *testing.T) {
 
 	//provider := db.NewProvider(config.NewAPIConfig())
 
-	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider))
+	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider), repository.NewExamRepository(provider))
 
 	testCourse := requestmodels.RefCourse{
 		Description: "testcourse",
@@ -446,7 +446,7 @@ func TestPreventCascadeDelete(t *testing.T) {
 
 	//provider := db.NewProvider(config.NewAPIConfig())
 
-	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider))
+	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider), repository.NewExamRepository(provider))
 
 	// create a module and link it indirectly with the course
 	moduleDao := NewModuleDao(repository.NewModuleRepository(provider))
@@ -473,4 +473,56 @@ func TestPreventCascadeDelete(t *testing.T) {
 	retCheckModule, err := moduleDao.Get(retEnt.ID, retEnt.Version)
 	require.Nil(t, err)
 	require.Equal(t, testModule.Description, retCheckModule.Description)
+}
+
+func TestCourseExamLink(t *testing.T) {
+	provider := db.NewMockProvider()
+
+	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider), repository.NewExamRepository(provider))
+
+	examDao := NewExamDao(repository.NewExamRepository(provider), repository.NewCourseRepository(provider))
+
+	testExam := models.Exam{
+		Description: "testexam",
+	}
+
+	testExamSecondary := models.Exam{
+		Description: "another one",
+	}
+
+	retExam, err := examDao.Create(testExam)
+	require.Nil(t, err)
+
+	retExamSecondary, err := examDao.Create(testExamSecondary)
+	require.Nil(t, err)
+
+	testRefCourse := requestmodels.RefCourse{
+		Description: "testcourse",
+		Exams:       []requestmodels.RefId{{ID: retExam.ID}, {ID: retExamSecondary.ID}},
+	}
+
+	retCourse, err := courseDao.Create(testRefCourse)
+	require.Nil(t, err)
+
+	t.Logf("len of created course exams is %v", len(retCourse.Exams))
+	require.True(t, len(retCourse.Exams) == 2)
+	require.Equal(t, testExam.Description, retCourse.Exams[0].Description) // TODO: refactor this fragile test
+
+	// check if the exam now has the course registered in the orm
+	retExamSecondaryCheck, err := examDao.Get(retExamSecondary.ID)
+	require.Nil(t, err)
+
+	require.Equal(t, retCourse.ID, retExamSecondaryCheck.Course.ID)
+	require.Equal(t, retCourse.Version, retExamSecondaryCheck.Course.Version)
+
+	// check if the exam is correctly removed from the course once deleted
+	err = examDao.Delete(retExam.ID)
+	require.Nil(t, err)
+
+	retCourseCheck, err := courseDao.Get(retCourse.ID, retCourse.Version)
+	require.Nil(t, err)
+
+	t.Logf("len of created course exams is %v", len(retCourseCheck.Exams))
+	require.True(t, len(retCourseCheck.Exams) == 1)
+	require.Equal(t, testExamSecondary.Description, retCourseCheck.Exams[0].Description) // TODO: refactor this fragile test
 }

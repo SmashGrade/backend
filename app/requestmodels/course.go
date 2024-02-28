@@ -7,4 +7,5 @@ type RefCourse struct {
 	Modules         []RefVersioned      `json:"modules"`
 	TeachedBy       []RefId             `json:"teachedBy"`
 	SelectedCourses []RefSelectedCourse `json:"selectedCourses"`
+	Exams           []RefId             `json:"exams"`
 }
