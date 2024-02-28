@@ -1,8 +1,6 @@
 package api
 
 import (
-	"strconv"
-
 	"github.com/SmashGrade/backend/app/dao"
 	"github.com/SmashGrade/backend/app/db"
 	e "github.com/SmashGrade/backend/app/error"
@@ -63,21 +61,19 @@ func (c *CourseController) Courses(ctx echo.Context) error {
 // @Security		Bearer
 func (c *CourseController) Course(ctx echo.Context) error {
 	// Read id parameter from request
-	id := c.GetPathParam(ctx, "id")
-	if id == "" {
-		return e.ErrorInvalidRequest("course id")
-	}
-	paramid, err := strconv.Atoi(id) //uuid.Parse(id)
+	id, err := c.GetPathParamUint(ctx, "id")
 	if err != nil {
-		return e.ErrorInvalidRequest("course id")
+		return e.NewDaoValidationError("id", "uint", c.GetPathParam(ctx, "id"))
 	}
+
 	// Read version parameter from request
-	version := c.GetPathParamInt(ctx, "version")
-	if version == -1 {
-		return e.ErrorInvalidRequest("course version")
+	version, err := c.GetPathParamUint(ctx, "version")
+	if err != nil {
+		return e.NewDaoValidationError("version", "uint", c.GetPathParam(ctx, "version"))
 	}
+
 	// Ask the DAO for the course
-	res, err := c.Dao.Get(uint(paramid), uint(version))
+	res, err := c.Dao.Get(id, version)
 	if err != nil {
 		return err
 	}
@@ -85,8 +81,8 @@ func (c *CourseController) Course(ctx echo.Context) error {
 	return c.Yeet(ctx, res)
 }
 
-// @Summary		Post a course
-// @Description	Post a course
+// @Summary		Create a course
+// @Description	Create a course
 // @Tags			courses
 // @Produce		json
 // @Accept			json
@@ -99,7 +95,7 @@ func (c *CourseController) Course(ctx echo.Context) error {
 // @Failure		500		{object}	error.ApiError
 // @Router			/courses [post]
 // @Security		Bearer
-func (c *CourseController) Post(ctx echo.Context) error {
+func (c *CourseController) Create(ctx echo.Context) error {
 	course := new(requestmodels.RefCourse)
 	// Read the request into Course
 	if err := ctx.Bind(course); err != nil {
@@ -114,9 +110,57 @@ func (c *CourseController) Post(ctx echo.Context) error {
 	return c.Yeet(ctx, returnCourse)
 }
 
+// @Summary		Update a course
+// @Description	Update a course
+// @Tags			courses
+// @Produce		json
+// @Accept			json
+//
+// @Param			request	body		requestmodels.RefCourse	true	"request body"
+// @Param			id		path	uint	true	"Course ID"
+// @Param			version	path	uint	true	"Course Version"
+//
+// @Success		200		{object}	models.Course
+// @Failure		401		{object}	error.ApiError
+// @Failure		403		{object}	error.ApiError
+// @Failure		500		{object}	error.ApiError
+// @Router			/courses [put]
+// @Security		Bearer
+func (c *CourseController) Update(ctx echo.Context) error {
+	// Read id parameter from request
+
+	id, err := c.GetPathParamUint(ctx, "id")
+	if err != nil {
+		return e.NewDaoValidationError("id", "uint", c.GetPathParam(ctx, "id"))
+	}
+
+	version, err := c.GetPathParamUint(ctx, "version")
+	if err != nil {
+		return e.NewDaoValidationError("version", "uint", c.GetPathParam(ctx, "version"))
+	}
+
+	course := new(requestmodels.RefCourse)
+	// Read the request into Course
+	if err := ctx.Bind(course); err != nil {
+		return e.ErrorInvalidRequest("course")
+	}
+
+	course.ID = id
+	course.Version = version
+
+	// Let dao create the Course
+	err = c.Dao.Update(*course)
+	if err != nil {
+		return err
+	}
+	// return the result from the Post
+	return c.Yeet(ctx, course)
+}
+
 // register all output endpoints to router
 func RegisterV1Courses(g *echo.Group, c *CourseController) {
 	g.GET("/courses", c.Courses)
 	g.GET("/courses/:id/:version", c.Course)
-	g.POST("courses", c.Post)
+	g.POST("/courses", c.Create)
+	g.PUT("/courses/:id/:version", c.Update)
 }

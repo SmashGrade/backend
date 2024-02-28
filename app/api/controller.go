@@ -38,19 +38,19 @@ func (c *BaseController) GetPathParam(ctx echo.Context, param string) string {
 
 // Gets the parameter from the request and converts it to an integer
 // Returns -1 if the conversion fails
-func (c *BaseController) GetPathParamInt(ctx echo.Context, param string) int {
+func (c *BaseController) GetPathParamUint(ctx echo.Context, param string) (uint, error) {
 	res, err := strconv.Atoi(c.GetPathParam(ctx, param))
 	// Check if conversion failed
 	if err != nil {
-		return -1
+		return 0, err
 	}
 	// Check if the result is negative
 	// This would not be able to be converted to a uint
 	if res < 0 {
-		return -1
+		return 0, err
 	}
 	// Return value
-	return res
+	return uint(res), nil
 }
 
 // Retrieves the user from the requests bearer token

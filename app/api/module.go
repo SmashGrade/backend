@@ -1,8 +1,6 @@
 package api
 
 import (
-	"strconv"
-
 	"github.com/SmashGrade/backend/app/dao"
 	"github.com/SmashGrade/backend/app/db"
 	e "github.com/SmashGrade/backend/app/error"
@@ -56,21 +54,17 @@ func (c *ModuleController) Modules(ctx echo.Context) error {
 // @Security		Bearer
 func (c *ModuleController) Module(ctx echo.Context) error {
 	// Read id parameter from request
-	id := c.GetPathParam(ctx, "id")
-	if id == "" {
-		return e.ErrorInvalidRequest("module id")
-	}
-	paramid, err := strconv.Atoi(id)
+	id, err := c.GetPathParamUint(ctx, "id")
 	if err != nil {
-		return e.ErrorInvalidRequest("module id")
+		return e.NewDaoValidationError("id", "uint", c.GetPathParam(ctx, "id"))
 	}
 	// Read version parameter from request
-	version := c.GetPathParamInt(ctx, "version")
-	if version == -1 {
-		return e.ErrorInvalidRequest("module version")
+	version, err := c.GetPathParamUint(ctx, "version")
+	if err != nil {
+		return e.NewDaoValidationError("version", "uint", c.GetPathParam(ctx, "version"))
 	}
 	// Ask the DAO for the module
-	res, err := c.Dao.Get(uint(paramid), uint(version))
+	res, err := c.Dao.Get(id, version)
 	if err != nil {
 		return err
 	}
