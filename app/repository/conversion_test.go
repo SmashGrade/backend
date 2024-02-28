@@ -12,7 +12,7 @@ import (
 func Test_Conversion_Create(t *testing.T) {
 	repository := NewConversionRepository(db.NewPrefilledMockProvider())
 
-	conversion_1 := db.Conversion_1()
+	conversion_1 := db.Conversion1
 	conversion_1.ID = 0
 
 	_, err := repository.Create(&conversion_1)
@@ -24,7 +24,7 @@ func Test_Conversion_Update(t *testing.T) {
 	repository := NewConversionRepository(db.NewPrefilledMockProvider())
 
 	// Update Description of Field
-	conversion := db.Conversion_1()
+	conversion := db.Conversion1
 	conversion.Value = 4.7
 	err := repository.Update(&conversion)
 
@@ -40,11 +40,11 @@ func Test_Conversion_Find(t *testing.T) {
 	repository := NewConversionRepository(db.NewPrefilledMockProvider())
 
 	// Find Field
-	result2, err := repository.Find(db.Conversion_1())
+	result2, err := repository.Find(db.Conversion1)
 	fields := result2.([]models.Conversion)
 
 	require.NoError(t, err)
-	require.Nil(t, deep.Equal(db.Field_1().ID, fields[0].ID))
+	require.Nil(t, deep.Equal(db.Field1.ID, fields[0].ID))
 }
 
 func Test_Conversion_GetAll(t *testing.T) {
@@ -55,19 +55,19 @@ func Test_Conversion_GetAll(t *testing.T) {
 	conversions := result.([]models.Conversion)
 
 	require.NoError(t, err)
-	require.Nil(t, deep.Equal(db.Conversion_1().ID, conversions[0].ID))
-	require.Nil(t, deep.Equal(db.Conversion_2().ID, conversions[1].ID))
+	require.Nil(t, deep.Equal(db.Conversion1.ID, conversions[0].ID))
+	require.Nil(t, deep.Equal(db.Conversion2.ID, conversions[1].ID))
 }
 
 func Test_Field_GetTimed(t *testing.T) {
 	repository := NewConversionRepository(db.NewPrefilledMockProvider())
 
 	// Get by ID and Start year
-	result, err := repository.GetTimed(db.Conversion_1().ID, db.Conversion_1().EESelectedCourseClassStartyear)
+	result, err := repository.GetTimed(db.Conversion1.ID, db.Conversion1.EESelectedCourseClassStartyear)
 	conversion := result.(*models.Conversion)
 
 	require.NoError(t, err)
-	require.Nil(t, deep.Equal(conversion.Value, db.Conversion_1().Value))
+	require.Nil(t, deep.Equal(conversion.Value, db.Conversion1.Value))
 }
 
 func Test_Field_DeleteTimed(t *testing.T) {
@@ -78,7 +78,7 @@ func Test_Field_DeleteTimed(t *testing.T) {
 	afterCreateLength := len(result.([]models.Conversion))
 
 	// Delete conversion
-	err := repository.DeleteTimed(db.Conversion_1().ID, db.Conversion_1().EESelectedCourseClassStartyear)
+	err := repository.DeleteTimed(db.Conversion1.ID, db.Conversion1.EESelectedCourseClassStartyear)
 
 	result2, _ := repository.GetAll()
 	afterDeleteLength := len(result2.([]models.Conversion))

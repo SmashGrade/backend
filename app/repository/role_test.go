@@ -12,7 +12,7 @@ import (
 func Test_Role_Create(t *testing.T) {
 	repository := NewRoleRepository(db.NewPrefilledMockProvider())
 
-	role_1 := db.Role_1()
+	role_1 := db.Role1
 	role_1.ID = 0
 
 	_, err := repository.Create(&role_1)
@@ -24,7 +24,7 @@ func Test_Role_Update(t *testing.T) {
 	repository := NewRoleRepository(db.NewPrefilledMockProvider())
 
 	// Update Description of Role
-	role := db.Role_1()
+	role := db.Role1
 	role.Description = "edited description Role 1"
 	err := repository.Update(&role)
 
@@ -40,11 +40,11 @@ func Test_Role_Find(t *testing.T) {
 	repository := NewRoleRepository(db.NewPrefilledMockProvider())
 
 	// Find Role
-	result2, err := repository.Find(db.Role_1())
+	result2, err := repository.Find(db.Role1)
 	roles := result2.([]models.Role)
 
 	require.NoError(t, err)
-	require.Nil(t, deep.Equal(db.Role_1().ID, roles[0].ID))
+	require.Nil(t, deep.Equal(db.Role1.ID, roles[0].ID))
 }
 
 func Test_Role_GetAll(t *testing.T) {
@@ -55,19 +55,19 @@ func Test_Role_GetAll(t *testing.T) {
 	roles := result.([]models.Role)
 
 	require.NoError(t, err)
-	require.Nil(t, deep.Equal(db.Role_1().ID, roles[0].ID))
-	require.Nil(t, deep.Equal(db.Role_2().ID, roles[1].ID))
+	require.Nil(t, deep.Equal(db.Role1.ID, roles[0].ID))
+	require.Nil(t, deep.Equal(db.Role2.ID, roles[1].ID))
 }
 
 func Test_Role_GetID(t *testing.T) {
 	repository := NewRoleRepository(db.NewPrefilledMockProvider())
 
 	// Get by ID
-	result, err := repository.GetId(db.Role_1().ID)
+	result, err := repository.GetId(db.Role1.ID)
 	role := result.(*models.Role)
 
 	require.NoError(t, err)
-	require.Nil(t, deep.Equal(role.Description, db.Role_1().Description))
+	require.Nil(t, deep.Equal(role.Description, db.Role1.Description))
 }
 
 func Test_Role_DeleteId(t *testing.T) {
@@ -78,7 +78,7 @@ func Test_Role_DeleteId(t *testing.T) {
 	afterCreateLength := len(result.([]models.Role))
 
 	// Delete role
-	err := repository.DeleteId(db.Role_1().ID)
+	err := repository.DeleteId(db.Role1.ID)
 
 	result2, _ := repository.GetAll()
 	afterDeleteLength := len(result2.([]models.Role))

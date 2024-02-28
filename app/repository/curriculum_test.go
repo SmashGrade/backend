@@ -13,7 +13,7 @@ import (
 func Test_Curriculum_Create(t *testing.T) {
 	repository := NewCurriculumRepository(db.NewPrefilledMockProvider())
 
-	curriculum_1 := db.Curriculum_1()
+	curriculum_1 := db.Curriculum1
 	curriculum_1.ID = 0
 
 	_, err := repository.Create(&curriculum_1)
@@ -25,7 +25,7 @@ func Test_Curriculum_Update(t *testing.T) {
 	repository := NewCurriculumRepository(db.NewPrefilledMockProvider())
 
 	// Update Description of Curriculum
-	curriculum := db.Curriculum_1()
+	curriculum := db.Curriculum1
 	curriculum.Description = "edited description Curriculum 1"
 	err := repository.Update(&curriculum)
 
@@ -41,11 +41,11 @@ func Test_Curriculum_Find(t *testing.T) {
 	repository := NewCurriculumRepository(db.NewPrefilledMockProvider())
 
 	// Find Curriculum
-	result2, err := repository.Find(db.Curriculum_1())
+	result2, err := repository.Find(db.Curriculum1)
 	curriculums := result2.([]models.Curriculum)
 
 	require.NoError(t, err)
-	require.Nil(t, deep.Equal(db.Curriculum_1().ID, curriculums[0].ID))
+	require.Nil(t, deep.Equal(db.Curriculum1.ID, curriculums[0].ID))
 }
 
 func Test_Curriculum_GetAll(t *testing.T) {
@@ -56,19 +56,19 @@ func Test_Curriculum_GetAll(t *testing.T) {
 	curriculums := result.([]models.Curriculum)
 
 	require.NoError(t, err)
-	require.Nil(t, deep.Equal(db.Curriculum_1().ID, curriculums[0].ID))
-	require.Nil(t, deep.Equal(db.Curriculum_2().ID, curriculums[1].ID))
+	require.Nil(t, deep.Equal(db.Curriculum1.ID, curriculums[0].ID))
+	require.Nil(t, deep.Equal(db.Curriculum2.ID, curriculums[1].ID))
 }
 
 func Test_Curriculum_GetID(t *testing.T) {
 	repository := NewCurriculumRepository(db.NewPrefilledMockProvider())
 
 	// Get by ID
-	result, err := repository.GetId(db.Curriculum_1().ID)
+	result, err := repository.GetId(db.Curriculum1.ID)
 	curriculum := result.(*models.Curriculum)
 
 	require.NoError(t, err)
-	require.Nil(t, deep.Equal(curriculum.Description, db.Curriculum_1().Description))
+	require.Nil(t, deep.Equal(curriculum.Description, db.Curriculum1.Description))
 }
 
 func Test_Curriculum_DeleteId(t *testing.T) {
@@ -79,7 +79,7 @@ func Test_Curriculum_DeleteId(t *testing.T) {
 	afterCreateLength := len(result.([]models.Curriculum))
 
 	// Delete curriculum
-	err := repository.DeleteId(db.Curriculum_1().ID)
+	err := repository.DeleteId(db.Curriculum1.ID)
 
 	result2, _ := repository.GetAll()
 	afterDeleteLength := len(result2.([]models.Curriculum))
