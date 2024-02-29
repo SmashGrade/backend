@@ -786,6 +786,23 @@ func (u *UserDao) Get(uid uint) (entity *models.User, err *e.ApiError) {
 	return getOrError[models.User](u.repo, uid)
 }
 
+// Returns all Teachers as User types as slice
+func (c *UserDao) GetTeachers() (entities []models.User, err *e.ApiError) {
+	users, err := getAllOrError[models.User](c.repo)
+
+	// Filter through all the Roles of the User
+	// Append Users with the Role Dozent to the filtered list
+	filtered := make([]models.User, 0)
+	for _, user := range users {
+		for _, role := range user.Roles {
+			if role.Description == "Dozent" {
+				filtered = append(filtered, user)
+			}
+		}
+	}
+	return filtered, err
+}
+
 // Returns a list of courses a user has assigned
 func (u *UserDao) GetCourses(uid uint) (courses []models.SelectedCourse, err *e.ApiError) {
 	return nil, e.NewDaoUnimplementedError()

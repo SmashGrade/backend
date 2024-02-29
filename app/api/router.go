@@ -14,6 +14,7 @@ type Router struct {
 	config *config.APIConfig
 	auth   *auth.AuthProvider
 	course *CourseController
+	module *ModuleController
 	output *OutputController
 	user   *UserController
 	exam   *ExamController
@@ -26,6 +27,7 @@ func NewRouter(e *echo.Echo, p db.Provider) *Router {
 		config: p.Config(),
 		auth:   auth.NewAuthProvider(p.Config()),
 		course: NewCourseController(p),
+		module: NewModuleController(p),
 		output: NewOutputController(p),
 		user:   NewUserController(p),
 		exam:   NewExamController(p),
@@ -49,4 +51,5 @@ func (r *Router) RegisterV1() {
 	RegisterV1Output(v1, r.output)
 	RegisterV1User(v1, r.user)
 	RegisterV1Exams(v1, r.exam)
+	RegisterV1MetaCourse(v1, r)
 }
