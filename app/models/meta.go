@@ -5,3 +5,9 @@ type MetaCourse struct {
 	Modules   []Module   `json:"modules"`
 	Examtypes []Examtype `json:"examtypes"`
 }
+
+type MetaModules struct {
+	Evaluationtypes []Evaluationtype `json:"evaluationtype"`
+	Curriculums     []Curriculum     `json:"curriculums"`
+	Curriculumstype []Curriculumtype `json:"curriculumstype"`
+}

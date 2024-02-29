@@ -442,6 +442,11 @@ func NewCurriculumDao(curriculumRepository *repository.CurriculumRepository) *Cu
 	}
 }
 
+// returns all modules as slice
+func (m *CurriculumDao) GetAll() (entities []models.Curriculum, err *e.ApiError) {
+	return getAllOrError[models.Curriculum](m.repo)
+}
+
 // Returns existing curriculum
 func (c *CurriculumDao) Get(id uint, startValidity time.Time) (entity *models.Curriculum, err *e.ApiError) {
 	return nil, e.NewDaoUnimplementedError()

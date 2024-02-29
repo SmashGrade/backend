@@ -10,27 +10,29 @@ import (
 
 // Router is the main router for the API
 type Router struct {
-	echo   *echo.Echo
-	config *config.APIConfig
-	auth   *auth.AuthProvider
-	course *CourseController
-	module *ModuleController
-	output *OutputController
-	user   *UserController
-	exam   *ExamController
+	echo       *echo.Echo
+	config     *config.APIConfig
+	auth       *auth.AuthProvider
+	course     *CourseController
+	module     *ModuleController
+	curriculum *CurriculumController
+	output     *OutputController
+	user       *UserController
+	exam       *ExamController
 }
 
 // NewRouter creates a new router
 func NewRouter(e *echo.Echo, p db.Provider) *Router {
 	return &Router{
-		echo:   e,
-		config: p.Config(),
-		auth:   auth.NewAuthProvider(p.Config()),
-		course: NewCourseController(p),
-		module: NewModuleController(p),
-		output: NewOutputController(p),
-		user:   NewUserController(p),
-		exam:   NewExamController(p),
+		echo:       e,
+		config:     p.Config(),
+		auth:       auth.NewAuthProvider(p.Config()),
+		course:     NewCourseController(p),
+		module:     NewModuleController(p),
+		curriculum: NewCurriculumController(p),
+		output:     NewOutputController(p),
+		user:       NewUserController(p),
+		exam:       NewExamController(p),
 	}
 }
 
