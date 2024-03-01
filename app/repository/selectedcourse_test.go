@@ -2,7 +2,6 @@ package repository
 
 import (
 	"testing"
-	"time"
 
 	"github.com/SmashGrade/backend/app/db"
 	"github.com/SmashGrade/backend/app/models"
@@ -11,9 +10,9 @@ import (
 )
 
 func Test_SelectedCourse_Create(t *testing.T) {
-	repository := NewSelectedCourseRepository(db.NewPrefilledMockProvider())
+	repository := NewSelectedCourseRepository(db.NewMockProvider())
 
-	selectedCourse_1 := db.SelectedCourse_1()
+	selectedCourse_1 := db.SelectedCourse1
 	selectedCourse_1.UserID = 2
 
 	_, err := repository.Create(&selectedCourse_1)
@@ -25,7 +24,7 @@ func Test_SelectedCourse_Update(t *testing.T) {
 	repository := NewSelectedCourseRepository(db.NewPrefilledMockProvider())
 
 	// Update Description of SelectedCourse
-	selectedCourse := db.SelectedCourse_1()
+	selectedCourse := db.SelectedCourse1
 	selectedCourse.Dispensed = true
 	err := repository.Update(&selectedCourse)
 
@@ -41,11 +40,11 @@ func Test_SelectedCourse_Find(t *testing.T) {
 	repository := NewSelectedCourseRepository(db.NewPrefilledMockProvider())
 
 	// Find SelectedCourse
-	result2, err := repository.Find(db.SelectedCourse_1())
+	result2, err := repository.Find(db.SelectedCourse1)
 	selectedCourses := result2.([]models.SelectedCourse)
 
 	require.NoError(t, err)
-	require.Nil(t, deep.Equal(db.SelectedCourse_1().UserID, selectedCourses[0].UserID))
+	require.Nil(t, deep.Equal(db.SelectedCourse1.UserID, selectedCourses[0].UserID))
 }
 
 func Test_SelectedCourse_GetAll(t *testing.T) {
@@ -56,17 +55,17 @@ func Test_SelectedCourse_GetAll(t *testing.T) {
 	selectedCourses := result.([]models.SelectedCourse)
 
 	require.NoError(t, err)
-	require.Nil(t, deep.Equal(db.SelectedCourse_1().UserID, selectedCourses[0].UserID))
-	require.Nil(t, deep.Equal(db.SelectedCourse_2().UserID, selectedCourses[1].UserID))
+	require.Nil(t, deep.Equal(db.SelectedCourse1.UserID, selectedCourses[0].UserID))
+	require.Nil(t, deep.Equal(db.SelectedCourse2.UserID, selectedCourses[1].UserID))
 }
 
 func Test_SelectedCourse_GetSelectedCourse(t *testing.T) {
 	repository := NewSelectedCourseRepository(db.NewPrefilledMockProvider())
 
-	result, err := repository.GetSelectedCourse(1, 1, 1, time.Date(2024, time.January, 1, 0, 0, 0, 0, time.UTC))
+	result, err := repository.GetSelectedCourse(db.SelectedCourse1.UserID, db.SelectedCourse1.CourseID, db.SelectedCourse1.CourseVersion, db.SelectedCourse1.ClassStartyear)
 
 	require.NoError(t, err)
-	require.Nil(t, deep.Equal(db.SelectedCourse_1().Dispensed, result.Dispensed))
+	require.Nil(t, deep.Equal(db.SelectedCourse1.Dispensed, result.Dispensed))
 }
 
 func Test_SelectedCourse_DeleteSelectedCourse(t *testing.T) {
@@ -77,7 +76,7 @@ func Test_SelectedCourse_DeleteSelectedCourse(t *testing.T) {
 	afterCreateLength := len(result.([]models.SelectedCourse))
 
 	// Delete selectedcourse
-	err := repository.DeleteSelectedCourse(1, 1, 1, time.Date(2024, time.January, 1, 0, 0, 0, 0, time.UTC))
+	err := repository.DeleteSelectedCourse(db.SelectedCourse1.UserID, db.SelectedCourse1.CourseID, db.SelectedCourse1.CourseVersion, db.SelectedCourse1.ClassStartyear)
 
 	result2, _ := repository.GetAll()
 	afterDeleteLength := len(result2.([]models.SelectedCourse))
