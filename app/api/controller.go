@@ -8,6 +8,7 @@ import (
 	e "github.com/SmashGrade/backend/app/error"
 	"github.com/SmashGrade/backend/app/models"
 	"github.com/SmashGrade/backend/app/repository"
+	"github.com/goccy/go-json"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
 )
@@ -19,10 +20,10 @@ type BaseController struct {
 }
 
 type TokenClaim struct {
-	Email string   `json:"email"`
+	Email string   `json:"preferred_username"`
 	Name  string   `json:"name"`
 	Roles []string `json:"roles"`
-	*jwt.MapClaims
+	jwt.RegisteredClaims
 }
 
 // Constructor for BaseController
@@ -67,28 +68,88 @@ func (c *BaseController) GetUser(ctx echo.Context) (*models.User, *e.ApiError) {
 	userRaw := ctx.Get("user")
 	// Middleware does not have a user key, so we return unauthorized
 	if userRaw == nil {
-		ctx.Logger().Info("Authorized endpoint called without a bearer token. Request denied.")
+		ctx.Logger().Error("Authorized endpoint called without a bearer token. Request denied.")
 		return nil, e.NewUnauthorizedError()
 	}
 	// Check if the user key is a valid jwt token
 	user, ok := userRaw.(*jwt.Token)
 	if !ok {
-		ctx.Logger().Info("Authorized endpoint called without a valid bearer token. Request denied.")
+		ctx.Logger().Error("Authorized endpoint called without a valid bearer token. Request denied.")
 		return nil, e.NewUnauthorizedError()
 	}
 	// Check if the user is valid
-	claims, ok := user.Claims.(TokenClaim)
-	if !ok {
-		ctx.Logger().Info("Authorized endpoint called without valid claims. Request denied.")
+	// This is a workaround to get the claims from the token as the default map can not be converted to a struct
+	marshalledClaims, err := json.Marshal(user.Claims)
+	if err != nil {
+		ctx.Logger().Error("Authorized endpoint called without valid claims. Request denied.")
+		return nil, e.NewUnauthorizedError()
+	}
+	// Build the clains as struct from the marshalled claims
+	claims := TokenClaim{}
+	err = json.Unmarshal(marshalledClaims, &claims)
+	if err != nil {
+		ctx.Logger().Error("Authorized endpoint called without valid claims. Request denied.")
 		return nil, e.NewUnauthorizedError()
 	}
 
-	print(claims.Email, claims.Name, claims.Roles)
+	// Create a list of roles from the claims
+	userRoles := make([]*models.Role, len(claims.Roles))
+	// Add roles from the claims to the user
+	for _, claimRole := range claims.Roles {
+		role, err := c.UserDao.GetRoleByClaim(claimRole)
+		if err != nil {
+			ctx.Logger().Warnf("Encountered a role that does not exist in the database: %s for user %s", claimRole, claims.Email)
+		} else {
+			userRoles = append(userRoles, role)
+		}
+	}
 
-	/*
-	 *Claims: map[acct:1 aio:AYQAe/8WAAAANuzCcU/Fuw3PdUijspv08VrJY1CKopiZXI8nl35szPB1Nu0paNS4UhTcHGEu3pZ0uCkBewp44kVv3N3HvzYgBBusbj67dOT0FFi8h19OljJOyDppvSVcXY/lCd+Uw4McPGH202G12BkFe9RDO4fUCur91+FOiuG37JpZ8k/5qLM= aud:72acf4df-78f6-4e6f-81c6-f5aa1efa8ebc auth_time:1.706943744e+09 email:joshua.lehmann@hftm.ch exp:1.708774097e+09 iat:1.708770197e+09 idp:https://sts.windows.net/7a09aace-3641-41b0-993d-3729201228b3/ ipaddr:178.197.219.87 iss:https://login.microsoftonline.com/744b66c4-2df7-4756-905a-c1127799c955/v2.0 login_hint:O.CiQ4YTVkZWYzMy0zMjJhLTQ0M2EtOGFjOC0zYWMxNGU3MDA0NDQSJDdhMDlhYWNlLTM2NDEtNDFiMC05OTNkLTM3MjkyMDEyMjhiMxoWam9zaHVhLmxlaG1hbm5AaGZ0bS5jaCCOAQ== name:Joshua Lehmann nbf:1.708770197e+09 nonce:c92d3774-3b7c-4f5d-92fa-fc2f539d682b oid:8eae5a8e-d0ae-4b89-8d4a-ada300d72719 preferred_username:joshua.lehmann@hftm.ch rh:0.ATsAxGZLdPctVkeQWsESd5nJVd_0rHL2eG9Ogcb1qh76jrw7ACA. roles:[Kursadministrator] sid:bcff908e-a50c-4c00-a873-3d6611c8bde8 sub:M8wesEuTiwsYzMlbCeS5rU5JjGvE2MZKCR9KzJ2EcbQ tenant_ctry:CH tenant_region_scope:EU tid:744b66c4-2df7-4756-905a-c1127799c955 uti:NfWu2nTF70CBKMrpu6sWAA ver:2.0 verified_primary_email:[joshua.lehmann@hftm.ch] verified_secondary_email:[joshua.lehmann@hftm.onmicrosoft.com] xms_tpl:de]
-	 */
+	// Create the user object from the claims
+	userEntity := &models.User{
+		Email: claims.Email,
+		Name:  claims.Name,
+		Roles: userRoles,
+	}
 
-	// TODO: Finish this function
-	return &models.User{}, nil
+	// Ensure that the database contains the user and that the user is updated based on the claims
+	crudErr := c.CreateUpdateUser(userEntity)
+	if crudErr != nil {
+		ctx.Logger().Error("Error creating or updating user in database. Request denied.")
+		return nil, e.NewUnauthorizedError()
+	}
+
+	// Return the user
+	return userEntity, nil
+}
+
+// This function is used to update or create a user in the database based on the given user object
+// If the user already exists, it will be updated
+// If the user does not exist, it will be created
+// Returns an error if the user could not be updated or created
+func (c *BaseController) CreateUpdateUser(user *models.User) *e.ApiError {
+	// Retrieve the current user from the database if it exists
+	currentUser, _ := c.UserDao.GetByEmail(user.Email)
+	// Check if we have a user and update it
+	if currentUser != nil {
+		// Set the ID of the user to the ID of the current user
+		user.ID = currentUser.ID
+		// Update the user in the database
+		err := c.UserDao.Update(*user)
+		if err != nil {
+			return e.NewDaoDbError()
+		}
+	} else {
+		// Add fields with empty slices to the user
+		// If we do not do this, we will get a null pointer exception when trying to create the user in the database
+		// TODO: Fix the error: reflect: call of reflect.Value.Field on zero Value
+		user.Fields = make([]*models.Field, 0)
+		user.TeachesCourses = make([]*models.Course, 0)
+		user.SelectedCourses = make([]models.SelectedCourse, 0)
+		// Create the user in the database
+		_, err := c.UserDao.Create(*user)
+		if err != nil {
+			return e.NewDaoDbError()
+		}
+	}
+	return nil
 }

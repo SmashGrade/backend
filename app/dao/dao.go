@@ -829,6 +829,21 @@ func (c *UserDao) GetFieldManagers() (entities []models.User, err *e.ApiError) {
 	return c.GetByRole(config.ROLE_FIELDMANAGER)
 }
 
+// Returns a role by claim name
+func (c *UserDao) GetRoleByClaim(claimName string) (entity *models.Role, err *e.ApiError) {
+	entities, internalError := c.roleRepo.Find(&models.Role{Claim: claimName})
+	if internalError != nil {
+		return nil, e.NewDaoDbError()
+	}
+
+	roleEntities := entities.([]models.Role)
+	if len(roleEntities) < 1 {
+		return nil, e.NewDaoNotExistingError(claimName, "claim")
+	}
+
+	return &roleEntities[0], nil
+}
+
 // Create default values for roles
 func (c *UserDao) CreateDefaults() *e.ApiError {
 	existingEntities, err := c.roleRepo.GetAll()
@@ -880,8 +895,19 @@ func (u *UserDao) GetExamEvaluationsForYear(uid uint, startYear time.Time) {
 	// TODO
 }
 
+// Creates a new user
 func (u *UserDao) Create(entity models.User) (returnEntity *models.User, err *e.ApiError) {
 	return createOrError(u.repo, entity)
+}
+
+// Updates an existing user
+func (c *UserDao) Update(entity models.User) *e.ApiError {
+	internalError := c.repo.Update(entity)
+	if internalError != nil {
+		return e.NewDaoDbError()
+	}
+
+	return nil
 }
 
 // returns first match for an email
