@@ -29,7 +29,7 @@ type TokenClaim struct {
 func NewBaseController(provider db.Provider) *BaseController {
 	return &BaseController{
 		Provider: provider,
-		UserDao:  dao.NewUserDao(repository.NewUserRepository(provider)),
+		UserDao:  dao.NewUserDao(repository.NewUserRepository(provider), repository.NewRoleRepository(provider)),
 	}
 }
 

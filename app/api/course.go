@@ -25,6 +25,7 @@ func NewCourseController(provider db.Provider) *CourseController {
 			repository.NewUserRepository(provider),
 			repository.NewSelectedCourseRepository(provider),
 			repository.NewExamRepository(provider),
+			repository.NewRoleRepository(provider),
 		),
 	}
 }

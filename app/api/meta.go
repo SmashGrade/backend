@@ -27,9 +27,9 @@ type MetaController struct {
 func NewMetaController(provider db.Provider) *MetaController {
 	return &MetaController{
 		BaseController:    NewBaseController(provider),
-		userDao:           dao.NewUserDao(repository.NewUserRepository(provider)),
+		userDao:           dao.NewUserDao(repository.NewUserRepository(provider), repository.NewRoleRepository(provider)),
 		moduleDao:         dao.NewModuleDao(repository.NewModuleRepository(provider)),
-		courseDao:         dao.NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider), repository.NewExamRepository(provider)),
+		courseDao:         dao.NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider), repository.NewExamRepository(provider), repository.NewRoleRepository(provider)),
 		curriculumDao:     dao.NewCurriculumDao(repository.NewCurriculumRepository(provider)),
 		examtypeDao:       dao.NewExamtypeDao(repository.NewExamtypeRepository(provider)),
 		evaluationtypeDao: dao.NewEvaluationTypeDao(repository.NewEvaluationtypeRepository(provider)),
@@ -41,7 +41,7 @@ func NewMetaController(provider db.Provider) *MetaController {
 
 // @Summary		Get Metadata for Course
 // @Description	Get Metadata for Course
-// @Tags			Meta
+// @Tags			meta, courses
 // @Produce		json
 // @Success		200	{array}		models.MetaCourse
 // @Failure		401	{object}	error.ApiError
@@ -82,7 +82,7 @@ func (m *MetaController) MetaCourses(ctx echo.Context) error {
 
 // @Summary		Get Metadata for Module
 // @Description	Get Metadata for Module
-// @Tags			meta
+// @Tags			meta, modules
 // @Produce		json
 // @Success		200	{array}		models.MetaModules
 // @Failure		401	{object}	error.ApiError
@@ -132,7 +132,7 @@ func (m *MetaController) MetaModules(ctx echo.Context) error {
 
 // @Summary		Get Metadata for Curriculums
 // @Description	Get Metadata for Curriculums
-// @Tags			Meta
+// @Tags			meta, curriculums
 // @Produce		json
 // @Success		200	{array}		models.MetaCurriculums
 // @Failure		401	{object}	error.ApiError
@@ -180,9 +180,9 @@ func (m *MetaController) MetaCurriculums(ctx echo.Context) error {
 	return m.Yeet(ctx, metaCurriculums)
 }
 
-// @Summary		Get Courses for a teacher
-// @Description	Get Courses for a teacher selected by userinfo in accesstoken
-// @Tags			Meta
+// @Summary		Get your Courses as a teacher
+// @Description	Get Courses as a teacher selected by teached by userinfo from accesstoken
+// @Tags			meta, courses
 // @Produce		json
 // @Success		200	{array}		models.TeacherCourses
 // @Failure		401	{object}	error.ApiError
@@ -198,9 +198,9 @@ func (m *MetaController) MyCoursesAsTeacher(ctx echo.Context) error {
 	return e.NewApiUnimplementedError()
 }
 
-// @Summary		Get Curriculums for a student
-// @Description	Get Curriculums for a student selected by userinfo in accesstoken
-// @Tags			Meta
+// @Summary		Get Curriculums as a student
+// @Description	Get Curriculums as a student selected by userinfo from accesstoken
+// @Tags			meta, curriculums
 // @Produce		json
 // @Success		200	{array}		models.StudentCurriculums
 // @Failure		401	{object}	error.ApiError

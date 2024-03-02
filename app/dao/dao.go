@@ -563,11 +563,11 @@ type CourseDao struct {
 }
 
 // Create new dao with required repositories
-func NewCourseDao(courseRepository *repository.CourseRepository, moduleRepository *repository.ModuleRepository, userRepository *repository.UserRepository, selectedCourseRepository *repository.SelectedCourseRepository, examRepository *repository.ExamRepository) *CourseDao {
+func NewCourseDao(courseRepository *repository.CourseRepository, moduleRepository *repository.ModuleRepository, userRepository *repository.UserRepository, selectedCourseRepository *repository.SelectedCourseRepository, examRepository *repository.ExamRepository, roleRepository *repository.RoleRepository) *CourseDao {
 	return &CourseDao{
 		repo:              courseRepository,
 		moduleDao:         NewModuleDao(moduleRepository),
-		userDao:           NewUserDao(userRepository),
+		userDao:           NewUserDao(userRepository, roleRepository),
 		selectedCourseDao: NewSelectedCourseDao(selectedCourseRepository),
 		examDao:           NewExamDao(examRepository, courseRepository),
 	}
@@ -777,13 +777,15 @@ func (ex *ExamDao) Delete(id uint) *e.ApiError {
 }
 
 type UserDao struct {
-	repo *repository.UserRepository
+	repo     *repository.UserRepository
+	roleRepo *repository.RoleRepository
 }
 
 // Creates new dao from required repositories
-func NewUserDao(userRepository *repository.UserRepository) *UserDao {
+func NewUserDao(userRepository *repository.UserRepository, roleRepository *repository.RoleRepository) *UserDao {
 	return &UserDao{
-		repo: userRepository,
+		repo:     userRepository,
+		roleRepo: roleRepository,
 	}
 }
 
@@ -806,6 +808,41 @@ func (c *UserDao) GetTeachers() (entities []models.User, err *e.ApiError) {
 		}
 	}
 	return filtered, err
+}
+
+// Create default values for roles
+func (c *UserDao) CreateDefaults() *e.ApiError {
+	existingEntities, err := c.roleRepo.GetAll()
+	existingRoles := existingEntities.([]models.Role)
+	if err != nil {
+		return e.NewDaoDbError()
+	}
+
+	for _, v := range c.repo.Provider.Config().Roles {
+
+		existingFound := false
+		for _, existing := range existingRoles {
+			if v.Id == existing.ID {
+				existingFound = true
+				break
+			}
+		}
+		if existingFound {
+			continue
+		}
+
+		newRole := &models.Role{
+			Description: v.Name,
+		}
+		newRole.ID = v.Id
+
+		_, err := c.roleRepo.Create(newRole)
+		if err != nil {
+			return e.NewDaoDbError()
+		}
+	}
+
+	return nil
 }
 
 // Returns a list of courses a user has assigned
