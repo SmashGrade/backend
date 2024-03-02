@@ -14,3 +14,12 @@ type User struct {
 	TeachesCourses  []*Course        `gorm:"many2many:course_teacher;" json:"teachesCourses"`
 	SelectedCourses []SelectedCourse `json:"selectedCourses"`
 }
+
+func (u User) HasRole(roleId uint) bool {
+	for i := range u.Roles {
+		if u.Roles[i].ID == roleId {
+			return true
+		}
+	}
+	return false
+}
