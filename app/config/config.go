@@ -48,8 +48,10 @@ type CorsConfig struct {
 
 // Configuration for a role
 type RoleConfig struct {
-	Name    string   `yaml:"name"`    // Name of the role
-	Members []string `yaml:"members"` // Statically assigned members of the role
+	Id        uint     `yaml:"id"`        // Id of the role
+	Name      string   `yaml:"name"`      // Name of the role
+	Members   []string `yaml:"members"`   // Statically assigned members of the role
+	ClaimName string   `yaml:"claimName"` // Name of the claim in the JWT
 }
 
 type RateLimitConfig struct {
@@ -102,14 +104,14 @@ func NewAPIConfig() *APIConfig {
 			{Description: "Vollzeit", DurationYears: 2}, {Description: "Teilzeit", DurationYears: 3},
 		},
 		Roles: []RoleConfig{
-			{Name: "Kursadministrator", Members: []string{}},
-			{Name: "Fachbereichsleiter", Members: []string{}},
-			{Name: "Dozent", Members: []string{}},
-			{Name: "Student", Members: []string{}},
+			{Id: 1, Name: "Kursadministrator", Members: []string{}, ClaimName: "Kursadministrator"},
+			{Id: 2, Name: "Fachbereichsleiter", Members: []string{}, ClaimName: "Fachbereichsleiter"},
+			{Id: 3, Name: "Dozent", Members: []string{}, ClaimName: "Dozent"},
+			{Id: 4, Name: "Student", Members: []string{}, ClaimName: "Student"},
 		},
 		MockData: false,
 		Cors: CorsConfig{
-			AllowedOrigins: []string{"https://localhost:9000", "api.smashgrade.ch"},
+			AllowedOrigins: []string{"https://localhost:9000", "https://api.smashgrade.ch"},
 			AllowedHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization},
 		},
 		MaxBodySize: "2M",
