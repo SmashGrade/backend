@@ -18,6 +18,13 @@ import (
 // Version of the API
 const VERSION string = "0.6.0"
 
+const (
+	ROLE_COURSEADMIN  = 1
+	ROLE_FIELDMANAGER = 2
+	ROLE_TEACHER      = 3
+	ROLE_STUDENT      = 4
+)
+
 // APIConfig is used to define the configuration of the API
 type APIConfig struct {
 	Host                string                     `yaml:"host"`                // Host is the address of the server
@@ -103,10 +110,10 @@ func NewAPIConfig() *APIConfig {
 			{Description: "Vollzeit", DurationYears: 2}, {Description: "Teilzeit", DurationYears: 3},
 		},
 		Roles: []RoleConfig{
-			{Id: 1, Name: "Kursadministrator", ClaimName: "Kursadministrator"},
-			{Id: 2, Name: "Fachbereichsleiter", ClaimName: "Fachbereichsleiter"},
-			{Id: 3, Name: "Dozent", ClaimName: "Dozent"},
-			{Id: 4, Name: "Student", ClaimName: "Student"},
+			{Id: ROLE_COURSEADMIN, Name: "Kursadministrator", ClaimName: "Kursadministrator"},
+			{Id: ROLE_FIELDMANAGER, Name: "Fachbereichsleiter", ClaimName: "Fachbereichsleiter"},
+			{Id: ROLE_TEACHER, Name: "Dozent", ClaimName: "Dozent"},
+			{Id: ROLE_STUDENT, Name: "Student", ClaimName: "Student"},
 		},
 		MockData: false,
 		Cors: CorsConfig{
