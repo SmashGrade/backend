@@ -12,7 +12,7 @@ import (
 func Test_ExamEvaluation_Create(t *testing.T) {
 	repository := NewExamEvaluationRepository(db.NewPrefilledMockProvider())
 
-	examEvaluation_1 := db.ExamEvaluation_1()
+	examEvaluation_1 := db.ExamEvaluation1
 	examEvaluation_1.ID = 0
 
 	_, err := repository.Create(&examEvaluation_1)
@@ -24,7 +24,7 @@ func Test_ExamEvaluation_Update(t *testing.T) {
 	repository := NewExamEvaluationRepository(db.NewPrefilledMockProvider())
 
 	// Update OriginalValue of ExamEvaluation
-	examEvaluation := db.ExamEvaluation_1()
+	examEvaluation := db.ExamEvaluation1
 	examEvaluation.OriginalValue = "edited description ExamEvaluation 1"
 	err := repository.Update(&examEvaluation)
 
@@ -40,11 +40,11 @@ func Test_ExamEvaluation_Find(t *testing.T) {
 	repository := NewExamEvaluationRepository(db.NewPrefilledMockProvider())
 
 	// Find ExamEvaluation
-	result2, err := repository.Find(db.ExamEvaluation_1())
+	result2, err := repository.Find(db.ExamEvaluation1)
 	examEvaluations := result2.([]models.ExamEvaluation)
 
 	require.NoError(t, err)
-	require.Nil(t, deep.Equal(db.ExamEvaluation_1().ID, examEvaluations[0].ID))
+	require.Nil(t, deep.Equal(db.ExamEvaluation1.ID, examEvaluations[0].ID))
 }
 
 func Test_ExamEvaluation_GetAll(t *testing.T) {
@@ -55,19 +55,19 @@ func Test_ExamEvaluation_GetAll(t *testing.T) {
 	examEvaluations := result.([]models.ExamEvaluation)
 
 	require.NoError(t, err)
-	require.Nil(t, deep.Equal(db.ExamEvaluation_1().ID, examEvaluations[0].ID))
-	require.Nil(t, deep.Equal(db.ExamEvaluation_2().ID, examEvaluations[1].ID))
+	require.Nil(t, deep.Equal(db.ExamEvaluation1.ID, examEvaluations[0].ID))
+	require.Nil(t, deep.Equal(db.ExamEvaluation2.ID, examEvaluations[1].ID))
 }
 
 func Test_ExamEvaluation_GetID(t *testing.T) {
 	repository := NewExamEvaluationRepository(db.NewPrefilledMockProvider())
 
 	// Get by ID
-	result, err := repository.GetId(db.ExamEvaluation_1().ID)
+	result, err := repository.GetId(db.ExamEvaluation1.ID)
 	examEvaluation := result.(*models.ExamEvaluation)
 
 	require.NoError(t, err)
-	require.Nil(t, deep.Equal(examEvaluation.OriginalValue, db.ExamEvaluation_1().OriginalValue))
+	require.Nil(t, deep.Equal(examEvaluation.OriginalValue, db.ExamEvaluation1.OriginalValue))
 }
 
 func Test_ExamEvaluation_DeleteId(t *testing.T) {
@@ -78,7 +78,7 @@ func Test_ExamEvaluation_DeleteId(t *testing.T) {
 	afterCreateLength := len(result.([]models.ExamEvaluation))
 
 	// Delete examEvaluation
-	err := repository.DeleteId(db.ExamEvaluation_1().ID)
+	err := repository.DeleteId(db.ExamEvaluation1.ID)
 
 	result2, _ := repository.GetAll()
 	afterDeleteLength := len(result2.([]models.ExamEvaluation))

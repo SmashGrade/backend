@@ -15,7 +15,7 @@ func Test_Course_Create(t *testing.T) {
 
 	var err error
 
-	course_1 := db.Course_1()
+	course_1 := db.Course1
 	course_1.ID, err = repository.GetNextId()
 	require.NoError(t, err)
 
@@ -28,7 +28,7 @@ func Test_Course_Update(t *testing.T) {
 	repository := NewCourseRepository(db.NewPrefilledMockProvider())
 
 	// Update Description of Field
-	course := db.Course_1()
+	course := db.Course1
 	course.Description = "edited Course 1"
 	err := repository.Update(&course)
 
@@ -44,11 +44,11 @@ func Test_Course_Find(t *testing.T) {
 	repository := NewCourseRepository(db.NewPrefilledMockProvider())
 
 	// Find Field
-	result2, err := repository.Find(db.Course_1())
+	result2, err := repository.Find(db.Course1)
 	courses := result2.([]models.Course)
 
 	require.NoError(t, err)
-	require.Nil(t, deep.Equal(db.Course_1().ID, courses[0].ID))
+	require.Nil(t, deep.Equal(db.Course1.ID, courses[0].ID))
 }
 
 func Test_Course_GetAll(t *testing.T) {
@@ -59,19 +59,19 @@ func Test_Course_GetAll(t *testing.T) {
 	courses := result.([]models.Course)
 
 	require.NoError(t, err)
-	require.Nil(t, deep.Equal(db.Course_1().ID, courses[0].ID))
-	require.Nil(t, deep.Equal(db.Course_2_1().ID, courses[1].ID))
+	require.Nil(t, deep.Equal(db.Course1.ID, courses[0].ID))
+	require.Nil(t, deep.Equal(db.Course2.ID, courses[1].ID))
 }
 
 func Test_Course_GetVersioned(t *testing.T) {
 	repository := NewCourseRepository(db.NewPrefilledMockProvider())
 
 	// Get by ID
-	result, err := repository.GetVersioned(db.Course_1().ID, db.Course_1().Version)
+	result, err := repository.GetVersioned(db.Course1.ID, db.Course1.Version)
 	course := result.(*models.Course)
 
 	require.NoError(t, err)
-	require.Nil(t, deep.Equal(course.Description, db.Course_1().Description))
+	require.Nil(t, deep.Equal(course.Description, db.Course1.Description))
 }
 
 func Test_Course_DeleteVersioned(t *testing.T) {
@@ -82,7 +82,7 @@ func Test_Course_DeleteVersioned(t *testing.T) {
 	afterCreateLength := len(result.([]models.Course))
 
 	// Delete field
-	err := repository.DeleteVersioned(db.Course_1().ID, db.Course_1().Version)
+	err := repository.DeleteVersioned(db.Course1.ID, db.Course1.Version)
 
 	result2, _ := repository.GetAll()
 	afterDeleteLength := len(result2.([]models.Course))
@@ -95,9 +95,9 @@ func Test_Course_GetLatestVersioned(t *testing.T) {
 	repository := NewCourseRepository(db.NewPrefilledMockProvider())
 
 	// Get latest Version
-	result, err := repository.GetLatestVersioned(db.Course_2_1().ID)
+	result, err := repository.GetLatestVersioned(db.Course2.ID)
 	course := result.(*models.Course)
 
 	require.NoError(t, err)
-	require.Nil(t, deep.Equal(course.Version, db.Course_2_2().Version))
+	require.Nil(t, deep.Equal(course.Version, db.Course3.Version))
 }

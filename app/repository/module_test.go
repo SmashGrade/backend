@@ -13,7 +13,7 @@ func Test_Module_Create(t *testing.T) {
 	repository := NewModuleRepository(db.NewPrefilledMockProvider())
 
 	var err error
-	module_1 := db.Module_1()
+	module_1 := db.Module1
 	module_1.ID, err = repository.GetNextId()
 	require.NoError(t, err)
 
@@ -26,7 +26,7 @@ func Test_Module_Update(t *testing.T) {
 	repository := NewModuleRepository(db.NewPrefilledMockProvider())
 
 	// Update Description of Field
-	module := db.Module_1()
+	module := db.Module1
 	module.Description = "edited Module 1"
 	err := repository.Update(&module)
 
@@ -42,11 +42,11 @@ func Test_Module_Find(t *testing.T) {
 	repository := NewModuleRepository(db.NewPrefilledMockProvider())
 
 	// Find Field
-	result2, err := repository.Find(db.Module_1())
+	result2, err := repository.Find(db.Module1)
 	modules := result2.([]models.Module)
 
 	require.NoError(t, err)
-	require.Nil(t, deep.Equal(db.Module_1().ID, modules[0].ID))
+	require.Nil(t, deep.Equal(db.Module1.ID, modules[0].ID))
 }
 
 func Test_Module_GetAll(t *testing.T) {
@@ -57,19 +57,19 @@ func Test_Module_GetAll(t *testing.T) {
 	modules := result.([]models.Module)
 
 	require.NoError(t, err)
-	require.Nil(t, deep.Equal(db.Module_1().ID, modules[0].ID))
-	require.Nil(t, deep.Equal(db.Module_2_1().ID, modules[1].ID))
+	require.Nil(t, deep.Equal(db.Module1.ID, modules[0].ID))
+	require.Nil(t, deep.Equal(db.Module2.ID, modules[1].ID))
 }
 
 func Test_Module_GetVersioned(t *testing.T) {
 	repository := NewModuleRepository(db.NewPrefilledMockProvider())
 
 	// Get by ID
-	result, err := repository.GetVersioned(db.Module_1().ID, db.Module_1().Version)
+	result, err := repository.GetVersioned(db.Module1.ID, db.Module1.Version)
 	module := result.(*models.Module)
 
 	require.NoError(t, err)
-	require.Nil(t, deep.Equal(module.Description, db.Module_1().Description))
+	require.Nil(t, deep.Equal(module.Description, db.Module1.Description))
 }
 
 func Test_Module_DeleteVersioned(t *testing.T) {
@@ -80,7 +80,7 @@ func Test_Module_DeleteVersioned(t *testing.T) {
 	afterCreateLength := len(result.([]models.Module))
 
 	// Delete field
-	err := repository.DeleteVersioned(db.Module_1().ID, db.Module_1().Version)
+	err := repository.DeleteVersioned(db.Module1.ID, db.Module1.Version)
 
 	result2, _ := repository.GetAll()
 	afterDeleteLength := len(result2.([]models.Module))
@@ -93,11 +93,11 @@ func Test_Module_GetLatestVersioned(t *testing.T) {
 	repository := NewModuleRepository(db.NewPrefilledMockProvider())
 
 	// Get latest Version
-	result, err := repository.GetLatestVersioned(db.Module_2_1().ID)
+	result, err := repository.GetLatestVersioned(db.Module2.ID)
 	module := result.(*models.Module)
 
 	require.NoError(t, err)
-	require.Nil(t, deep.Equal(module.Version, db.Module_2_2().Version))
+	require.Nil(t, deep.Equal(module.Version, db.Module2.Version))
 }
 
 // check if the version is correctly incremented and tracked

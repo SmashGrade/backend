@@ -12,7 +12,7 @@ import (
 func Test_Focus_Create(t *testing.T) {
 	repository := NewFocusRepository(db.NewPrefilledMockProvider())
 
-	focus_1 := db.Focus_1()
+	focus_1 := db.Focus1
 	focus_1.ID = 0
 
 	_, err := repository.Create(&focus_1)
@@ -24,7 +24,7 @@ func Test_Focus_Update(t *testing.T) {
 	repository := NewFocusRepository(db.NewPrefilledMockProvider())
 
 	// Update Description of Focus
-	focus := db.Focus_1()
+	focus := db.Focus1
 	focus.Description = "edited description Focus 1"
 	err := repository.Update(&focus)
 
@@ -40,11 +40,11 @@ func Test_Focus_Find(t *testing.T) {
 	repository := NewFocusRepository(db.NewPrefilledMockProvider())
 
 	// Find Focus
-	result2, err := repository.Find(db.Focus_1())
+	result2, err := repository.Find(db.Focus1)
 	focuses := result2.([]models.Focus)
 
 	require.NoError(t, err)
-	require.Nil(t, deep.Equal(db.Focus_1().ID, focuses[0].ID))
+	require.Nil(t, deep.Equal(db.Focus1.ID, focuses[0].ID))
 }
 
 func Test_Focus_GetAll(t *testing.T) {
@@ -55,19 +55,19 @@ func Test_Focus_GetAll(t *testing.T) {
 	focuses := result.([]models.Focus)
 
 	require.NoError(t, err)
-	require.Nil(t, deep.Equal(db.Focus_1().ID, focuses[0].ID))
-	require.Nil(t, deep.Equal(db.Focus_2().ID, focuses[1].ID))
+	require.Nil(t, deep.Equal(db.Focus1.ID, focuses[0].ID))
+	require.Nil(t, deep.Equal(db.Focus2.ID, focuses[1].ID))
 }
 
 func Test_Focus_GetID(t *testing.T) {
 	repository := NewFocusRepository(db.NewPrefilledMockProvider())
 
 	// Get by ID
-	result, err := repository.GetId(db.Focus_1().ID)
+	result, err := repository.GetId(db.Focus1.ID)
 	focus := result.(*models.Focus)
 
 	require.NoError(t, err)
-	require.Nil(t, deep.Equal(focus.Description, db.Focus_1().Description))
+	require.Nil(t, deep.Equal(focus.Description, db.Focus1.Description))
 }
 
 func Test_Focus_DeleteId(t *testing.T) {
@@ -78,7 +78,7 @@ func Test_Focus_DeleteId(t *testing.T) {
 	afterCreateLength := len(result.([]models.Focus))
 
 	// Delete focus
-	err := repository.DeleteId(db.Focus_1().ID)
+	err := repository.DeleteId(db.Focus1.ID)
 
 	result2, _ := repository.GetAll()
 	afterDeleteLength := len(result2.([]models.Focus))
