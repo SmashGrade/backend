@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/SmashGrade/backend/app/config"
 	e "github.com/SmashGrade/backend/app/error"
 	"github.com/SmashGrade/backend/app/models"
 	"github.com/SmashGrade/backend/app/repository"
@@ -793,21 +794,39 @@ func (u *UserDao) Get(uid uint) (entity *models.User, err *e.ApiError) {
 	return getOrError[models.User](u.repo, uid)
 }
 
+// generic by role filter used in other functions
+func (c *UserDao) GetByRole(roleId uint) (entities []models.User, err *e.ApiError) {
+	roleEnt, internalError := c.roleRepo.GetId(roleId)
+	if internalError != nil {
+		return nil, e.NewDaoDbError()
+	}
+
+	role := roleEnt.(models.Role)
+	users := make([]models.User, 0)
+	for i := range role.Users {
+		users = append(users, *role.Users[i])
+	}
+	return users, nil
+}
+
 // Returns all Teachers as User types as slice
 func (c *UserDao) GetTeachers() (entities []models.User, err *e.ApiError) {
-	users, err := getAllOrError[models.User](c.repo)
+	return c.GetByRole(config.ROLE_TEACHER)
+}
 
-	// Filter through all the Roles of the User
-	// Append Users with the Role Dozent to the filtered list
-	filtered := make([]models.User, 0)
-	for _, user := range users {
-		for _, role := range user.Roles {
-			if role.Description == "Dozent" {
-				filtered = append(filtered, user)
-			}
-		}
-	}
-	return filtered, err
+// Returns all Students as User types as slice
+func (c *UserDao) GetStudents() (entities []models.User, err *e.ApiError) {
+	return c.GetByRole(config.ROLE_STUDENT)
+}
+
+// Returns all CourseAdmins as User types as slice
+func (c *UserDao) GetCourseAdmins() (entities []models.User, err *e.ApiError) {
+	return c.GetByRole(config.ROLE_COURSEADMIN)
+}
+
+// Returns all FieldManagers as User types as slice
+func (c *UserDao) GetFieldManagers() (entities []models.User, err *e.ApiError) {
+	return c.GetByRole(config.ROLE_FIELDMANAGER)
 }
 
 // Create default values for roles
