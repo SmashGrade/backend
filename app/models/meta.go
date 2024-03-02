@@ -10,4 +10,5 @@ type MetaModules struct {
 	Evaluationtypes []Evaluationtype `json:"evaluationtype"`
 	Curriculums     []Curriculum     `json:"curriculums"`
 	Curriculumstype []Curriculumtype `json:"curriculumstype"`
+	Courses         []Course         `json:"courses"`
 }
