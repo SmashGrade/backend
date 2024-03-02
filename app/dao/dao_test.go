@@ -527,3 +527,35 @@ func TestCourseExamLink(t *testing.T) {
 	require.True(t, len(retCourseCheck.Exams) == 1)
 	require.Equal(t, testExamSecondary.Description, retCourseCheck.Exams[0].Description) // TODO: refactor this fragile test
 }
+
+// check if roles get created and a duplicated creation is prevented
+func TestCreateDefaultRoles(t *testing.T) {
+	provider := db.NewMockProvider()
+	userDao := NewUserDao(repository.NewUserRepository(provider), repository.NewRoleRepository(provider))
+
+	expectedNumberOfRoles := len(provider.Config().Roles)
+
+	err := userDao.CreateDefaults()
+	require.Nil(t, err)
+
+	// quick check do we have the same number of roles
+	roleEnts, internalErr := userDao.roleRepo.GetAll()
+	require.Nil(t, internalErr)
+	require.Len(t, roleEnts, expectedNumberOfRoles)
+
+	err = userDao.CreateDefaults()
+	require.Nil(t, err)
+
+	// quick check again do we have the same number of roles
+	roleEnts, internalErr = userDao.roleRepo.GetAll()
+	require.Nil(t, internalErr)
+	require.Len(t, roleEnts, expectedNumberOfRoles)
+
+	// now check in detail if the roles match
+	for _, expectedRole := range provider.Config().Roles {
+		roleEnt, internalErr := userDao.roleRepo.GetId(expectedRole.Id)
+		require.Nil(t, internalErr)
+		role := roleEnt.(*models.Role)
+		require.Equal(t, expectedRole.ClaimName, role.Claim)
+	}
+}
