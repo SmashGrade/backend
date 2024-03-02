@@ -72,6 +72,13 @@ func NewDaoUnimplementedError() *ApiError {
 	}
 }
 
+func NewApiUnimplementedError() *ApiError {
+	return &ApiError{
+		Status: 501,
+		Msg:    "This api function is not yet implemented",
+	}
+}
+
 func NewDaoDbError() *ApiError {
 	return &ApiError{
 		Status: 500,

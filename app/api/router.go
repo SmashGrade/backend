@@ -19,6 +19,7 @@ type Router struct {
 	output     *OutputController
 	user       *UserController
 	exam       *ExamController
+	meta       *MetaController
 }
 
 // NewRouter creates a new router
@@ -33,6 +34,7 @@ func NewRouter(e *echo.Echo, p db.Provider) *Router {
 		output:     NewOutputController(p),
 		user:       NewUserController(p),
 		exam:       NewExamController(p),
+		meta:       NewMetaController(p),
 	}
 }
 
@@ -53,5 +55,5 @@ func (r *Router) RegisterV1() {
 	RegisterV1Output(v1, r.output)
 	RegisterV1User(v1, r.user)
 	RegisterV1Exams(v1, r.exam)
-	RegisterV1MetaCourse(v1, r)
+	RegisterV1MetaCourse(v1, r.meta)
 }

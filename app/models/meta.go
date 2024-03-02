@@ -18,6 +18,14 @@ type MetaModules struct {
 type MetaCurriculums struct {
 	Focuses         []Focus          `json:"focuses"`
 	Fields          []Field          `json:"fields"`
-	Curriculumstype []Curriculumtype `json:"curriculumtypes"`
-	Users           []User           `json:"users"`
+	Curriculumtypes []Curriculumtype `json:"curriculumtypes"`
+	Teachers        []User           `json:"teachers"`
+}
+
+// list of courses teached by current user with modules and study stage, list of all users
+type TeacherCourses struct {
+}
+
+// chosen curriculum with start year and curriculum type
+type StudentCurriculums struct {
 }
