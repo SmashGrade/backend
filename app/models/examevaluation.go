@@ -16,5 +16,7 @@ type ExamEvaluation struct {
 	ExamID                       uint           `gorm:"primarykey" json:"examID"`
 	Exam                         Exam           `json:"exam"`
 	OriginalValue                string         `json:"originalValue"`
+	OrignialGradeTypeID          uint           `json:"orignialGradeTypeID"`
+	OrignialGradeTyp             Gradetype      `gorm:"foreignkey:OrignialGradeTypeID;"`
 	EntryDate                    time.Time      `json:"entryDate"`
 }
