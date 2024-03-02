@@ -68,5 +68,4 @@ func main() {
 	// Start the server
 	// Any returned error is fatal
 	server.Logger.Fatal(server.Start(config.ServerAddress()))
-
 }
