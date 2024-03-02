@@ -68,13 +68,22 @@ func prefillMockDB(p Provider) {
 }
 
 var Role1 = models.Role{
+	Basemodel: models.Basemodel{
+		ID: 1,
+	},
 	Description: "Student",
 }
 var Role2 = models.Role{
+	Basemodel: models.Basemodel{
+		ID: 2,
+	},
 	Description: "Dozent",
 }
 
 var User1 = models.User{
+	Basemodel: models.Basemodel{
+		ID: 1,
+	},
 	Name:  "Kurt Munter",
 	Email: "kurt.munter@hftm.ch",
 	Roles: []*models.Role{
@@ -82,6 +91,9 @@ var User1 = models.User{
 	},
 }
 var User2 = models.User{
+	Basemodel: models.Basemodel{
+		ID: 2,
+	},
 	Name:           "Jakob Ferber",
 	Email:          "jakob.ferber@hftm.ch",
 	ClassStartyear: time.Date(2021, time.April, 1, 12, 0, 0, 0, time.UTC),
@@ -90,6 +102,9 @@ var User2 = models.User{
 	},
 }
 var User3 = models.User{
+	Basemodel: models.Basemodel{
+		ID: 3,
+	},
 	Name:           "Rafael Stauffer",
 	Email:          "rafael.stauffer@hftm.ch",
 	ClassStartyear: time.Date(2021, time.April, 1, 12, 0, 0, 0, time.UTC),
@@ -98,6 +113,9 @@ var User3 = models.User{
 	},
 }
 var User4 = models.User{
+	Basemodel: models.Basemodel{
+		ID: 4,
+	},
 	Name:  "Bruno Borer",
 	Email: "bruno.borer@hftm.ch",
 	Roles: []*models.Role{
@@ -105,6 +123,9 @@ var User4 = models.User{
 	},
 }
 var User5 = models.User{
+	Basemodel: models.Basemodel{
+		ID: 5,
+	},
 	Name:  "Simeon Liniger",
 	Email: "simeon.liniger@hftm.ch",
 	Roles: []*models.Role{
@@ -113,12 +134,18 @@ var User5 = models.User{
 }
 
 var Field1 = models.Field{
+	Basemodel: models.Basemodel{
+		ID: 1,
+	},
 	Description: "Informatik",
 	Users: []*models.User{
 		&User1,
 	},
 }
 var Field2 = models.Field{
+	Basemodel: models.Basemodel{
+		ID: 2,
+	},
 	Description: "Elektrotechnik",
 	Users: []*models.User{
 		&User4,
@@ -126,30 +153,51 @@ var Field2 = models.Field{
 }
 
 var CurriculumTyp1 = models.Curriculumtype{
+	Basemodel: models.Basemodel{
+		ID: 1,
+	},
 	Description:   "Fix",
 	DurationYears: 2,
 }
 var CurriculumTyp2 = models.Curriculumtype{
+	Basemodel: models.Basemodel{
+		ID: 2,
+	},
 	Description:   "Vollzeit",
 	DurationYears: 2,
 }
 var CurriculumTyp3 = models.Curriculumtype{
+	Basemodel: models.Basemodel{
+		ID: 3,
+	},
 	Description:   "Berufsbegleitend",
 	DurationYears: 3,
 }
 
 var State1 = models.State{
+	Basemodel: models.Basemodel{
+		ID: 1,
+	},
 	Description: "Aktiv",
 }
 var State2 = models.State{
+	Basemodel: models.Basemodel{
+		ID: 2,
+	},
 	Description: "Inaktiv",
 }
 
 var Focus1 = models.Focus{
+	Basemodel: models.Basemodel{
+		ID: 1,
+	},
 	Description: "Softwareentwicklung",
 	Field:       Field1,
 }
 var Focus2 = models.Focus{
+	Basemodel: models.Basemodel{
+		ID: 2,
+	},
 	Description: "Wirtschaftsinformatik",
 	Field:       Field1,
 }
@@ -178,18 +226,30 @@ var Curriculum2 = models.Curriculum{
 }
 
 var EvaluationType1 = models.Evaluationtype{ // TODO: was sind evaluationtypes
+	Basemodel: models.Basemodel{
+		ID: 1,
+	},
 	Description: "F",
 	Code:        "F",
 }
 var EvaluationType2 = models.Evaluationtype{
+	Basemodel: models.Basemodel{
+		ID: 2,
+	},
 	Description: "D",
 	Code:        "D",
 }
 
 var StudyStage1 = models.StudyStage{
+	Basemodel: models.Basemodel{
+		ID: 1,
+	},
 	Description: "Grundstudium",
 }
 var StudyStage2 = models.StudyStage{
+	Basemodel: models.Basemodel{
+		ID: 2,
+	},
 	Description: "Fachstudium",
 }
 
@@ -283,19 +343,31 @@ var SelectedCourse2 = models.SelectedCourse{
 }
 
 var Examtype1 = models.Examtype{
+	Basemodel: models.Basemodel{
+		ID: 1,
+	},
 	Description: "Schriftlich",
 }
 var Examtype2 = models.Examtype{
+	Basemodel: models.Basemodel{
+		ID: 2,
+	},
 	Description: "Mündlich",
 }
 
 var Exam1 = models.Exam{
+	Basemodel: models.Basemodel{
+		ID: 1,
+	},
 	Description: "Erste Prüfung",
 	Weighting:   2,
 	Examtype:    Examtype1,
 	Course:      Course3,
 }
 var Exam2 = models.Exam{
+	Basemodel: models.Basemodel{
+		ID: 2,
+	},
 	Description: "Präsentation",
 	Weighting:   1,
 	Examtype:    Examtype2,
@@ -303,13 +375,22 @@ var Exam2 = models.Exam{
 }
 
 var GradeType1 = models.Gradetype{
+	Basemodel: models.Basemodel{
+		ID: 1,
+	},
 	Description: "CH-Noten",
 }
 var GradeType2 = models.Gradetype{
+	Basemodel: models.Basemodel{
+		ID: 2,
+	},
 	Description: "Prozent",
 }
 
 var ExamEvaluation1 = models.ExamEvaluation{
+	Basemodel: models.Basemodel{
+		ID: 1,
+	},
 	RegisteredBy:     User5,
 	SelectedCourse:   SelectedCourse1,
 	Exam:             Exam1,
@@ -318,6 +399,9 @@ var ExamEvaluation1 = models.ExamEvaluation{
 	EntryDate:        time.Date(2023, time.September, 1, 12, 0, 0, 0, time.UTC),
 }
 var ExamEvaluation2 = models.ExamEvaluation{
+	Basemodel: models.Basemodel{
+		ID: 2,
+	},
 	RegisteredBy:     User5,
 	SelectedCourse:   SelectedCourse2,
 	Exam:             Exam1,
@@ -326,6 +410,9 @@ var ExamEvaluation2 = models.ExamEvaluation{
 	EntryDate:        time.Date(2023, time.September, 1, 12, 0, 0, 0, time.UTC),
 }
 var ExamEvaluation3 = models.ExamEvaluation{
+	Basemodel: models.Basemodel{
+		ID: 3,
+	},
 	RegisteredBy:   User5,
 	SelectedCourse: SelectedCourse2,
 	Exam:           Exam2,
