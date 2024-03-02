@@ -852,6 +852,7 @@ func (c *UserDao) CreateDefaults() *e.ApiError {
 
 		newRole := &models.Role{
 			Description: v.Name,
+			Claim:       v.ClaimName,
 		}
 		newRole.ID = v.Id
 
