@@ -16,7 +16,7 @@ import (
 )
 
 // Version of the API
-const VERSION string = "0.5.1"
+const VERSION string = "0.6.0"
 
 // APIConfig is used to define the configuration of the API
 type APIConfig struct {
