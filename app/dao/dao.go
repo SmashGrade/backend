@@ -843,6 +843,19 @@ func (c *UserDao) CreateDefaults() *e.ApiError {
 		for _, existing := range existingRoles {
 			if v.Id == existing.ID {
 				existingFound = true
+
+				// update description and claim of existing role
+				updatedRole := &models.Role{
+					Description: v.Name,
+					Claim:       v.ClaimName,
+					Users:       existing.Users,
+				}
+				updatedRole.ID = existing.ID
+				err = c.roleRepo.Update(updatedRole)
+				if err != nil {
+					return e.NewDaoDbError()
+				}
+
 				break
 			}
 		}
@@ -850,6 +863,7 @@ func (c *UserDao) CreateDefaults() *e.ApiError {
 			continue
 		}
 
+		// create new entry
 		newRole := &models.Role{
 			Description: v.Name,
 			Claim:       v.ClaimName,
