@@ -910,6 +910,26 @@ func (c *UserDao) Update(entity models.User) *e.ApiError {
 	return nil
 }
 
+// This function is used to update or create a user in the database based on the given user object
+// if a user with the supplied email exists: update data in db, return with id and references filled
+// if no user with email found: create new and return with id and references filled
+func (u *UserDao) CreateOrUpdateByEmail(entity models.User) (returnEntity *models.User, err *e.ApiError) {
+	existingUser, err := u.GetByEmail(entity.Email)
+	if err != nil { // TODO: close error inspection with errors.Is needed
+		// user does not exist, create new return obj
+		return u.Create(entity)
+	} else {
+		// user exists, update in db return updated version
+		entity.ID = existingUser.ID
+		err = u.Update(entity)
+		if err != nil {
+			return
+		}
+
+		return u.Get(entity.ID)
+	}
+}
+
 // returns first match for an email
 func (u *UserDao) GetByEmail(email string) (entity *models.User, err *e.ApiError) {
 	entities, internalError := u.repo.Find(&models.User{Email: email})

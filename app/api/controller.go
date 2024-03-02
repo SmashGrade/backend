@@ -112,7 +112,7 @@ func (c *BaseController) GetUser(ctx echo.Context) (*models.User, *e.ApiError) {
 	}
 
 	// Ensure that the database contains the user and that the user is updated based on the claims
-	crudErr := c.CreateUpdateUser(userEntity)
+	userEntity, crudErr := c.UserDao.CreateOrUpdateByEmail(*userEntity)
 	if crudErr != nil {
 		ctx.Logger().Error("Error creating or updating user in database. Request denied.")
 		return nil, e.NewUnauthorizedError()
@@ -120,36 +120,4 @@ func (c *BaseController) GetUser(ctx echo.Context) (*models.User, *e.ApiError) {
 
 	// Return the user
 	return userEntity, nil
-}
-
-// This function is used to update or create a user in the database based on the given user object
-// If the user already exists, it will be updated
-// If the user does not exist, it will be created
-// Returns an error if the user could not be updated or created
-func (c *BaseController) CreateUpdateUser(user *models.User) *e.ApiError {
-	// Retrieve the current user from the database if it exists
-	currentUser, _ := c.UserDao.GetByEmail(user.Email)
-	// Check if we have a user and update it
-	if currentUser != nil {
-		// Set the ID of the user to the ID of the current user
-		user.ID = currentUser.ID
-		// Update the user in the database
-		err := c.UserDao.Update(*user)
-		if err != nil {
-			return e.NewDaoDbError()
-		}
-	} else {
-		// Add fields with empty slices to the user
-		// If we do not do this, we will get a null pointer exception when trying to create the user in the database
-		// TODO: Fix the error: reflect: call of reflect.Value.Field on zero Value
-		user.Fields = make([]*models.Field, 0)
-		user.TeachesCourses = make([]*models.Course, 0)
-		user.SelectedCourses = make([]models.SelectedCourse, 0)
-		// Create the user in the database
-		_, err := c.UserDao.Create(*user)
-		if err != nil {
-			return e.NewDaoDbError()
-		}
-	}
-	return nil
 }

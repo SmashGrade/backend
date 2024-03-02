@@ -559,3 +559,56 @@ func TestCreateDefaultRoles(t *testing.T) {
 		require.Equal(t, expectedRole.ClaimName, role.Claim)
 	}
 }
+
+// check if a user can created and updated
+func TestCreateUpdateUser(t *testing.T) {
+	provider := db.NewMockProvider()
+	userDao := NewUserDao(repository.NewUserRepository(provider), repository.NewRoleRepository(provider))
+
+	testUser := models.User{
+		Name: "Test",
+	}
+
+	ret, err := userDao.Create(testUser)
+	require.Nil(t, err)
+	require.Equal(t, testUser.Name, ret.Name)
+
+	testUserUpdate := models.User{
+		Name: "TestAgain",
+	}
+	testUserUpdate.ID = ret.ID
+
+	err = userDao.Update(testUserUpdate)
+	require.Nil(t, err)
+
+	retUpdated, err := userDao.Get(ret.ID)
+	require.Nil(t, err)
+	require.Equal(t, testUserUpdate.Name, retUpdated.Name)
+
+}
+
+// check if create and update user by email works
+func TestCreateUpdateUserByEmail(t *testing.T) {
+	provider := db.NewMockProvider()
+	userDao := NewUserDao(repository.NewUserRepository(provider), repository.NewRoleRepository(provider))
+
+	testUser := models.User{
+		Name:  "Test",
+		Email: "stafi@hftm.ch",
+	}
+
+	retCreated, err := userDao.CreateOrUpdateByEmail(testUser)
+	require.Nil(t, err)
+	require.Equal(t, testUser.Email, retCreated.Email)
+	require.Equal(t, testUser.Name, retCreated.Name)
+
+	testUserUpdate := models.User{
+		Name:  "Woopsiedoopsie",
+		Email: "stafi@hftm.ch",
+	}
+
+	retUpdated, err := userDao.CreateOrUpdateByEmail(testUserUpdate)
+	require.Nil(t, err)
+	require.Equal(t, testUserUpdate.Email, retUpdated.Email)
+	require.Equal(t, testUserUpdate.Name, retUpdated.Name)
+}
