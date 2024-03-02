@@ -1,6 +1,7 @@
 package api
 
 import (
+	"github.com/SmashGrade/backend/app/config"
 	"github.com/SmashGrade/backend/app/dao"
 	"github.com/SmashGrade/backend/app/db"
 	e "github.com/SmashGrade/backend/app/error"
@@ -195,6 +196,15 @@ func (m *MetaController) MyCoursesAsTeacher(ctx echo.Context) error {
 	// returns: list of courses teached by current user with modules and study stage, list of all users
 	// TODO: check if user is teacher
 
+	user, err := m.GetUser(ctx)
+	if err != nil {
+		return err
+	}
+
+	if !user.HasRole(config.ROLE_TEACHER) {
+		return e.NewClaimMissingError(config.NewAPIConfig().Roles[config.ROLE_TEACHER].ClaimName)
+	}
+
 	return e.NewApiUnimplementedError()
 }
 
@@ -212,6 +222,8 @@ func (m *MetaController) MyCurriculumsAsStudent(ctx echo.Context) error {
 	// View of the student, general info
 	// returns: chosen curriculum with start year and curriculum type
 	// TODO: check if user is student
+
+	//user, err := m.GetUser(ctx)
 
 	return e.NewApiUnimplementedError()
 }
