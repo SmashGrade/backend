@@ -18,7 +18,7 @@ func TestMagicSmoke(t *testing.T) {
 
 	repo := repository.NewCourseRepository(provider)
 
-	dao := NewCourseDao(repo, repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider), repository.NewExamRepository(provider))
+	dao := NewCourseDao(repo, repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider), repository.NewExamRepository(provider), repository.NewRoleRepository(provider))
 
 	courseEnt := requestmodels.RefCourse{Description: "Lol"}
 
@@ -36,7 +36,7 @@ func TestGetAll(t *testing.T) {
 
 	repo := repository.NewCourseRepository(provider)
 
-	dao := NewCourseDao(repo, repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider), repository.NewExamRepository(provider))
+	dao := NewCourseDao(repo, repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider), repository.NewExamRepository(provider), repository.NewRoleRepository(provider))
 
 	courseEnt := requestmodels.RefCourse{Description: "Lol"}
 
@@ -194,7 +194,7 @@ func TestCreateFieldAndFocus(t *testing.T) {
 func TestGetByEmail(t *testing.T) {
 	provider := db.NewPrefilledMockProvider()
 
-	dao := NewUserDao(repository.NewUserRepository(provider))
+	dao := NewUserDao(repository.NewUserRepository(provider), repository.NewRoleRepository(provider))
 
 	r1, err := dao.GetByEmail("rafael.stauffer@hftm.ch")
 	if err != nil {
@@ -216,7 +216,7 @@ func TestCreateCourseVersion(t *testing.T) {
 
 	//provider := db.NewProvider(config.NewAPIConfig())
 
-	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider), repository.NewExamRepository(provider))
+	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider), repository.NewExamRepository(provider), repository.NewRoleRepository(provider))
 
 	testCourse := requestmodels.RefCourse{
 		Description: "testcourse",
@@ -350,7 +350,7 @@ func TestLinkCourseObjectsByKey(t *testing.T) {
 
 	//provider := db.NewProvider(config.NewAPIConfig())
 
-	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider), repository.NewExamRepository(provider))
+	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider), repository.NewExamRepository(provider), repository.NewRoleRepository(provider))
 
 	// create a module and link it indirectly with the course
 	moduleDao := NewModuleDao(repository.NewModuleRepository(provider))
@@ -363,7 +363,7 @@ func TestLinkCourseObjectsByKey(t *testing.T) {
 	require.Nil(t, err)
 
 	// create a user to link as teacher
-	userDao := NewUserDao(repository.NewUserRepository(provider))
+	userDao := NewUserDao(repository.NewUserRepository(provider), repository.NewRoleRepository(provider))
 
 	testUser := models.User{
 		Name: "Rafael Stauffer",
@@ -402,7 +402,7 @@ func TestErrorAtNonexistingLink(t *testing.T) {
 
 	//provider := db.NewProvider(config.NewAPIConfig())
 
-	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider), repository.NewExamRepository(provider))
+	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider), repository.NewExamRepository(provider), repository.NewRoleRepository(provider))
 
 	nonexistantOnlyIDModule := requestmodels.RefVersioned{}
 	nonexistantOnlyIDModule.ID = 234
@@ -426,7 +426,7 @@ func TestErrorAtValidationError(t *testing.T) {
 
 	//provider := db.NewProvider(config.NewAPIConfig())
 
-	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider), repository.NewExamRepository(provider))
+	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider), repository.NewExamRepository(provider), repository.NewRoleRepository(provider))
 
 	testCourse := requestmodels.RefCourse{
 		Description: "testcourse",
@@ -446,7 +446,7 @@ func TestPreventCascadeDelete(t *testing.T) {
 
 	//provider := db.NewProvider(config.NewAPIConfig())
 
-	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider), repository.NewExamRepository(provider))
+	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider), repository.NewExamRepository(provider), repository.NewRoleRepository(provider))
 
 	// create a module and link it indirectly with the course
 	moduleDao := NewModuleDao(repository.NewModuleRepository(provider))
@@ -479,7 +479,7 @@ func TestPreventCascadeDelete(t *testing.T) {
 func TestCourseExamLink(t *testing.T) {
 	provider := db.NewMockProvider()
 
-	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider), repository.NewExamRepository(provider))
+	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider), repository.NewExamRepository(provider), repository.NewRoleRepository(provider))
 
 	examDao := NewExamDao(repository.NewExamRepository(provider), repository.NewCourseRepository(provider))
 
@@ -526,4 +526,36 @@ func TestCourseExamLink(t *testing.T) {
 	t.Logf("len of created course exams is %v", len(retCourseCheck.Exams))
 	require.True(t, len(retCourseCheck.Exams) == 1)
 	require.Equal(t, testExamSecondary.Description, retCourseCheck.Exams[0].Description) // TODO: refactor this fragile test
+}
+
+// check if roles get created and a duplicated creation is prevented
+func TestCreateDefaultRoles(t *testing.T) {
+	provider := db.NewMockProvider()
+	userDao := NewUserDao(repository.NewUserRepository(provider), repository.NewRoleRepository(provider))
+
+	expectedNumberOfRoles := len(provider.Config().Roles)
+
+	err := userDao.CreateDefaults()
+	require.Nil(t, err)
+
+	// quick check do we have the same number of roles
+	roleEnts, internalErr := userDao.roleRepo.GetAll()
+	require.Nil(t, internalErr)
+	require.Len(t, roleEnts, expectedNumberOfRoles)
+
+	err = userDao.CreateDefaults()
+	require.Nil(t, err)
+
+	// quick check again do we have the same number of roles
+	roleEnts, internalErr = userDao.roleRepo.GetAll()
+	require.Nil(t, internalErr)
+	require.Len(t, roleEnts, expectedNumberOfRoles)
+
+	// now check in detail if the roles match
+	for _, expectedRole := range provider.Config().Roles {
+		roleEnt, internalErr := userDao.roleRepo.GetId(expectedRole.Id)
+		require.Nil(t, internalErr)
+		role := roleEnt.(*models.Role)
+		require.Equal(t, expectedRole.ClaimName, role.Claim)
+	}
 }

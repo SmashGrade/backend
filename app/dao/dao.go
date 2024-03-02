@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/SmashGrade/backend/app/config"
 	e "github.com/SmashGrade/backend/app/error"
 	"github.com/SmashGrade/backend/app/models"
 	"github.com/SmashGrade/backend/app/repository"
@@ -563,11 +564,11 @@ type CourseDao struct {
 }
 
 // Create new dao with required repositories
-func NewCourseDao(courseRepository *repository.CourseRepository, moduleRepository *repository.ModuleRepository, userRepository *repository.UserRepository, selectedCourseRepository *repository.SelectedCourseRepository, examRepository *repository.ExamRepository) *CourseDao {
+func NewCourseDao(courseRepository *repository.CourseRepository, moduleRepository *repository.ModuleRepository, userRepository *repository.UserRepository, selectedCourseRepository *repository.SelectedCourseRepository, examRepository *repository.ExamRepository, roleRepository *repository.RoleRepository) *CourseDao {
 	return &CourseDao{
 		repo:              courseRepository,
 		moduleDao:         NewModuleDao(moduleRepository),
-		userDao:           NewUserDao(userRepository),
+		userDao:           NewUserDao(userRepository, roleRepository),
 		selectedCourseDao: NewSelectedCourseDao(selectedCourseRepository),
 		examDao:           NewExamDao(examRepository, courseRepository),
 	}
@@ -777,13 +778,15 @@ func (ex *ExamDao) Delete(id uint) *e.ApiError {
 }
 
 type UserDao struct {
-	repo *repository.UserRepository
+	repo     *repository.UserRepository
+	roleRepo *repository.RoleRepository
 }
 
 // Creates new dao from required repositories
-func NewUserDao(userRepository *repository.UserRepository) *UserDao {
+func NewUserDao(userRepository *repository.UserRepository, roleRepository *repository.RoleRepository) *UserDao {
 	return &UserDao{
-		repo: userRepository,
+		repo:     userRepository,
+		roleRepo: roleRepository,
 	}
 }
 
@@ -791,21 +794,75 @@ func (u *UserDao) Get(uid uint) (entity *models.User, err *e.ApiError) {
 	return getOrError[models.User](u.repo, uid)
 }
 
+// generic by role filter used in other functions
+func (c *UserDao) GetByRole(roleId uint) (entities []models.User, err *e.ApiError) {
+	roleEnt, internalError := c.roleRepo.GetId(roleId)
+	if internalError != nil {
+		return nil, e.NewDaoDbError()
+	}
+
+	role := roleEnt.(models.Role)
+	users := make([]models.User, 0)
+	for i := range role.Users {
+		users = append(users, *role.Users[i])
+	}
+	return users, nil
+}
+
 // Returns all Teachers as User types as slice
 func (c *UserDao) GetTeachers() (entities []models.User, err *e.ApiError) {
-	users, err := getAllOrError[models.User](c.repo)
+	return c.GetByRole(config.ROLE_TEACHER)
+}
 
-	// Filter through all the Roles of the User
-	// Append Users with the Role Dozent to the filtered list
-	filtered := make([]models.User, 0)
-	for _, user := range users {
-		for _, role := range user.Roles {
-			if role.Description == "Dozent" {
-				filtered = append(filtered, user)
+// Returns all Students as User types as slice
+func (c *UserDao) GetStudents() (entities []models.User, err *e.ApiError) {
+	return c.GetByRole(config.ROLE_STUDENT)
+}
+
+// Returns all CourseAdmins as User types as slice
+func (c *UserDao) GetCourseAdmins() (entities []models.User, err *e.ApiError) {
+	return c.GetByRole(config.ROLE_COURSEADMIN)
+}
+
+// Returns all FieldManagers as User types as slice
+func (c *UserDao) GetFieldManagers() (entities []models.User, err *e.ApiError) {
+	return c.GetByRole(config.ROLE_FIELDMANAGER)
+}
+
+// Create default values for roles
+func (c *UserDao) CreateDefaults() *e.ApiError {
+	existingEntities, err := c.roleRepo.GetAll()
+	existingRoles := existingEntities.([]models.Role)
+	if err != nil {
+		return e.NewDaoDbError()
+	}
+
+	for _, v := range c.repo.Provider.Config().Roles {
+
+		existingFound := false
+		for _, existing := range existingRoles {
+			if v.Id == existing.ID {
+				existingFound = true
+				break
 			}
 		}
+		if existingFound {
+			continue
+		}
+
+		newRole := &models.Role{
+			Description: v.Name,
+			Claim:       v.ClaimName,
+		}
+		newRole.ID = v.Id
+
+		_, err := c.roleRepo.Create(newRole)
+		if err != nil {
+			return e.NewDaoDbError()
+		}
 	}
-	return filtered, err
+
+	return nil
 }
 
 // Returns a list of courses a user has assigned

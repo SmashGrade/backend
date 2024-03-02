@@ -19,6 +19,7 @@ type OutputController struct {
 	fieldDao           *dao.FieldDao
 	focusDao           *dao.FocusDao
 	examtypeDao        *dao.ExamtypeDao
+	userDao            *dao.UserDao
 }
 
 // Constructor for output controller
@@ -32,6 +33,7 @@ func NewOutputController(provider db.Provider) *OutputController {
 		fieldDao:           dao.NewFieldDao(repository.NewFieldRepository(provider)),
 		focusDao:           dao.NewFocusDao(repository.NewFocusRepository(provider)),
 		examtypeDao:        dao.NewExamtypeDao(repository.NewExamtypeRepository(provider)),
+		userDao:            dao.NewUserDao(repository.NewUserRepository(provider), repository.NewRoleRepository(provider)),
 	}
 
 	if provider.Config().AutoMigrate {
@@ -41,6 +43,7 @@ func NewOutputController(provider db.Provider) *OutputController {
 		ctrl.gradetypeDao.CreateDefaults()
 		ctrl.evaluationtypeDao.CreateDefaults()
 		ctrl.examtypeDao.CreateDefaults()
+		ctrl.userDao.CreateDefaults() // this is not part of output but convinient to have here
 		provider.Config().Logger().Info("Creating defaults from config completed successfully")
 	}
 

@@ -17,7 +17,7 @@ type UserController struct {
 func NewUserController(provider db.Provider) *UserController {
 	return &UserController{
 		BaseController: NewBaseController(provider),
-		Dao:            dao.NewUserDao(repository.NewUserRepository(provider)),
+		Dao:            dao.NewUserDao(repository.NewUserRepository(provider), repository.NewRoleRepository(provider)),
 	}
 }
 
