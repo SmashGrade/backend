@@ -591,10 +591,19 @@ func TestCreateUpdateUser(t *testing.T) {
 func TestCreateUpdateUserByEmail(t *testing.T) {
 	provider := db.NewMockProvider()
 	userDao := NewUserDao(repository.NewUserRepository(provider), repository.NewRoleRepository(provider))
+	userDao.CreateDefaults()
+
+	roles := make([]*models.Role, 0)
+
+	dozentRole, err := userDao.GetRoleByClaim("Dozent")
+	require.Nil(t, err)
+
+	roles = append(roles, dozentRole)
 
 	testUser := models.User{
 		Name:  "Test",
 		Email: "stafi@hftm.ch",
+		Roles: roles,
 	}
 
 	retCreated, err := userDao.CreateOrUpdateByEmail(testUser)
@@ -602,13 +611,30 @@ func TestCreateUpdateUserByEmail(t *testing.T) {
 	require.Equal(t, testUser.Email, retCreated.Email)
 	require.Equal(t, testUser.Name, retCreated.Name)
 
+	studentRole, err := userDao.GetRoleByClaim("Student")
+	require.Nil(t, err)
+
+	roles = append(roles, studentRole)
+
 	testUserUpdate := models.User{
 		Name:  "Woopsiedoopsie",
 		Email: "stafi@hftm.ch",
+		Roles: roles,
 	}
 
 	retUpdated, err := userDao.CreateOrUpdateByEmail(testUserUpdate)
 	require.Nil(t, err)
 	require.Equal(t, testUserUpdate.Email, retUpdated.Email)
 	require.Equal(t, testUserUpdate.Name, retUpdated.Name)
+
+	// be paranoid and check with a fresh get by id
+	retGet, err := userDao.Get(retUpdated.ID)
+	require.Nil(t, err)
+	require.Equal(t, testUserUpdate.Email, retGet.Email)
+	require.Equal(t, testUserUpdate.Name, retGet.Name)
+
+	require.Len(t, retGet.Roles, len(roles)) // do the roles match up in length
+	for i := range roles {
+		require.Contains(t, retGet.Roles, roles[i]) // check if each role is in the role list
+	}
 }
