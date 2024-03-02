@@ -77,7 +77,7 @@ func (r *Router) MetaModules(ctx echo.Context) error {
 	}
 
 	// Get all Curriculumtypes
-	curriculumstype, err := r.output.curriculumytypeDao.GetAll()
+	curriculumtypes, err := r.output.curriculumytypeDao.GetAll()
 	if err != nil {
 		return err
 	}
@@ -90,7 +90,7 @@ func (r *Router) MetaModules(ctx echo.Context) error {
 
 	metaModules.Evaluationtypes = evaluationtypes
 	metaModules.Curriculums = curriculums
-	metaModules.Curriculumstype = curriculumstype
+	metaModules.Curriculumtypes = curriculumtypes
 	metaModules.Courses = courses
 
 	return r.module.Yeet(ctx, metaModules)
