@@ -64,9 +64,9 @@ func (c *ModuleController) Module(ctx echo.Context) error {
 		return e.NewDaoValidationError("version", "uint", c.GetPathParam(ctx, "version"))
 	}
 	// Ask the DAO for the module
-	res, err := c.Dao.Get(id, version)
-	if err != nil {
-		return err
+	res, daoErr := c.Dao.Get(id, version)
+	if daoErr != nil {
+		return daoErr
 	}
 	// Return the result to the client
 	return c.Yeet(ctx, res)
