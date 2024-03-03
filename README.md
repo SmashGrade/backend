@@ -4,7 +4,7 @@ This is the backend service for Smashgrade.
 
 ## Configuration
 
-Configuration of the container can be managed either with the configuration file (see defaults.yaml) or environment variables. The environment mode (e.g dev or prod) has to be set with environment variables in the container.
+Configuration of the container can be managed either with the configuration file (see [defaults.yaml](defaults.yaml)) or environment variables. The environment mode (e.g dev or prod) has to be set with environment variables in the container.
 
 ```
 # Required environment variable (default: dev)

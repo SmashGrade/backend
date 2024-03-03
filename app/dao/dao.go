@@ -866,7 +866,7 @@ func (u *UserDao) CreateDefaults() *e.ApiError {
 					Users:       existing.Users,
 				}
 				updatedRole.ID = existing.ID
-				err = c.roleRepo.Update(updatedRole)
+				err = u.roleRepo.Update(updatedRole)
 				if err != nil {
 					return e.NewDaoDbError()
 				}
