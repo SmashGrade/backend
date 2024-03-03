@@ -136,7 +136,8 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Meta"
+                    "meta",
+                    "courses"
                 ],
                 "summary": "Get Metadata for Course",
                 "responses": {
@@ -177,14 +178,15 @@ const docTemplate = `{
                         "Bearer": []
                     }
                 ],
-                "description": "Get Courses for a teacher selected by userinfo in accesstoken",
+                "description": "Get Courses as a teacher selected by teached by userinfo from accesstoken",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "Meta"
+                    "meta",
+                    "courses"
                 ],
-                "summary": "Get Courses for a teacher",
+                "summary": "Get your Courses as a teacher",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -477,7 +479,8 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Meta"
+                    "meta",
+                    "curriculums"
                 ],
                 "summary": "Get Metadata for Curriculums",
                 "responses": {
@@ -518,14 +521,15 @@ const docTemplate = `{
                         "Bearer": []
                     }
                 ],
-                "description": "Get Curriculums for a student selected by userinfo in accesstoken",
+                "description": "Get Curriculums as a student selected by userinfo from accesstoken",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "Meta"
+                    "meta",
+                    "curriculums"
                 ],
-                "summary": "Get Curriculums for a student",
+                "summary": "Get Curriculums as a student",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -989,7 +993,8 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "meta"
+                    "meta",
+                    "modules"
                 ],
                 "summary": "Get Metadata for Module",
                 "responses": {
@@ -1588,6 +1593,9 @@ const docTemplate = `{
         "models.Role": {
             "type": "object",
             "properties": {
+                "claim": {
+                    "type": "string"
+                },
                 "created": {
                     "type": "string"
                 },

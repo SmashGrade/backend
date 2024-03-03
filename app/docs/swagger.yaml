@@ -272,6 +272,8 @@ definitions:
     type: object
   models.Role:
     properties:
+      claim:
+        type: string
       created:
         type: string
       deleted:
@@ -686,10 +688,11 @@ paths:
       - Bearer: []
       summary: Get Metadata for Course
       tags:
-      - Meta
+      - meta
+      - courses
   /courses/teacher:
     get:
-      description: Get Courses for a teacher selected by userinfo in accesstoken
+      description: Get Courses as a teacher selected by teached by userinfo from accesstoken
       produces:
       - application/json
       responses:
@@ -713,9 +716,10 @@ paths:
             $ref: '#/definitions/error.ApiError'
       security:
       - Bearer: []
-      summary: Get Courses for a teacher
+      summary: Get your Courses as a teacher
       tags:
-      - Meta
+      - meta
+      - courses
   /curriculums/meta:
     get:
       description: Get Metadata for Curriculums
@@ -744,10 +748,11 @@ paths:
       - Bearer: []
       summary: Get Metadata for Curriculums
       tags:
-      - Meta
+      - meta
+      - curriculums
   /curriculums/student:
     get:
-      description: Get Curriculums for a student selected by userinfo in accesstoken
+      description: Get Curriculums as a student selected by userinfo from accesstoken
       produces:
       - application/json
       responses:
@@ -771,9 +776,10 @@ paths:
             $ref: '#/definitions/error.ApiError'
       security:
       - Bearer: []
-      summary: Get Curriculums for a student
+      summary: Get Curriculums as a student
       tags:
-      - Meta
+      - meta
+      - curriculums
   /curriculumtypes:
     get:
       description: Get all curriculum types
@@ -1106,6 +1112,7 @@ paths:
       summary: Get Metadata for Module
       tags:
       - meta
+      - modules
   /states:
     get:
       description: Get all states
