@@ -35,8 +35,16 @@ To find documentation run the docker image locally with:
 docker run --name smashgrade-backend -e ENV=dev -p 9000:9000 ghcr.io/smashgrade/backend:dev
 ```
 
+## Adding a new user e.g Kursadmin
+
+To add a new user manually to the database you can use the following steps:
+
+1. Run the server at least once to generate the database, roles and configuration file
+2. Run the command ``` smashgrade add -n "Peter Mueller" -e peter.mueller@hftm.ch -r Kursadministrator ```
+3. The user will get created with the role that was assigned to him
+
 ## Documentation
 
-You can now access the backends documentation with http://localhost:9000/docs
+You can now access the backends documentation with http://localhost:9000/docs/
 
 Keep in mind that the endpoints in the swagger doc point to api.smashgrade.ch

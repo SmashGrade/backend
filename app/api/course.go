@@ -74,9 +74,9 @@ func (c *CourseController) Course(ctx echo.Context) error {
 	}
 
 	// Ask the DAO for the course
-	res, err := c.Dao.Get(id, version)
-	if err != nil {
-		return err
+	res, daoErr := c.Dao.Get(id, version)
+	if daoErr != nil {
+		return daoErr
 	}
 	// Return the result to the client
 	return c.Yeet(ctx, res)
@@ -118,7 +118,7 @@ func (c *CourseController) Create(ctx echo.Context) error {
 // @Accept			json
 //
 // @Param			request	body		requestmodels.RefCourse	true	"request body"
-// @Param			id		path	uint	true	"Course ID"
+// @Param			id		path		uint					true	"Course ID"
 //
 // @Success		200		{object}	models.Course
 // @Failure		401		{object}	error.ApiError
@@ -144,9 +144,9 @@ func (c *CourseController) CreateVersion(ctx echo.Context) error {
 	course.Version = 0
 
 	// Let dao create the Course
-	returnCourse, err := c.Dao.Create(*course)
-	if err != nil {
-		return err
+	returnCourse, daoErr := c.Dao.Create(*course)
+	if daoErr != nil {
+		return daoErr
 	}
 	// return the result from the Post
 	return c.Yeet(ctx, returnCourse)
@@ -159,8 +159,8 @@ func (c *CourseController) CreateVersion(ctx echo.Context) error {
 // @Accept			json
 //
 // @Param			request	body		requestmodels.RefCourse	true	"request body"
-// @Param			id		path	uint	true	"Course ID"
-// @Param			version	path	uint	true	"Course Version"
+// @Param			id		path		uint					true	"Course ID"
+// @Param			version	path		uint					true	"Course Version"
 //
 // @Success		200		{object}	models.Course
 // @Failure		401		{object}	error.ApiError
@@ -190,9 +190,9 @@ func (c *CourseController) Update(ctx echo.Context) error {
 	course.Version = version
 
 	// Let dao create the Course
-	err = c.Dao.Update(*course)
-	if err != nil {
-		return err
+	daoErr := c.Dao.Update(*course)
+	if daoErr != nil {
+		return daoErr
 	}
 	// return the result from the Post
 	return c.Yeet(ctx, course)
@@ -208,9 +208,9 @@ func (c *CourseController) Update(ctx echo.Context) error {
 // @Param			version	path	uint	true	"Course Version"
 //
 // @Success		200
-// @Failure		401		{object}	error.ApiError
-// @Failure		403		{object}	error.ApiError
-// @Failure		500		{object}	error.ApiError
+// @Failure		401	{object}	error.ApiError
+// @Failure		403	{object}	error.ApiError
+// @Failure		500	{object}	error.ApiError
 // @Router			/courses/{id}/{version} [delete]
 // @Security		Bearer
 func (c *CourseController) Delete(ctx echo.Context) error {
@@ -227,9 +227,9 @@ func (c *CourseController) Delete(ctx echo.Context) error {
 	}
 
 	// Let dao create the Course
-	err = c.Dao.Delete(id, version)
-	if err != nil {
-		return err
+	daoErr := c.Dao.Delete(id, version)
+	if daoErr != nil {
+		return daoErr
 	}
 	// return the result from the Post
 	return c.Yeet(ctx, nil)

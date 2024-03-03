@@ -58,9 +58,9 @@ func (c *ExamController) Exam(ctx echo.Context) error {
 		return e.NewDaoValidationError("id", "uint", c.GetPathParam(ctx, "id"))
 	}
 	// Ask the DAO for the exam
-	res, err := c.Dao.Get(id)
-	if err != nil {
-		return err
+	res, daoErr := c.Dao.Get(id)
+	if daoErr != nil {
+		return daoErr
 	}
 	// Return the result to the client
 	return c.Yeet(ctx, res)
