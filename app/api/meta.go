@@ -203,7 +203,6 @@ func (m *MetaController) MetaCurriculums(ctx echo.Context) error {
 func (m *MetaController) MyCoursesAsTeacher(ctx echo.Context) error {
 	// View of the course teacher
 	// returns: list of courses teached by current user with modules and study stage, list of all users
-	// TODO: check if user is teacher
 
 	err := m.CheckUserRole(config.ROLE_TEACHER, ctx)
 	if err != nil {
@@ -226,7 +225,6 @@ func (m *MetaController) MyCoursesAsTeacher(ctx echo.Context) error {
 func (m *MetaController) MyCurriculumsAsStudent(ctx echo.Context) error {
 	// View of the student, general info
 	// returns: chosen curriculum with start year and curriculum type
-	// TODO: check if user is student
 
 	err := m.CheckUserRole(config.ROLE_STUDENT, ctx)
 	if err != nil {
