@@ -23,6 +23,10 @@ data.db
 go.work
 
 # Databases that get created
-*.Db
+*.db
 
+# Configuration file that are written to the current directory
+config.yaml
+
+# Mac Stuff
 .DS_Store

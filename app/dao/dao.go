@@ -795,8 +795,8 @@ func (u *UserDao) Get(uid uint) (entity *models.User, err *e.ApiError) {
 }
 
 // generic by role filter used in other functions
-func (c *UserDao) GetByRole(roleId uint) (entities []models.User, err *e.ApiError) {
-	roleEnt, internalError := c.roleRepo.GetId(roleId)
+func (u *UserDao) GetByRole(roleId uint) (entities []models.User, err *e.ApiError) {
+	roleEnt, internalError := u.roleRepo.GetId(roleId)
 	if internalError != nil {
 		return nil, e.NewDaoDbError()
 	}
@@ -810,34 +810,49 @@ func (c *UserDao) GetByRole(roleId uint) (entities []models.User, err *e.ApiErro
 }
 
 // Returns all Teachers as User types as slice
-func (c *UserDao) GetTeachers() (entities []models.User, err *e.ApiError) {
-	return c.GetByRole(config.ROLE_TEACHER)
+func (u *UserDao) GetTeachers() (entities []models.User, err *e.ApiError) {
+	return u.GetByRole(config.ROLE_TEACHER)
 }
 
 // Returns all Students as User types as slice
-func (c *UserDao) GetStudents() (entities []models.User, err *e.ApiError) {
-	return c.GetByRole(config.ROLE_STUDENT)
+func (u *UserDao) GetStudents() (entities []models.User, err *e.ApiError) {
+	return u.GetByRole(config.ROLE_STUDENT)
 }
 
 // Returns all CourseAdmins as User types as slice
-func (c *UserDao) GetCourseAdmins() (entities []models.User, err *e.ApiError) {
-	return c.GetByRole(config.ROLE_COURSEADMIN)
+func (u *UserDao) GetCourseAdmins() (entities []models.User, err *e.ApiError) {
+	return u.GetByRole(config.ROLE_COURSEADMIN)
 }
 
 // Returns all FieldManagers as User types as slice
-func (c *UserDao) GetFieldManagers() (entities []models.User, err *e.ApiError) {
-	return c.GetByRole(config.ROLE_FIELDMANAGER)
+func (u *UserDao) GetFieldManagers() (entities []models.User, err *e.ApiError) {
+	return u.GetByRole(config.ROLE_FIELDMANAGER)
+}
+
+// Returns a role by claim name
+func (u *UserDao) GetRoleByClaim(claimName string) (entity *models.Role, err *e.ApiError) {
+	entities, internalError := u.roleRepo.Find(&models.Role{Claim: claimName})
+	if internalError != nil {
+		return nil, e.NewDaoDbError()
+	}
+
+	roleEntities := entities.([]models.Role)
+	if len(roleEntities) < 1 {
+		return nil, e.NewDaoNotExistingError(claimName, "claim")
+	}
+
+	return &roleEntities[0], nil
 }
 
 // Create default values for roles
-func (c *UserDao) CreateDefaults() *e.ApiError {
-	existingEntities, err := c.roleRepo.GetAll()
+func (u *UserDao) CreateDefaults() *e.ApiError {
+	existingEntities, err := u.roleRepo.GetAll()
 	existingRoles := existingEntities.([]models.Role)
 	if err != nil {
 		return e.NewDaoDbError()
 	}
 
-	for _, v := range c.repo.Provider.Config().Roles {
+	for _, v := range u.repo.Provider.Config().Roles {
 
 		existingFound := false
 		for _, existing := range existingRoles {
@@ -851,7 +866,7 @@ func (c *UserDao) CreateDefaults() *e.ApiError {
 					Users:       existing.Users,
 				}
 				updatedRole.ID = existing.ID
-				err = c.roleRepo.Update(updatedRole)
+				err = u.roleRepo.Update(updatedRole)
 				if err != nil {
 					return e.NewDaoDbError()
 				}
@@ -870,7 +885,7 @@ func (c *UserDao) CreateDefaults() *e.ApiError {
 		}
 		newRole.ID = v.Id
 
-		_, err := c.roleRepo.Create(newRole)
+		_, err := u.roleRepo.Create(newRole)
 		if err != nil {
 			return e.NewDaoDbError()
 		}
@@ -894,8 +909,39 @@ func (u *UserDao) GetExamEvaluationsForYear(uid uint, startYear time.Time) {
 	// TODO
 }
 
+// Creates a new user
 func (u *UserDao) Create(entity models.User) (returnEntity *models.User, err *e.ApiError) {
 	return createOrError(u.repo, entity)
+}
+
+// Updates an existing user
+func (u *UserDao) Update(entity models.User) *e.ApiError {
+	internalError := u.repo.Update(entity)
+	if internalError != nil {
+		return e.NewDaoDbError()
+	}
+
+	return nil
+}
+
+// This function is used to update or create a user in the database based on the given user object
+// if a user with the supplied email exists: update data in db, return with id and references filled
+// if no user with email found: create new and return with id and references filled
+func (u *UserDao) CreateOrUpdateByEmail(entity models.User) (returnEntity *models.User, err *e.ApiError) {
+	existingUser, err := u.GetByEmail(entity.Email)
+	if err != nil { // TODO: close error inspection with errors.Is needed
+		// user does not exist, create new return obj
+		return u.Create(entity)
+	} else {
+		// user exists, update in db return updated version
+		entity.ID = existingUser.ID
+		err = u.Update(entity)
+		if err != nil {
+			return
+		}
+
+		return u.Get(entity.ID)
+	}
 }
 
 // returns first match for an email
