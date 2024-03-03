@@ -41,7 +41,7 @@ To add a new user manually to the database you can use the following steps:
 
 1. Run the server at least once to generate the database, roles and configuration file
 2. Run the command ``` smashgrade add -n "Peter Mueller" -e peter.mueller@hftm.ch -r Kursadministrator ```
-3. The user will get created with the role that was assigned to him.
+3. The user will get created with the role that was assigned to him
 
 ## Documentation
 
