@@ -11,6 +11,7 @@ import (
 	echoSwagger "github.com/swaggo/echo-swagger"
 )
 
+// Command to start the server
 var serverCmd = &cobra.Command{
 	Use:   "server",
 	Short: "Start the SmashGrade server",
@@ -18,12 +19,12 @@ var serverCmd = &cobra.Command{
 	Run:   StartServer,
 }
 
+// Initialize the server command
 func init() {
 	rootCmd.AddCommand(serverCmd)
-
-	serverCmd.Flags().StringP("config", "c", "config.yaml", "Path to the configuration file")
 }
 
+// StartServer starts the backend server
 func StartServer(cmd *cobra.Command, args []string) {
 	configPath, err := cmd.Flags().GetString("config")
 	if err != nil {

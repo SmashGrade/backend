@@ -16,7 +16,7 @@ import (
 )
 
 // Version of the API
-const VERSION string = "0.6.0"
+const VERSION string = "0.7.0"
 
 const (
 	ROLE_COURSEADMIN  = 1
@@ -33,6 +33,7 @@ type APIConfig struct {
 	AutoMigrate         bool                       `yaml:"autoMigrate"`         // AutoMigrate is a flag to determine if the database should be migrated automatically
 	Connect             bool                       `yaml:"connect"`             // Connect is a flag to determine if the database should be connected automatically
 	DBConnectionStr     string                     `yaml:"dbConnectionStr"`     // DBConnectionStr is the connection string for the database
+	AllowedDomains      []string                   `yaml:"allowedDomains"`      // AllowedDomains is the list of allowed domains for new users
 	ExamTypes           []string                   `yaml:"examTypes"`           // ExamTypes is the list of exam types
 	ExamEvaluationTypes []ExamEvaluationTypeConfig `yaml:"examEvaluationTypes"` // EvalTypes is the list of evaluation types
 	GradeTypes          []string                   `yaml:"gradeTypes"`          // GradeTypes is the list of grade types
@@ -92,11 +93,12 @@ func NewAPIConfig() *APIConfig {
 		Port:    9000,
 		Connect: true,
 		AuthConfig: AuthConfig{
-			Enabled:              true,
+			Enabled:              false,
 			OAuthKeyDiscoveryURL: "https://login.microsoftonline.com/common/discovery/keys",
 		},
 		AutoMigrate:     true,
 		DBConnectionStr: "sqlite://:memory:",
+		AllowedDomains:  []string{"hftm.ch", "smashgrade.ch"},
 		ExamTypes:       []string{"Mündliche oder schriftliche Prüfung", "Präsentationen", "Lernbericht", "schriftliche Arbeit", "Lernjournal"},
 		GradeTypes:      []string{"Kein Eintrag", "Note (1-6)", "Prozentwert (0-100)"},
 		ExamEvaluationTypes: []ExamEvaluationTypeConfig{
@@ -301,9 +303,9 @@ func ToFile(path string, config *APIConfig) {
 	if err == nil {
 		err = yaml.NewEncoder(cf).Encode(config)
 		if err != nil {
-			config.Logger().Info(fmt.Sprintf("Configuration saved to file: %s", path))
+			config.Logger().Error(fmt.Sprintf("Error writing configuration to file: %s: %s", path, err))
 		} else {
-			config.Logger().Error("Error writing configuration to file: %s: %s", path, err)
+			config.Logger().Info(fmt.Sprintf("Configuration saved to file: %s", path))
 		}
 	} else {
 		config.Logger().Warn(fmt.Sprintf("Error writing configuration to file: %s. Path does not exist or is not writable", path))

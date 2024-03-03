@@ -1,13 +1,16 @@
 host: 0.0.0.0
 port: 9000
 auth:
-  enabled: true
+  enabled: false
   oAuthKeyDiscoveryURL: https://login.microsoftonline.com/common/discovery/keys
 autoMigrate: true
 connect: true
-dbConnectionStr: 'sqlite://data.db'
+dbConnectionStr: 'sqlite://:memory:'
+allowedDomains:
+- hftm.ch
+- smashgrade.ch
 examTypes:
-- 'Mündliche oder schriftliche Prüfung'
+- Mündliche oder schriftliche Prüfung
 - Präsentationen
 - Lernbericht
 - schriftliche Arbeit

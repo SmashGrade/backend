@@ -1,7 +1,10 @@
 package api
 
 import (
+	"net/mail"
+	"slices"
 	"strconv"
+	"strings"
 
 	"github.com/SmashGrade/backend/app/dao"
 	"github.com/SmashGrade/backend/app/db"
@@ -102,6 +105,20 @@ func (c *BaseController) GetUser(ctx echo.Context) (*models.User, *e.ApiError) {
 		} else {
 			userRoles = append(userRoles, role)
 		}
+	}
+
+	// Check if the email is valid
+	_, emailInvalidErr := mail.ParseAddress(claims.Email)
+	if emailInvalidErr != nil {
+		ctx.Logger().Errorf("Authorized endpoint called with invalid email address: %s. Request denied.", claims.Email)
+		return nil, e.NewUnauthorizedError()
+	}
+
+	// Check if the email address of the user is allowed to access the application
+	emailDomain := claims.Email[strings.Index(claims.Email, "@")+1:]
+	if !slices.Contains(c.Provider.Config().AllowedDomains, emailDomain) {
+		ctx.Logger().Errorf("Authorized endpoint called with unauthorized email address: %s. Request denied.", claims.Email)
+		return nil, e.NewUnauthorizedError()
 	}
 
 	// Create the user object from the claims

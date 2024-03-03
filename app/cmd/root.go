@@ -26,3 +26,8 @@ func Execute() {
 		os.Exit(1)
 	}
 }
+
+// Initialize the root command
+func Init() {
+	rootCmd.Flags().StringP("config", "c", "config.yaml", "Path to the configuration file")
+}
