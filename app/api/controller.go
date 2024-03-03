@@ -93,7 +93,7 @@ func (c *BaseController) GetUser(ctx echo.Context) (*models.User, *e.ApiError) {
 	}
 
 	// Create a list of roles from the claims
-	userRoles := make([]*models.Role, len(claims.Roles))
+	userRoles := make([]*models.Role, 0)
 	// Add roles from the claims to the user
 	for _, claimRole := range claims.Roles {
 		role, err := c.UserDao.GetRoleByClaim(claimRole)
@@ -105,19 +105,19 @@ func (c *BaseController) GetUser(ctx echo.Context) (*models.User, *e.ApiError) {
 	}
 
 	// Create the user object from the claims
-	userEntity := &models.User{
+	userEntity := models.User{
 		Email: claims.Email,
 		Name:  claims.Name,
 		Roles: userRoles,
 	}
 
 	// Ensure that the database contains the user and that the user is updated based on the claims
-	userEntity, crudErr := c.UserDao.CreateOrUpdateByEmail(*userEntity)
+	crudUser, crudErr := c.UserDao.CreateOrUpdateByEmail(userEntity)
 	if crudErr != nil {
 		ctx.Logger().Error("Error creating or updating user in database. Request denied.")
 		return nil, e.NewUnauthorizedError()
 	}
 
 	// Return the user
-	return userEntity, nil
+	return crudUser, nil
 }
