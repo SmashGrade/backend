@@ -231,7 +231,23 @@ func (m *MetaController) MyCurriculumsAsStudent(ctx echo.Context) error {
 		return err
 	}
 
-	return e.NewApiUnimplementedError()
+	user, err := m.GetUser(ctx)
+	if err != nil {
+		return err
+	}
+
+	studentCurriculum := models.StudentCurriculums{
+		StartYear: user.ClassStartyear,
+	}
+
+	curriculum, err := m.curriculumDao.GetValidForTimepoint(user.CurriculumID, studentCurriculum.StartYear)
+	if err != nil {
+		return err
+	}
+
+	studentCurriculum.Curriculum = *curriculum
+
+	return m.Yeet(ctx, studentCurriculum)
 }
 
 // register all output endpoints to router

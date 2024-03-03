@@ -1,5 +1,7 @@
 package models
 
+import "time"
+
 type MetaCourse struct {
 	Teachers  []User     `json:"teachers"`
 	Modules   []Module   `json:"modules"`
@@ -28,4 +30,7 @@ type TeacherCourses struct {
 
 // chosen curriculum with start year and curriculum type
 type StudentCurriculums struct {
+	StartYear time.Time // taken from the user or selectedcourse
+	// Curriculumtype Curriculumtype // this is already in the curriculum
+	Curriculum Curriculum
 }

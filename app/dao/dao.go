@@ -453,6 +453,12 @@ func (c *CurriculumDao) Get(id uint, startValidity time.Time) (entity *models.Cu
 	return nil, e.NewDaoUnimplementedError()
 }
 
+// returns the active version of a curriculum at the time timePoint
+// returns an error if no active curriculum at that time exists
+func (c *CurriculumDao) GetValidForTimepoint(id uint, timePoint time.Time) (entity *models.Curriculum, err *e.ApiError) {
+	return nil, e.NewDaoUnimplementedError()
+}
+
 // Creates new curriculum
 func (c *CurriculumDao) Create(entity models.Curriculum) *e.ApiError {
 	return e.NewDaoUnimplementedError()
