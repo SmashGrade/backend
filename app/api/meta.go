@@ -56,7 +56,10 @@ func (m *MetaController) MetaCourses(ctx echo.Context) error {
 	// These are Preselected Items
 	var metaCourse models.MetaCourse
 
-	// TODO: only allow course admin role on this endpoint
+	err := m.CheckUserRole(config.ROLE_COURSEADMIN, ctx)
+	if err != nil {
+		return err
+	}
 
 	// Get all Teachers
 	teachers, err := m.userDao.GetTeachers()
@@ -97,7 +100,10 @@ func (m *MetaController) MetaModules(ctx echo.Context) error {
 	// These are Preselected Items
 	var metaModules models.MetaModules
 
-	// TODO: only allow course admin role on this endpoint
+	err := m.CheckUserRole(config.ROLE_COURSEADMIN, ctx)
+	if err != nil {
+		return err
+	}
 
 	// Get all Evaluationtypes
 	evaluationtypes, err := m.evaluationtypeDao.GetAll()
@@ -145,7 +151,10 @@ func (m *MetaController) MetaCurriculums(ctx echo.Context) error {
 	// MetaCurriculum contains all form choice data to create or modify a curriculum (Studiengang)
 	// returns: all focus (Fachrichtung), all fields (Schwerpunkt), all curriculumtypes, all users
 
-	// TODO: only allow course admin role on this endpoint
+	err := m.CheckUserRole(config.ROLE_COURSEADMIN, ctx)
+	if err != nil {
+		return err
+	}
 
 	var metaCurriculums models.MetaCurriculums
 
@@ -196,13 +205,9 @@ func (m *MetaController) MyCoursesAsTeacher(ctx echo.Context) error {
 	// returns: list of courses teached by current user with modules and study stage, list of all users
 	// TODO: check if user is teacher
 
-	user, err := m.GetUser(ctx)
+	err := m.CheckUserRole(config.ROLE_TEACHER, ctx)
 	if err != nil {
 		return err
-	}
-
-	if !user.HasRole(config.ROLE_TEACHER) {
-		return e.NewClaimMissingError(config.NewAPIConfig().Roles[config.ROLE_TEACHER].ClaimName)
 	}
 
 	return e.NewApiUnimplementedError()
@@ -223,7 +228,10 @@ func (m *MetaController) MyCurriculumsAsStudent(ctx echo.Context) error {
 	// returns: chosen curriculum with start year and curriculum type
 	// TODO: check if user is student
 
-	//user, err := m.GetUser(ctx)
+	err := m.CheckUserRole(config.ROLE_STUDENT, ctx)
+	if err != nil {
+		return err
+	}
 
 	return e.NewApiUnimplementedError()
 }
