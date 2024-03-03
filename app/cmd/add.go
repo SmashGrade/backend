@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"net/mail"
 	"slices"
 	"strings"
@@ -43,6 +44,8 @@ func AddUser(cmd *cobra.Command, args []string) {
 
 	// Load configuration
 	config := c.FromFile(configPath)
+	// Show the branding banner
+	config.ShowBrand()
 
 	// Initialize the database provider
 	provider := db.NewProvider(config)
@@ -51,27 +54,27 @@ func AddUser(cmd *cobra.Command, args []string) {
 
 	// Check if the email is empty
 	if email == "" {
-		cmd.Println("Email is required")
+		config.Logger().Error("Email is required")
 		return
 	}
 
 	// Check if the name is empty
 	if name == "" {
-		cmd.Println("Name is required")
+		config.Logger().Error("Name is required")
 		return
 	}
 
 	// Check if the mail is valid
 	_, err = mail.ParseAddress(email)
 	if err != nil {
-		cmd.Println("Invalid email address")
+		config.Logger().Error("Invalid email address")
 		return
 	}
 
 	// Check if the mail is part of the allowed domains
 	emailDomain := email[strings.Index(email, "@")+1:]
 	if !slices.Contains(config.AllowedDomains, emailDomain) {
-		cmd.Println("Email address not allowed")
+		config.Logger().Error("Email domain is not allowed to register users. Please add the domain to the allowed domains in the configuration file")
 		return
 	}
 
@@ -86,7 +89,7 @@ func AddUser(cmd *cobra.Command, args []string) {
 		roleEntity, err := userDao.GetRoleByClaim(role)
 		// Check if the role exists
 		if err != nil {
-			cmd.Printf("Role %s does not exist.\nPlease create the role in the configuration first or run the backend at least once to migrate the database\n", role)
+			config.Logger().Error(fmt.Sprintf("Role %s does not exist. Please create the role in the configuration first or run the backend at least once to migrate the database", role))
 			return
 		}
 		// Add the role to the list
@@ -102,17 +105,17 @@ func AddUser(cmd *cobra.Command, args []string) {
 
 	existentUser, _ := userDao.GetByEmail(email)
 	if existentUser != nil {
-		cmd.Println("User already exists")
+		config.Logger().Error("User already exists")
 		return
 	}
 
 	// Add the user to the database
 	_, daoErr := userDao.Create(user)
 	if daoErr != nil {
-		cmd.Println("Failed to create user")
+		config.Logger().Error("Failed to create user")
 		return
 	}
 
-	cmd.Println("User sucessfully created")
+	config.Logger().Info("User sucessfully created")
 
 }
