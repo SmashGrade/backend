@@ -97,7 +97,7 @@ func NewAPIConfig() *APIConfig {
 		},
 		AutoMigrate:     true,
 		DBConnectionStr: "sqlite://:memory:",
-		ExamTypes:       []string{"Mündliche oder schriftliche Prüfung ", "Präsentationen", "Lernbericht", "schriftliche Arbeit", "Lernjournal"},
+		ExamTypes:       []string{"Mündliche oder schriftliche Prüfung", "Präsentationen", "Lernbericht", "schriftliche Arbeit", "Lernjournal"},
 		GradeTypes:      []string{"Kein Eintrag", "Note (1-6)", "Prozentwert (0-100)"},
 		ExamEvaluationTypes: []ExamEvaluationTypeConfig{
 			{Code: "F", Description: "Modul bestanden, wenn jeder Kurs eine genügende Bewertung aufweist. (Art. 29)"},
@@ -279,11 +279,11 @@ func FromFile(path string) *APIConfig {
 	config := NewAPIConfig()
 	cf, err := os.ReadFile(path)
 	if err == nil {
-		err = yaml.Unmarshal(cf, config)
-		if err != nil {
-			config.Logger().Info(fmt.Sprintf("Configuration loaded from file: %s", path))
+		unmarshalErr := yaml.Unmarshal(cf, config)
+		if unmarshalErr != nil {
+			config.Logger().Error(fmt.Sprintf("Error loading configuration from file: %s: %e", path, err))
 		} else {
-			config.Logger().Error("Error loading configuration from file: %s: %s", path, err)
+			config.Logger().Info(fmt.Sprintf("Configuration loaded from file: %s", path))
 		}
 	} else {
 		config.Logger().Warn(fmt.Sprintf("Error loading configuration from file: %s. File does not exist or is not readable", path))
