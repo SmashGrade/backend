@@ -56,4 +56,5 @@ func (r *Router) RegisterV1() {
 	RegisterV1User(v1, r.user)
 	RegisterV1Exams(v1, r.exam)
 	RegisterV1MetaCourse(v1, r.meta)
+	RegisterV1Curriculums(v1, r.curriculum)
 }
