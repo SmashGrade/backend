@@ -30,7 +30,7 @@ func NewMetaController(provider db.Provider) *MetaController {
 		userDao:           dao.NewUserDao(repository.NewUserRepository(provider), repository.NewRoleRepository(provider)),
 		moduleDao:         dao.NewModuleDao(repository.NewModuleRepository(provider)),
 		courseDao:         dao.NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider), repository.NewExamRepository(provider), repository.NewRoleRepository(provider)),
-		curriculumDao:     dao.NewCurriculumDao(repository.NewCurriculumRepository(provider)),
+		curriculumDao:     dao.NewCurriculumDao(repository.NewCurriculumRepository(provider), repository.NewFocusRepository(provider), repository.NewCurriculumtypeRepository(provider), repository.NewStateRepository(provider), repository.NewModuleRepository(provider)),
 		examtypeDao:       dao.NewExamtypeDao(repository.NewExamtypeRepository(provider)),
 		evaluationtypeDao: dao.NewEvaluationTypeDao(repository.NewEvaluationtypeRepository(provider)),
 		curriculumtypeDao: dao.NewCurriculumTypeDao(repository.NewCurriculumtypeRepository(provider)),

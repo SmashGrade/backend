@@ -19,7 +19,13 @@ type CurriculumController struct {
 func NewCurriculumController(provider db.Provider) *CurriculumController {
 	return &CurriculumController{
 		BaseController: NewBaseController(provider),
-		Dao:            dao.NewCurriculumDao(repository.NewCurriculumRepository(provider)),
+		Dao: dao.NewCurriculumDao(
+			repository.NewCurriculumRepository(provider),
+			repository.NewFocusRepository(provider),
+			repository.NewCurriculumtypeRepository(provider),
+			repository.NewStateRepository(provider),
+			repository.NewModuleRepository(provider),
+		),
 	}
 }
 
