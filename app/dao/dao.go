@@ -172,7 +172,7 @@ func (c *CurriculumDao) Update(referenceEntity requestmodels.RefCurriculum) *e.A
 	entity.ID = existingEntity.ID
 	entity.StartValidity = existingEntity.StartValidity
 
-	internalError := c.repo.Update(entity)
+	internalError := c.repo.Update(&entity)
 	if internalError != nil {
 		return e.NewDaoDbError()
 	}
@@ -500,9 +500,17 @@ type CurriculumDao struct {
 }
 
 // Create new curriculum with required repository
-func NewCurriculumDao(curriculumRepository *repository.CurriculumRepository) *CurriculumDao {
+func NewCurriculumDao(curriculumRepository *repository.CurriculumRepository,
+	focusRepository *repository.FocusRepository,
+	curriculumTypeRepository *repository.CurriculumtypeRepository,
+	stateRepository *repository.StateRepository,
+	moduleRepository *repository.ModuleRepository) *CurriculumDao {
 	return &CurriculumDao{
-		repo: curriculumRepository,
+		repo:              curriculumRepository,
+		focusDao:          NewFocusDao(focusRepository),
+		curriculumTypeDao: NewCurriculumTypeDao(curriculumTypeRepository),
+		stateDao:          NewStateDao(stateRepository),
+		moduleDao:         NewModuleDao(moduleRepository),
 	}
 }
 
