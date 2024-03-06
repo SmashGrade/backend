@@ -12,8 +12,8 @@ type RefVersioned struct {
 }
 
 type RefTimed struct {
-	ID            uint   `json:"id"`
-	StartValidity string `json:"startvalidity"`
+	ID            uint   `json:"id" example:"1"`
+	StartValidity string `json:"startvalidity" example:"02.01.2006"`
 }
 
 type RefSelectedCourse struct {
