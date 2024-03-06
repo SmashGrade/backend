@@ -2054,16 +2054,19 @@ const docTemplate = `{
                     "$ref": "#/definitions/requestmodels.RefId"
                 },
                 "description": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Softwareentwicklung"
                 },
                 "endValidity": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "02.01.2006"
                 },
                 "focus": {
                     "$ref": "#/definitions/requestmodels.RefId"
                 },
                 "id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "modules": {
                     "type": "array",
@@ -2072,7 +2075,8 @@ const docTemplate = `{
                     }
                 },
                 "startvalidity": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "02.01.2006"
                 },
                 "state": {
                     "$ref": "#/definitions/requestmodels.RefId"

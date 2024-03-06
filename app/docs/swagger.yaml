@@ -401,18 +401,22 @@ definitions:
       curriculumType:
         $ref: '#/definitions/requestmodels.RefId'
       description:
+        example: Softwareentwicklung
         type: string
       endValidity:
+        example: 02.01.2006
         type: string
       focus:
         $ref: '#/definitions/requestmodels.RefId'
       id:
+        example: 1
         type: integer
       modules:
         items:
           $ref: '#/definitions/requestmodels.RefVersioned'
         type: array
       startvalidity:
+        example: 02.01.2006
         type: string
       state:
         $ref: '#/definitions/requestmodels.RefId'
