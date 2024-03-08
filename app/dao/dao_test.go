@@ -3,6 +3,7 @@ package dao
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/SmashGrade/backend/app/db"
 	_ "github.com/SmashGrade/backend/app/docs"
@@ -639,6 +640,217 @@ func TestCreateUpdateUserByEmail(t *testing.T) {
 		require.Contains(t, retGet.Roles, roles[i]) // check if each role is in the role list
 	}
 }
+
+func TestCreateCurriculum(t *testing.T) {
+	provider := db.NewMockProvider()
+	curriculumDao := NewCurriculumDao(
+		repository.NewCurriculumRepository(provider),
+		repository.NewFocusRepository(provider),
+		repository.NewCurriculumtypeRepository(provider),
+		repository.NewStateRepository(provider),
+		repository.NewModuleRepository(provider),
+	)
+
+	// Prefill Data with mock data for the Curriculum
+	focus := db.Focus1
+	curriculumType := db.CurriculumTyp3
+	state := db.State1
+	module := models.Module{
+		State:       state,
+		Description: "Schnittstellen-Technologien",
+		Number:      "IN123",
+		VersionedBasemodel: models.VersionedBasemodel{
+			Version: 2,
+			ID:      2,
+		},
+	}
+	provider.DB().Table("focus").Create(&focus)
+	provider.DB().Table("curriculumtypes").Create(&curriculumType)
+	provider.DB().Table("states").Create(&state)
+	provider.DB().Table("modules").Create(&module)
+
+	mustHaveId, _ := curriculumDao.repo.GetNextId()
+	// Create a new Curriculum and add all Values
+	curriculum := requestmodels.RefCurriculum{
+		Description: "Softwareentwicklung",
+		EndValidity: "01.02.2024",
+	}
+	curriculum.ID = 0
+	curriculum.StartValidity = "30.12.2025"
+	curriculum.FocusID.ID = focus.ID
+	curriculum.CurriculumtypeID.ID = curriculumType.ID
+	curriculum.StateID.ID = state.ID
+	versRef := requestmodels.RefVersioned{
+		ID:      module.ID,
+		Version: module.Version,
+	}
+	curriculum.Modules = append(curriculum.Modules, versRef)
+
+	// Create new Curriculum in Database
+	createdCurriculum, err := curriculumDao.Create(curriculum)
+
+	require.Nil(t, err)
+	// Dependencies
+	require.Equal(t, focus.Description, createdCurriculum.Focus.Description)
+	require.Equal(t, curriculumType.Description, createdCurriculum.Curriculumtype.Description)
+	require.Equal(t, state.Description, createdCurriculum.State.Description)
+	require.Equal(t, module.ID, createdCurriculum.Modules[0].ID)
+	require.Equal(t, module.Version, createdCurriculum.Modules[0].Version)
+
+	// Correct Date
+	require.Equal(t, time.Date(2024, time.February, 1, 0, 0, 0, 0, time.UTC), createdCurriculum.EndValidity)
+	require.Equal(t, time.Date(2025, time.December, 30, 0, 0, 0, 0, time.UTC), createdCurriculum.StartValidity)
+
+	// Correct ID
+	require.Equal(t, mustHaveId, createdCurriculum.ID)
+}
+
+func TestGetAllCurriculum(t *testing.T) {
+	provider := db.NewPrefilledMockProvider()
+	curriculumDao := NewCurriculumDao(
+		repository.NewCurriculumRepository(provider),
+		repository.NewFocusRepository(provider),
+		repository.NewCurriculumtypeRepository(provider),
+		repository.NewStateRepository(provider),
+		repository.NewModuleRepository(provider),
+	)
+
+	curriculums, err := curriculumDao.GetAll()
+
+	require.Nil(t, err)
+
+	// There are two curriculums in the prefild Mockdatabase
+	require.Equal(t, 2, len(curriculums))
+
+	// Dependencies
+	// Curriculum 1
+	require.Equal(t, db.Focus1.Description, curriculums[0].Focus.Description)
+	require.Equal(t, db.CurriculumTyp3.Description, curriculums[0].Curriculumtype.Description)
+	require.Equal(t, db.State1.Description, curriculums[0].State.Description)
+	require.Equal(t, db.Module1.ID, curriculums[0].Modules[0].ID)
+	require.Equal(t, db.Module2.ID, curriculums[0].Modules[1].ID)
+	// Curriculum 2
+	require.Equal(t, db.Focus2.Description, curriculums[1].Focus.Description)
+	require.Equal(t, db.CurriculumTyp2.Description, curriculums[1].Curriculumtype.Description)
+	require.Equal(t, db.State1.Description, curriculums[1].State.Description)
+	require.Equal(t, db.Module1.ID, curriculums[1].Modules[0].ID)
+	require.Equal(t, db.Module2.ID, curriculums[1].Modules[1].ID)
+
+	// Correct Date
+	// Curriculum 1
+	require.Equal(t, db.Curriculum1.StartValidity, curriculums[0].StartValidity)
+	require.Equal(t, db.Curriculum1.EndValidity, curriculums[0].EndValidity)
+	// Curriculum 2
+	require.Equal(t, db.Curriculum2.StartValidity, curriculums[1].StartValidity)
+	require.Equal(t, db.Curriculum2.EndValidity, curriculums[1].EndValidity)
+
+	// Correct ID
+	require.Equal(t, db.Curriculum1.ID, curriculums[0].ID)
+	require.Equal(t, db.Curriculum2.ID, curriculums[1].ID)
+}
+
+func TestGetOneCurriculum(t *testing.T) {
+	provider := db.NewPrefilledMockProvider()
+	curriculumDao := NewCurriculumDao(
+		repository.NewCurriculumRepository(provider),
+		repository.NewFocusRepository(provider),
+		repository.NewCurriculumtypeRepository(provider),
+		repository.NewStateRepository(provider),
+		repository.NewModuleRepository(provider),
+	)
+
+	curriculum, err := curriculumDao.Get(2, time.Date(2021, time.April, 1, 0, 0, 0, 0, time.UTC))
+
+	require.Nil(t, err)
+
+	// Dependencies
+	require.Equal(t, db.Focus2.Description, curriculum.Focus.Description)
+	require.Equal(t, db.CurriculumTyp2.Description, curriculum.Curriculumtype.Description)
+	require.Equal(t, db.State1.Description, curriculum.State.Description)
+	require.Equal(t, db.Module1.ID, curriculum.Modules[0].ID)
+	require.Equal(t, db.Module2.ID, curriculum.Modules[1].ID)
+
+	// Correct Date
+	require.Equal(t, db.Curriculum2.StartValidity, curriculum.StartValidity)
+	require.Equal(t, db.Curriculum2.EndValidity, curriculum.EndValidity)
+
+	// Correct ID
+	require.Equal(t, db.Curriculum2.ID, curriculum.ID)
+}
+
+func TestUpdateCurriculum(t *testing.T) {
+	provider := db.NewPrefilledMockProvider()
+	curriculumDao := NewCurriculumDao(
+		repository.NewCurriculumRepository(provider),
+		repository.NewFocusRepository(provider),
+		repository.NewCurriculumtypeRepository(provider),
+		repository.NewStateRepository(provider),
+		repository.NewModuleRepository(provider),
+	)
+
+	// Change a Curriculum
+	refCurriculum := requestmodels.RefCurriculum{
+		Description: "Elektroniker",
+		EndValidity: "23.07.2020",
+	}
+	refCurriculum.FocusID.ID = db.Focus1.ID
+	refCurriculum.CurriculumtypeID.ID = db.CurriculumTyp3.ID
+	refCurriculum.StateID.ID = db.State2.ID
+	refCurriculum.ID = 2
+	refCurriculum.StartValidity = "01.04.2021"
+
+	// Update Curriculum2 (from mock)
+	err := curriculumDao.Update(refCurriculum)
+	require.Nil(t, err)
+
+	// Get Curriculum2
+	curriculum, err := curriculumDao.Get(2, time.Date(2021, time.April, 1, 0, 0, 0, 0, time.UTC))
+
+	require.Nil(t, err)
+
+	// Dependencies
+	require.Equal(t, db.Focus1.Description, curriculum.Focus.Description)
+	require.Equal(t, db.CurriculumTyp3.Description, curriculum.Curriculumtype.Description)
+	require.Equal(t, db.State2.Description, curriculum.State.Description)
+	require.Equal(t, db.Module1.ID, curriculum.Modules[0].ID)
+	require.Equal(t, db.Module2.ID, curriculum.Modules[1].ID)
+
+	// Correct Date
+	require.Equal(t, db.Curriculum2.StartValidity, curriculum.StartValidity)
+	require.Equal(t, time.Date(2020, time.July, 23, 0, 0, 0, 0, time.UTC), curriculum.EndValidity)
+
+	// Correct ID
+	require.Equal(t, db.Curriculum2.ID, curriculum.ID)
+}
+
+func TestDeleteCurriculum(t *testing.T) {
+	provider := db.NewPrefilledMockProvider()
+	curriculumDao := NewCurriculumDao(
+		repository.NewCurriculumRepository(provider),
+		repository.NewFocusRepository(provider),
+		repository.NewCurriculumtypeRepository(provider),
+		repository.NewStateRepository(provider),
+		repository.NewModuleRepository(provider),
+	)
+
+	// Get All Curriculums to get Length
+	curriculums, err := curriculumDao.GetAll()
+	require.Nil(t, err)
+
+	lengthCurriculums := len(curriculums)
+
+	// Delete Curriculums
+	for _, c := range curriculums {
+		err := curriculumDao.Delete(c.ID, c.StartValidity)
+		require.Nil(t, err)
+		lengthCurriculums = lengthCurriculums - 1
+	}
+
+	// Get New lenth of Curriculums
+	curriculumsAfterDelete, err := curriculumDao.GetAll()
+	require.Nil(t, err)
+
+	require.Equal(t, lengthCurriculums, len(curriculumsAfterDelete))
 
 // Check if users can be selected by role
 func TestGetUsersByRole(t *testing.T) {
