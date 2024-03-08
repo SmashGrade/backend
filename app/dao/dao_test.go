@@ -1,6 +1,7 @@
 package dao
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/SmashGrade/backend/app/db"
@@ -637,4 +638,25 @@ func TestCreateUpdateUserByEmail(t *testing.T) {
 	for i := range roles {
 		require.Contains(t, retGet.Roles, roles[i]) // check if each role is in the role list
 	}
+}
+
+// Check if users can be selected by role
+func TestGetUsersByRole(t *testing.T) {
+	provider := db.NewMockProvider()
+	userDao := NewUserDao(repository.NewUserRepository(provider), repository.NewRoleRepository(provider))
+	userDao.CreateDefaults()
+
+	role, err := userDao.GetRoleByClaim("Kursadministrator")
+	require.Nil(t, err)
+
+	roles := []*models.Role{role}
+
+	for i := 0; i < 10; i++ {
+		userDao.Create(models.User{Roles: roles, Email: fmt.Sprintf("test%v@hftm.ch", i)})
+	}
+
+	ents, err := userDao.GetByRole(1)
+	require.Nil(t, err)
+
+	require.Len(t, ents, 10)
 }

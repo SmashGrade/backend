@@ -801,7 +801,7 @@ func (u *UserDao) GetByRole(roleId uint) (entities []models.User, err *e.ApiErro
 		return nil, e.NewDaoDbError()
 	}
 
-	role := roleEnt.(models.Role)
+	role := roleEnt.(*models.Role)
 	users := make([]models.User, 0)
 	for i := range role.Users {
 		users = append(users, *role.Users[i])
