@@ -1,6 +1,7 @@
 package dao
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -850,4 +851,24 @@ func TestDeleteCurriculum(t *testing.T) {
 	require.Nil(t, err)
 
 	require.Equal(t, lengthCurriculums, len(curriculumsAfterDelete))
+
+// Check if users can be selected by role
+func TestGetUsersByRole(t *testing.T) {
+	provider := db.NewMockProvider()
+	userDao := NewUserDao(repository.NewUserRepository(provider), repository.NewRoleRepository(provider))
+	userDao.CreateDefaults()
+
+	role, err := userDao.GetRoleByClaim("Kursadministrator")
+	require.Nil(t, err)
+
+	roles := []*models.Role{role}
+
+	for i := 0; i < 10; i++ {
+		userDao.Create(models.User{Roles: roles, Email: fmt.Sprintf("test%v@hftm.ch", i)})
+	}
+
+	ents, err := userDao.GetByRole(1)
+	require.Nil(t, err)
+
+	require.Len(t, ents, 10)
 }
