@@ -28,7 +28,7 @@ func init() {
 func StartServer(cmd *cobra.Command, args []string) {
 	configPath, err := cmd.Flags().GetString("config")
 	if err != nil {
-		configPath = "config.yaml"
+		configPath = "config/config.yaml"
 	}
 
 	// Load configuration

@@ -16,7 +16,7 @@ import (
 )
 
 // Version of the API
-const VERSION string = "0.7.0"
+const VERSION string = "0.7.1"
 
 const (
 	ROLE_COURSEADMIN  = 1
@@ -119,7 +119,7 @@ func NewAPIConfig() *APIConfig {
 		},
 		MockData: false,
 		Cors: CorsConfig{
-			AllowedOrigins: []string{"https://localhost:9000", "https://api.smashgrade.ch"},
+			AllowedOrigins: []string{"https://localhost:9000", "https://api.smashgrade.ch", "https://smashgrade.ch"},
 			AllowedHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization},
 		},
 		MaxBodySize: "2M",
