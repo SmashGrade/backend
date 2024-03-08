@@ -852,6 +852,8 @@ func TestDeleteCurriculum(t *testing.T) {
 
 	require.Equal(t, lengthCurriculums, len(curriculumsAfterDelete))
 
+}
+
 // Check if users can be selected by role
 func TestGetUsersByRole(t *testing.T) {
 	provider := db.NewMockProvider()
