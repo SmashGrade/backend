@@ -7,64 +7,64 @@ import (
 )
 
 func prefillMockDB(p Provider) {
-	p.DB().Table("roles").Create(&Role1)
-	p.DB().Table("roles").Create(&Role2)
+	p.DB().Table("roles").FirstOrCreate(&Role1)
+	p.DB().Table("roles").FirstOrCreate(&Role2)
 
-	p.DB().Table("users").Create(&User1)
-	p.DB().Table("users").Create(&User2)
-	p.DB().Table("users").Create(&User3)
-	p.DB().Table("users").Create(&User4)
-	p.DB().Table("users").Create(&User5)
+	p.DB().Table("users").FirstOrCreate(&User1)
+	p.DB().Table("users").FirstOrCreate(&User2)
+	p.DB().Table("users").FirstOrCreate(&User3)
+	p.DB().Table("users").FirstOrCreate(&User4)
+	p.DB().Table("users").FirstOrCreate(&User5)
 
-	p.DB().Table("fields").Create(&Field1)
-	p.DB().Table("fields").Create(&Field2)
+	p.DB().Table("fields").FirstOrCreate(&Field1)
+	p.DB().Table("fields").FirstOrCreate(&Field2)
 
-	p.DB().Table("curriculumtypes").Create(&CurriculumTyp3)
-	p.DB().Table("curriculumtypes").Create(&CurriculumTyp1)
-	p.DB().Table("curriculumtypes").Create(&CurriculumTyp2)
+	p.DB().Table("curriculumtypes").FirstOrCreate(&CurriculumTyp3)
+	p.DB().Table("curriculumtypes").FirstOrCreate(&CurriculumTyp1)
+	p.DB().Table("curriculumtypes").FirstOrCreate(&CurriculumTyp2)
 
-	p.DB().Table("states").Create(&State1)
-	p.DB().Table("states").Create(&State2)
+	p.DB().Table("states").FirstOrCreate(&State1)
+	p.DB().Table("states").FirstOrCreate(&State2)
 
-	p.DB().Table("focus").Create(&Focus1)
-	p.DB().Table("focus").Create(&Focus2)
+	p.DB().Table("focus").FirstOrCreate(&Focus1)
+	p.DB().Table("focus").FirstOrCreate(&Focus2)
 
-	p.DB().Table("curriculums").Create(&Curriculum1)
-	p.DB().Table("curriculums").Create(&Curriculum2)
+	p.DB().Table("curriculums").FirstOrCreate(&Curriculum1)
+	p.DB().Table("curriculums").FirstOrCreate(&Curriculum2)
 
-	p.DB().Table("evaluationtypes").Create(&EvaluationType1)
-	p.DB().Table("evaluationtypes").Create(&EvaluationType2)
+	p.DB().Table("evaluationtypes").FirstOrCreate(&EvaluationType1)
+	p.DB().Table("evaluationtypes").FirstOrCreate(&EvaluationType2)
 
-	p.DB().Table("study_stages").Create(&StudyStage1)
-	p.DB().Table("study_stages").Create(&StudyStage2)
+	p.DB().Table("study_stages").FirstOrCreate(&StudyStage1)
+	p.DB().Table("study_stages").FirstOrCreate(&StudyStage2)
 
-	p.DB().Table("modules").Create(&Module1)
-	p.DB().Table("modules").Create(&Module2)
+	p.DB().Table("modules").FirstOrCreate(&Module1)
+	p.DB().Table("modules").FirstOrCreate(&Module2)
 
-	p.DB().Table("courses").Create(&Course1)
-	p.DB().Table("courses").Create(&Course2)
-	p.DB().Table("courses").Create(&Course3)
+	p.DB().Table("courses").FirstOrCreate(&Course1)
+	p.DB().Table("courses").FirstOrCreate(&Course2)
+	p.DB().Table("courses").FirstOrCreate(&Course3)
 
-	p.DB().Table("selected_courses").Create(&SelectedCourse1)
-	p.DB().Table("selected_courses").Create(&SelectedCourse2)
+	p.DB().Table("selected_courses").FirstOrCreate(&SelectedCourse1)
+	p.DB().Table("selected_courses").FirstOrCreate(&SelectedCourse2)
 
-	p.DB().Table("examtypes").Create(&Examtype1)
-	p.DB().Table("examtypes").Create(&Examtype2)
+	p.DB().Table("examtypes").FirstOrCreate(&Examtype1)
+	p.DB().Table("examtypes").FirstOrCreate(&Examtype2)
 
-	p.DB().Table("exams").Create(&Exam1)
-	p.DB().Table("exams").Create(&Exam2)
+	p.DB().Table("exams").FirstOrCreate(&Exam1)
+	p.DB().Table("exams").FirstOrCreate(&Exam2)
 
-	p.DB().Table("gradetypes").Create(&GradeType1)
-	p.DB().Table("gradetypes").Create(&GradeType2)
+	p.DB().Table("gradetypes").FirstOrCreate(&GradeType1)
+	p.DB().Table("gradetypes").FirstOrCreate(&GradeType2)
 
-	p.DB().Table("exam_evaluations").Create(&ExamEvaluation1)
-	p.DB().Table("exam_evaluations").Create(&ExamEvaluation2)
-	p.DB().Table("exam_evaluations").Create(&ExamEvaluation3)
+	p.DB().Table("exam_evaluations").FirstOrCreate(&ExamEvaluation1)
+	p.DB().Table("exam_evaluations").FirstOrCreate(&ExamEvaluation2)
+	p.DB().Table("exam_evaluations").FirstOrCreate(&ExamEvaluation3)
 
-	p.DB().Table("conversions").Create(&Conversion1)
-	p.DB().Table("conversions").Create(&Conversion2)
-	p.DB().Table("conversions").Create(&Conversion3)
-	p.DB().Table("conversions").Create(&Conversion4)
+	p.DB().Table("conversions").FirstOrCreate(&Conversion1)
+	p.DB().Table("conversions").FirstOrCreate(&Conversion2)
+	p.DB().Table("conversions").FirstOrCreate(&Conversion3)
+	p.DB().Table("conversions").FirstOrCreate(&Conversion4)
 }
 
 var Role1 = models.Role{
