@@ -119,7 +119,7 @@ func NewAPIConfig() *APIConfig {
 		},
 		MockData: false,
 		Cors: CorsConfig{
-			AllowedOrigins: []string{"https://localhost:9000", "https://api.smashgrade.ch", "https://smashgrade.ch"},
+			AllowedOrigins: []string{"https://localhost:9000", "http://localhost:5173", "https://localhost:9191", "https://api.smashgrade.ch", "https://smashgrade.ch"},
 			AllowedHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization},
 		},
 		MaxBodySize: "2M",
