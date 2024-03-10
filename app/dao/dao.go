@@ -527,7 +527,24 @@ func (c *CurriculumDao) Get(id uint, startValidity time.Time) (entity *models.Cu
 // returns the active version of a curriculum at the time timePoint
 // returns an error if no active curriculum at that time exists
 func (c *CurriculumDao) GetValidForTimepoint(id uint, timePoint time.Time) (entity *models.Curriculum, err *e.ApiError) {
-	return nil, e.NewDaoUnimplementedError()
+	curriculums, err := c.GetAll()
+	if err != nil {
+		return nil, err
+	}
+
+	for i := range curriculums {
+		if curriculums[i].StartValidity.After(timePoint) {
+			continue
+		}
+
+		if !curriculums[i].EndValidity.IsZero() && curriculums[i].EndValidity.Before(timePoint) {
+			continue
+		}
+
+		return &curriculums[i], nil
+	}
+
+	return nil, e.NewDaoReferenceError("curriculum", timePoint.String())
 }
 
 // Creates new curriculum
@@ -556,14 +573,21 @@ func (c *CurriculumDao) Create(referenceEntity requestmodels.RefCurriculum) (ret
 }
 
 func (c *CurriculumDao) convertRefCurriculumToCurriculum(ent requestmodels.RefCurriculum) (retEnt models.Curriculum, err *e.ApiError) {
-	endValidity, parseErr := ParseTime(ent.EndValidity, "02.01.2006")
-	if parseErr != nil {
-		err = e.NewApiUnimplementedError()
-		return
+	var endValidity time.Time
+	var parseErr error
+	if ent.EndValidity == "" {
+		// the current curriculum could have a end validity not set this means it is valid until the end of time
+		endValidity = time.Time{}
+	} else {
+		endValidity, parseErr = ParseTime(ent.EndValidity, "02.01.2006")
+		if parseErr != nil {
+			err = e.NewDaoValidationError("EndValidity", "date in format dd.MM.yyyy", ent.EndValidity)
+			return
+		}
 	}
 	startValidity, parseErr := ParseTime(ent.StartValidity, "02.01.2006")
 	if parseErr != nil {
-		err = e.NewApiUnimplementedError()
+		err = e.NewDaoValidationError("StartValidity", "date in format dd.MM.yyyy", ent.StartValidity)
 		return
 	}
 

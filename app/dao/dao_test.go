@@ -874,3 +874,56 @@ func TestGetUsersByRole(t *testing.T) {
 
 	require.Len(t, ents, 10)
 }
+
+// check if we can select a curriculum by timepoint
+func TestCurriculumValidityTimeSelection(t *testing.T) {
+	provider := db.NewMockProvider()
+	cDao := NewCurriculumDao(repository.NewCurriculumRepository(provider), repository.NewFocusRepository(provider), repository.NewCurriculumtypeRepository(provider), repository.NewStateRepository(provider), repository.NewModuleRepository(provider))
+
+	cRef := requestmodels.RefCurriculum{}
+	cRef.ID = 5
+	cRef.StartValidity = "01.01.2022"
+	cRef.EndValidity = "01.01.2024"
+
+	retEnt, err := cDao.Create(cRef)
+	require.Nil(t, err)
+	require.Equal(t, cRef.ID, retEnt.ID)
+
+	cRef.StartValidity = "02.01.2024"
+	cRef.EndValidity = "05.01.2024"
+
+	retEnt2, err := cDao.Create(cRef)
+	require.Nil(t, err)
+	require.Equal(t, cRef.ID, retEnt2.ID)
+
+	cRef.StartValidity = "06.01.2024"
+	cRef.EndValidity = ""
+
+	retEnt3, err := cDao.Create(cRef)
+	require.Nil(t, err)
+	require.Equal(t, cRef.ID, retEnt3.ID)
+
+	// get the valid entry for 03.01.24 (should be the one from 02.01.24 to 05.01.24)
+	tPoint, intErr := ParseTime("03.01.2024", "02.01.2006")
+	require.Nil(t, intErr)
+	cRetValid, err := cDao.GetValidForTimepoint(cRef.ID, tPoint)
+	require.Nil(t, err)
+	require.Equal(t, cRef.ID, cRetValid.ID)
+	require.Equal(t, retEnt2.StartValidity, cRetValid.StartValidity)
+	require.Equal(t, retEnt2.EndValidity, cRetValid.EndValidity)
+
+	// get the valid entry for 21.01.24 (should be the one from 06.01.24)
+	tPoint, intErr = ParseTime("21.01.2024", "02.01.2006")
+	require.Nil(t, intErr)
+	cRetValid, err = cDao.GetValidForTimepoint(cRef.ID, tPoint)
+	require.Nil(t, err)
+	require.Equal(t, cRef.ID, cRetValid.ID)
+	require.Equal(t, retEnt3.StartValidity, cRetValid.StartValidity)
+	require.Equal(t, retEnt3.EndValidity, cRetValid.EndValidity)
+
+	// get the valid entry for 01.01.20 (should be nil)
+	tPoint, intErr = ParseTime("01.01.2020", "02.01.2006")
+	require.Nil(t, intErr)
+	_, err = cDao.GetValidForTimepoint(cRef.ID, tPoint)
+	require.NotNil(t, err)
+}
