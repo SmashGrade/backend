@@ -544,7 +544,7 @@ func (c *CurriculumDao) GetValidForTimepoint(id uint, timePoint time.Time) (enti
 		return &curriculums[i], nil
 	}
 
-	return nil, e.NewDaoReferenceError("curriculum", timePoint.String())
+	return nil, e.NewDaoNotExistingError("curriculum", timePoint.String())
 }
 
 // Creates new curriculum
