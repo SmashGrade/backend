@@ -5,6 +5,7 @@ import (
 	"slices"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/SmashGrade/backend/app/config"
 	"github.com/SmashGrade/backend/app/dao"
@@ -63,6 +64,23 @@ func (c *BaseController) GetPathParamUint(ctx echo.Context, param string) (uint,
 	}
 	// Return value
 	return uint(res), nil
+}
+
+// GetPathParamTime retrieves the value of a path parameter from the given context and parses it as a time.Time value.
+// It expects the path parameter to be in the format "30.07.2024".
+// If the parsing is successful, it returns the parsed time.Time value.
+// If the parsing fails, it returns an error.
+func (c *BaseController) GetPathParamTime(ctx echo.Context, param string) (time.Time, error) {
+	// Get dateString from Parameter
+	dateString := c.GetPathParam(ctx, param)
+
+	// parse string to time.Time
+	dateTime, err := dao.ParseTime(dateString, "02.01.2006")
+	if err != nil {
+		return time.Time{}, err
+	}
+
+	return dateTime, nil
 }
 
 // Retrieves the user from the requests bearer token

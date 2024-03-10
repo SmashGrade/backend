@@ -29,6 +29,7 @@ ENV API_DB_CONNECTION_STR "sqlite:///app/data/data.db"
 
 EXPOSE 9000
 VOLUME ["/app/data"]
+VOLUME ["/app/config"]
 
 WORKDIR /app
 

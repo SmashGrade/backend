@@ -209,7 +209,7 @@ var Curriculum1 = models.Curriculum{
 	Curriculumtype: CurriculumTyp3,
 	State:          State1,
 	TerminatedBasemodel: models.TerminatedBasemodel{
-		StartValidity: time.Date(2021, time.April, 1, 12, 0, 0, 0, time.UTC),
+		StartValidity: time.Date(2021, time.April, 1, 0, 0, 0, 0, time.UTC),
 		ID:            1,
 	},
 }
@@ -220,7 +220,7 @@ var Curriculum2 = models.Curriculum{
 	State:          State1,
 	EndValidity:    time.Date(2024, time.April, 1, 12, 0, 0, 0, time.UTC),
 	TerminatedBasemodel: models.TerminatedBasemodel{
-		StartValidity: time.Date(2021, time.April, 1, 12, 0, 0, 0, time.UTC),
+		StartValidity: time.Date(2021, time.April, 1, 0, 0, 0, 0, time.UTC),
 		ID:            2,
 	},
 }

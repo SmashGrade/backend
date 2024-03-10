@@ -35,6 +35,12 @@ To find documentation run the docker image locally with:
 docker run --name smashgrade-backend -e ENV=dev -p 9000:9000 ghcr.io/smashgrade/backend:dev
 ```
 
+## Mounting your configuration
+
+1. Run the docker container with -v ${PWD}/config:/app/config/ to mount the config folder in the current directory to the container
+2. The configuration file gets created
+3. You can update the values in the configuration file and restart the container
+
 ## Adding a new user e.g Kursadmin
 
 To add a new user manually to the database you can use the following steps:
