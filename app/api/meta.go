@@ -250,6 +250,58 @@ func (m *MetaController) MyCurriculumsAsStudent(ctx echo.Context) error {
 	return m.Yeet(ctx, studentCurriculum)
 }
 
+// @Summary		Set start year and curriculumId as student
+// @Description	Set start year and curriculumId as student by userinfo from accesstoken
+// @Tags			meta, curriculums, users
+// @Param			id		path	uint		true	"Curriculum ID"
+// @Param			date	path	time.Time	true	"Class start date"
+// @Produce		json
+// @Success		200	{array}		models.User
+// @Failure		401	{object}	error.ApiError
+// @Failure		403	{object}	error.ApiError
+// @Failure		500	{object}	error.ApiError
+// @Router			/onboarding [put]
+// @Security		Bearer
+func (m *MetaController) SetStudentCurriculumLink(ctx echo.Context) error {
+	err := m.CheckUserRole(config.ROLE_STUDENT, ctx)
+	if err != nil {
+		return err
+	}
+
+	user, err := m.GetUser(ctx)
+	if err != nil {
+		return err
+	}
+
+	// Read id parameter from request
+	id, intErr := m.GetPathParamUint(ctx, "id")
+	if intErr != nil {
+		return e.NewDaoValidationError("id", "uint", m.GetPathParam(ctx, "id"))
+	}
+
+	// Read date paramater from request
+	date, intErr := m.GetPathParamTime(ctx, "date")
+	if intErr != nil {
+		return e.NewDaoValidationError("date", "time.Time", m.GetPathParam(ctx, "date"))
+	}
+
+	// check if there is such a curriculum
+	_, intErr = m.curriculumDao.GetValidForTimepoint(id, date)
+	if intErr != nil {
+		return intErr
+	}
+
+	user.CurriculumID = id
+	user.ClassStartyear = date
+
+	intErr = m.userDao.Update(*user)
+	if intErr != nil {
+		return intErr
+	}
+
+	return m.Yeet(ctx, *user)
+}
+
 // register all output endpoints to router
 func RegisterV1MetaCourse(g *echo.Group, m *MetaController) {
 	g.GET("/courses/meta", m.MetaCourses)
@@ -257,4 +309,5 @@ func RegisterV1MetaCourse(g *echo.Group, m *MetaController) {
 	g.GET("/curriculums/meta", m.MetaCurriculums)
 	g.GET("/courses/teacher", m.MyCoursesAsTeacher)
 	g.GET("/curriculums/student", m.MyCurriculumsAsStudent)
+	g.PUT("/onboarding", m.SetStudentCurriculumLink)
 }
