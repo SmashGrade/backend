@@ -209,7 +209,19 @@ func (m *MetaController) MyCoursesAsTeacher(ctx echo.Context) error {
 		return err
 	}
 
-	return e.NewApiUnimplementedError()
+	user, err := m.GetUser(ctx)
+	if err != nil {
+		return err
+	}
+
+	var teacherCourses models.TeacherCourses
+
+	teacherCourses.Courses = make([]models.Course, len(user.TeachesCourses))
+	for i := range user.TeachesCourses {
+		teacherCourses.Courses[i] = *user.TeachesCourses[i]
+	}
+
+	return m.Yeet(ctx, teacherCourses)
 }
 
 // @Summary		Get Curriculums as a student
