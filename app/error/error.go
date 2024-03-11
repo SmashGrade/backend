@@ -3,6 +3,7 @@ package error
 import (
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/labstack/echo/v4"
 )
@@ -106,6 +107,10 @@ func NewDaoReferenceIdError(referenceObjectName string, id uint) *ApiError {
 
 func NewDaoReferenceVersionedError(referenceObjectName string, id, version uint) *ApiError {
 	return NewDaoReferenceError(referenceObjectName, fmt.Sprintf("id: %v, version: %v", id, version))
+}
+
+func NewDaoReferenceTimedError(referenceObjectName string, id uint, startValidity time.Time) *ApiError {
+	return NewDaoReferenceError(referenceObjectName, fmt.Sprintf("id: %v, startValidty: %v", id, startValidity))
 }
 
 func NewDaoNotExistingError(objectName, referenceKey string) *ApiError {
