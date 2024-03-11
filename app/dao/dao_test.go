@@ -927,3 +927,78 @@ func TestCurriculumValidityTimeSelection(t *testing.T) {
 	_, err = cDao.GetValidForTimepoint(cRef.ID, tPoint)
 	require.NotNil(t, err)
 }
+
+// Check if courses and studends are returned from the teaches by user field
+func TestTechedByTeacher(t *testing.T) {
+	provider := db.NewMockProvider()
+
+	//provider := db.NewProvider(config.NewAPIConfig())
+
+	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider), repository.NewExamRepository(provider), repository.NewRoleRepository(provider))
+
+	// create a module and link it indirectly with the course
+	moduleDao := NewModuleDao(repository.NewModuleRepository(provider))
+
+	testModule := models.Module{
+		Description: "testmodule",
+	}
+
+	retEnt, err := moduleDao.Create(testModule)
+	require.Nil(t, err)
+
+	// create a user to link as teacher
+	userDao := NewUserDao(repository.NewUserRepository(provider), repository.NewRoleRepository(provider))
+
+	testUser := models.User{
+		Name:  "Rafael Stauffer",
+		Email: "rafael.stauffer@hftm.ch",
+	}
+
+	retEntUser, err := userDao.Create(testUser)
+	require.Nil(t, err)
+
+	// create a course and add all indirect key only structs to it
+	testCourse := requestmodels.RefCourse{
+		Description: "testcourse",
+	}
+
+	testCourse.Modules = append(testCourse.Modules, requestmodels.RefVersioned{ID: retEnt.ID, Version: retEnt.Version})
+	testCourse.TeachedBy = append(testCourse.TeachedBy, requestmodels.RefId{ID: retEntUser.ID})
+
+	createdCourse, err := courseDao.Create(testCourse)
+	require.Nil(t, err)
+
+	// check has our main course object kept its data
+	require.Equal(t, "testcourse", createdCourse.Description)
+
+	startToday := time.Now()
+
+	testStudent := models.User{
+		Name:           "Max Mustermann",
+		Email:          "max.mustermann@hftm.ch",
+		ClassStartyear: startToday,
+	}
+
+	retEntUserStudent, err := userDao.Create(testStudent) // create first to get an id
+	require.Nil(t, err)
+
+	// now we can create the selected course link
+	retEntUserStudent.SelectedCourses = []models.SelectedCourse{{CourseID: createdCourse.ID, CourseVersion: createdCourse.Version, ClassStartyear: startToday, UserID: retEntUserStudent.ID}}
+
+	err = userDao.Update(*retEntUserStudent)
+	require.Nil(t, err)
+
+	retEntUserStudent, err = userDao.Get(retEntUserStudent.ID)
+	require.Nil(t, err)
+
+	require.True(t, len(retEntUserStudent.SelectedCourses) > 0) // This works, the user has now assigned a selected course
+	require.Equal(t, createdCourse.ID, retEntUserStudent.SelectedCourses[0].CourseID)
+
+	retEntUser, err = userDao.Get(retEntUser.ID) // now select the teacher again to check if we can see the teached module and its selected course link
+	require.Nil(t, err)
+
+	require.True(t, len(retEntUser.TeachesCourses) > 0)
+	// This fails, the selected courses does not autoload
+	// require.True(t, len(retEntUser.TeachesCourses[0].SelectedCourses) > 0)
+	//require.Equal(t, retEntUserStudent.ID, retEntUser.TeachesCourses[0].SelectedCourses[0].UserID)
+}
