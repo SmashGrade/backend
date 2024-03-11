@@ -24,8 +24,19 @@ type MetaCurriculums struct {
 	Teachers        []User           `json:"teachers"`
 }
 
+// a class are selectedcourses grouped by courseID, courseVersion and startyear
+type Class struct {
+	CourseID        uint             `json:"courseId"`
+	CourseVersion   uint             `json:"courseVersion"`
+	ClassStartyear  time.Time        `json:"classStartYear"`
+	Students        []User           `json:"students"`
+	ExamEvaluations []ExamEvaluation `json:"examEvaluations"`
+}
+
 // list of courses teached by current user with modules and study stage, list of all users
 type TeacherCourses struct {
+	Courses []Course `json:"courses"`
+	Classes []Class  `json:"classes"`
 }
 
 // chosen curriculum with start year and curriculum type
