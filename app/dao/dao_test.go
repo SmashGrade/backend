@@ -1002,3 +1002,13 @@ func TestTechedByTeacher(t *testing.T) {
 	// require.True(t, len(retEntUser.TeachesCourses[0].SelectedCourses) > 0)
 	//require.Equal(t, retEntUserStudent.ID, retEntUser.TeachesCourses[0].SelectedCourses[0].UserID)
 }
+
+func TestClassSelection(t *testing.T) {
+	provider := db.NewPrefilledMockProvider()
+
+	classDao := NewClassDao(repository.NewCourseRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider), repository.NewExamRepository(provider), repository.NewRoleRepository(provider), repository.NewExamEvaluationRepository(provider))
+
+	class, err := classDao.Get(db.SelectedCourse1.CourseID, db.SelectedCourse1.CourseVersion, db.SelectedCourse1.ClassStartyear)
+	require.Nil(t, err)
+	require.NotNil(t, class)
+}
