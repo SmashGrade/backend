@@ -5,6 +5,7 @@ import (
 	"github.com/SmashGrade/backend/app/db"
 	e "github.com/SmashGrade/backend/app/error"
 	"github.com/SmashGrade/backend/app/repository"
+	"github.com/SmashGrade/backend/app/requestmodels"
 	"github.com/labstack/echo/v4"
 )
 
@@ -20,6 +21,75 @@ func NewModuleController(provider db.Provider) *ModuleController {
 		BaseController: NewBaseController(provider),
 		Dao:            dao.NewModuleDao(repository.NewModuleRepository(provider)),
 	}
+}
+
+func (c *ModuleController) Create(ctx echo.Context) error {
+	module := new(requestmodels.RefModule)
+	// Read the request into Reference
+	if err := ctx.Bind(module); err != nil {
+		return e.ErrorInvalidRequest("module")
+	}
+	// Let dao create the module
+	returnModule, err := c.Dao.Create(*module)
+	if err != nil {
+		return err
+	}
+	// return the result from the Post
+	return c.Yeet(ctx, returnModule)
+}
+
+func (c *ModuleController) CreateVersion(ctx echo.Context) error {
+	id, err := c.GetPathParamUint(ctx, "id")
+	if err != nil {
+		return e.NewDaoValidationError("id", "uint", c.GetPathParam(ctx, "id"))
+	}
+
+	module := new(requestmodels.RefModule)
+	// Read the request into module
+	if err := ctx.Bind(module); err != nil {
+		return e.ErrorInvalidRequest("module")
+	}
+
+	module.ID = id
+	module.Version = 0
+
+	// Let dao create the module
+	returnModule, daoErr := c.Dao.Create(*module)
+	if daoErr != nil {
+		return daoErr
+	}
+	// return the result from the Post
+	return c.Yeet(ctx, returnModule)
+}
+
+func (c *ModuleController) Update(ctx echo.Context) error {
+	// Read id parameter from request
+	id, err := c.GetPathParamUint(ctx, "id")
+	if err != nil {
+		return e.NewDaoValidationError("id", "uint", c.GetPathParam(ctx, "id"))
+	}
+
+	version, err := c.GetPathParamUint(ctx, "version")
+	if err != nil {
+		return e.NewDaoValidationError("version", "uint", c.GetPathParam(ctx, "version"))
+	}
+
+	module := new(requestmodels.RefModule)
+	// Read the request into Module
+	if err := ctx.Bind(module); err != nil {
+		return e.ErrorInvalidRequest("module")
+	}
+
+	module.ID = id
+	module.Version = version
+
+	// Let dao create the module
+	daoErr := c.Dao.Update(*module)
+	if daoErr != nil {
+		return daoErr
+	}
+
+	return c.Yeet(ctx, module)
 }
 
 // @Summary		Get all modules
@@ -72,8 +142,32 @@ func (c *ModuleController) Module(ctx echo.Context) error {
 	return c.Yeet(ctx, res)
 }
 
+func (c *ModuleController) Delete(ctx echo.Context) error {
+	id, err := c.GetPathParamUint(ctx, "id")
+	if err != nil {
+		return e.NewDaoValidationError("id", "uint", c.GetPathParam(ctx, "version"))
+	}
+
+	version, err := c.GetPathParamUint(ctx, "version")
+	if err != nil {
+		return e.NewDaoValidationError("version", "uint", c.GetPathParam(ctx, "version"))
+	}
+
+	// Let dao create the module
+	daoErr := c.Dao.Delete(id, version)
+	if daoErr != nil {
+		return daoErr
+	}
+	// return the result from the Post
+	return c.Yeet(ctx, nil)
+}
+
 // register all output endpoints to router
 func RegisterV1Modules(g *echo.Group, c *ModuleController) {
 	g.GET("/modules", c.Modules)
 	g.GET("/modules/:id/:version", c.Module)
+	g.POST("/modules", c.Create)
+	g.POST("/modules/:id", c.CreateVersion)
+	g.PUT("/modules/:id/:version", c.Update)
+	g.DELETE("/modules/:id/:version", c.Delete)
 }
