@@ -786,7 +786,7 @@ func (m *ModuleDao) Update(referenceEntity requestmodels.RefModule) *e.ApiError 
 		return err
 	}
 
-	internalError := m.repo.Update(entity)
+	internalError := m.repo.Update(&entity)
 	if internalError != nil {
 		return e.NewDaoDbError()
 	}
