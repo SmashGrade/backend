@@ -16,13 +16,18 @@ import (
 )
 
 // Version of the API
-const VERSION string = "0.7.1"
+const VERSION string = "0.8.0"
 
 const (
+	// Roles
 	ROLE_COURSEADMIN  = 1
 	ROLE_FIELDMANAGER = 2
 	ROLE_TEACHER      = 3
 	ROLE_STUDENT      = 4
+	// Grade types
+	GRADETYPE_NONE    = 1
+	GRADETYPE_NOTE    = 2
+	GRADETYPE_PERCENT = 3
 )
 
 // APIConfig is used to define the configuration of the API
@@ -36,7 +41,7 @@ type APIConfig struct {
 	AllowedDomains      []string                   `yaml:"allowedDomains"`      // AllowedDomains is the list of allowed domains for new users
 	ExamTypes           []string                   `yaml:"examTypes"`           // ExamTypes is the list of exam types
 	ExamEvaluationTypes []ExamEvaluationTypeConfig `yaml:"examEvaluationTypes"` // EvalTypes is the list of evaluation types
-	GradeTypes          []string                   `yaml:"gradeTypes"`          // GradeTypes is the list of grade types
+	GradeTypes          []GradeTypeConfig          `yaml:"gradeTypes"`          // GradeTypes is the list of grade types
 	States              []string                   `yaml:"states"`              // States is the list of states
 	CurriculumTypes     []CurriculumTypeConfig     `yaml:"curriculumTypes"`     // CurriculumTypes is the list of curriculum types
 	Roles               []RoleConfig               `yaml:"roles"`               // Roles is the list of roles
@@ -85,6 +90,11 @@ type CurriculumTypeConfig struct {
 	DurationYears uint   `yaml:"durationyears"`
 }
 
+type GradeTypeConfig struct {
+	Id          uint   `yaml:"id"`          // Id of the grade type
+	Description string `yaml:"description"` // Description of the grade type
+}
+
 // Returns a new configuration with default values
 // This is used to create the config file if it does not exist
 func NewAPIConfig() *APIConfig {
@@ -100,7 +110,7 @@ func NewAPIConfig() *APIConfig {
 		DBConnectionStr: "sqlite://:memory:",
 		AllowedDomains:  []string{"hftm.ch", "smashgrade.ch"},
 		ExamTypes:       []string{"Mündliche oder schriftliche Prüfung", "Präsentationen", "Lernbericht", "schriftliche Arbeit", "Lernjournal"},
-		GradeTypes:      []string{"Kein Eintrag", "Note (1-6)", "Prozentwert (0-100)"},
+		GradeTypes:      []GradeTypeConfig{{Id: 1, Description: "Kein Eintrag"}, {Id: 2, Description: "Note (1-6)"}, {Id: 3, Description: "Prozentwert (0-100)"}},
 		ExamEvaluationTypes: []ExamEvaluationTypeConfig{
 			{Code: "F", Description: "Modul bestanden, wenn jeder Kurs eine genügende Bewertung aufweist. (Art. 29)"},
 			{Code: "M", Description: "Modul bestanden, wenn der Durchschnitt aller Kurse genügend und nicht mehr als ein Kurs im Modul ungenügend ist. (Art. 30)"},

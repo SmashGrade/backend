@@ -344,7 +344,7 @@ func (c *GradeTypeDao) CreateDefaults() *e.ApiError {
 
 		existingFound := false
 		for _, existing := range existingEntities {
-			if v == existing.Description {
+			if v.Description == existing.Description {
 				existingFound = true
 				break
 			}
@@ -354,7 +354,7 @@ func (c *GradeTypeDao) CreateDefaults() *e.ApiError {
 		}
 
 		_, err := c.Create(models.Gradetype{
-			Description: v,
+			Description: v.Description,
 		})
 		if err != nil {
 			return err
