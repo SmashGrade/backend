@@ -1,6 +1,8 @@
 package api
 
 import (
+	"time"
+
 	"github.com/SmashGrade/backend/app/config"
 	"github.com/SmashGrade/backend/app/dao"
 	"github.com/SmashGrade/backend/app/db"
@@ -22,6 +24,7 @@ type MetaController struct {
 	curriculumtypeDao *dao.CurriculumTypeDao
 	focusDao          *dao.FocusDao
 	fieldDao          *dao.FieldDao
+	classDao          *dao.ClassDao
 }
 
 // Constructor for MetaController
@@ -37,6 +40,7 @@ func NewMetaController(provider db.Provider) *MetaController {
 		curriculumtypeDao: dao.NewCurriculumTypeDao(repository.NewCurriculumtypeRepository(provider)),
 		focusDao:          dao.NewFocusDao(repository.NewFocusRepository(provider)),
 		fieldDao:          dao.NewFieldDao(repository.NewFieldRepository(provider)),
+		classDao:          dao.NewClassDao(repository.NewCourseRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider), repository.NewExamRepository(provider), repository.NewRoleRepository(provider), repository.NewExamEvaluationRepository(provider)),
 	}
 }
 
@@ -217,8 +221,32 @@ func (m *MetaController) MyCoursesAsTeacher(ctx echo.Context) error {
 	var teacherCourses models.TeacherCourses
 
 	teacherCourses.Courses = make([]models.Course, len(user.TeachesCourses))
+	teacherCourses.Classes = make([]models.Class, 0)
 	for i := range user.TeachesCourses {
 		teacherCourses.Courses[i] = *user.TeachesCourses[i]
+
+		// here we create a list of all unique class start dates in selected courses
+		uniqueStartDates := make([]time.Time, 0)
+		for _, newSelected := range user.TeachesCourses[i].SelectedCourses {
+			alreadyExists := false
+			for _, existingDate := range uniqueStartDates {
+				if newSelected.ClassStartyear == existingDate {
+					alreadyExists = true
+					break
+				}
+			}
+			if !alreadyExists {
+				uniqueStartDates = append(uniqueStartDates, newSelected.ClassStartyear)
+			}
+		}
+
+		for _, uniqueDate := range uniqueStartDates {
+			newClass, err := m.classDao.Get(teacherCourses.Courses[i].ID, teacherCourses.Courses[i].Version, uniqueDate)
+			if err != nil {
+				return err
+			}
+			teacherCourses.Classes = append(teacherCourses.Classes, *newClass)
+		}
 	}
 
 	return m.Yeet(ctx, teacherCourses)
