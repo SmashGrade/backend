@@ -162,11 +162,16 @@ func (c *BaseController) GetUser(ctx echo.Context) (*models.User, *e.ApiError) {
 // returns nil if the claim is valid
 func (c *BaseController) CheckUserRole(roleId uint, ctx echo.Context) *e.ApiError {
 
-	cfg := config.NewAPIConfig()
+	// Check if authentication has been disabled
+	// Return nil no matter what claims are present
+	if !c.Provider.Config().AuthConfig.Enabled {
+		return nil
+	}
+
 	var requiredRole *config.RoleConfig = nil
-	for i := range cfg.Roles {
-		if cfg.Roles[i].Id == roleId {
-			requiredRole = &cfg.Roles[i]
+	for i := range c.Provider.Config().Roles {
+		if c.Provider.Config().Roles[i].Id == roleId {
+			requiredRole = &c.Provider.Config().Roles[i]
 		}
 	}
 	if requiredRole == nil {
