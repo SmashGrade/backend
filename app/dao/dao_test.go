@@ -262,7 +262,7 @@ func TestModuleCRUD(t *testing.T) {
 	testDescr := "testdescr"
 
 	// Create
-	retModule, err := dao.Create(models.Module{
+	retModule, err := dao.Create(requestmodels.RefModule{
 		Description: testDescr,
 	})
 	require.Nil(t, err)
@@ -282,7 +282,7 @@ func TestModuleCRUD(t *testing.T) {
 
 	// Update
 	newTestDescr := "wowee"
-	newModule := models.Module{
+	newModule := requestmodels.RefModule{
 		Description: newTestDescr,
 	}
 	newModule.ID = retModule.ID
@@ -357,7 +357,7 @@ func TestLinkCourseObjectsByKey(t *testing.T) {
 	// create a module and link it indirectly with the course
 	moduleDao := NewModuleDao(repository.NewModuleRepository(provider))
 
-	testModule := models.Module{
+	testModule := requestmodels.RefModule{
 		Description: "testmodule",
 	}
 
@@ -453,7 +453,7 @@ func TestPreventCascadeDelete(t *testing.T) {
 	// create a module and link it indirectly with the course
 	moduleDao := NewModuleDao(repository.NewModuleRepository(provider))
 
-	testModule := models.Module{
+	testModule := requestmodels.RefModule{
 		Description: "testmodule",
 	}
 
