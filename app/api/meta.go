@@ -1,6 +1,9 @@
 package api
 
 import (
+	"time"
+
+	"github.com/SmashGrade/backend/app/config"
 	"github.com/SmashGrade/backend/app/dao"
 	"github.com/SmashGrade/backend/app/db"
 	e "github.com/SmashGrade/backend/app/error"
@@ -21,6 +24,7 @@ type MetaController struct {
 	curriculumtypeDao *dao.CurriculumTypeDao
 	focusDao          *dao.FocusDao
 	fieldDao          *dao.FieldDao
+	classDao          *dao.ClassDao
 }
 
 // Constructor for MetaController
@@ -36,6 +40,7 @@ func NewMetaController(provider db.Provider) *MetaController {
 		curriculumtypeDao: dao.NewCurriculumTypeDao(repository.NewCurriculumtypeRepository(provider)),
 		focusDao:          dao.NewFocusDao(repository.NewFocusRepository(provider)),
 		fieldDao:          dao.NewFieldDao(repository.NewFieldRepository(provider)),
+		classDao:          dao.NewClassDao(repository.NewCourseRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider), repository.NewExamRepository(provider), repository.NewRoleRepository(provider), repository.NewExamEvaluationRepository(provider)),
 	}
 }
 
@@ -55,7 +60,10 @@ func (m *MetaController) MetaCourses(ctx echo.Context) error {
 	// These are Preselected Items
 	var metaCourse models.MetaCourse
 
-	// TODO: only allow course admin role on this endpoint
+	err := m.CheckUserRole(config.ROLE_COURSEADMIN, ctx)
+	if err != nil {
+		return err
+	}
 
 	// Get all Teachers
 	teachers, err := m.userDao.GetTeachers()
@@ -96,7 +104,10 @@ func (m *MetaController) MetaModules(ctx echo.Context) error {
 	// These are Preselected Items
 	var metaModules models.MetaModules
 
-	// TODO: only allow course admin role on this endpoint
+	err := m.CheckUserRole(config.ROLE_COURSEADMIN, ctx)
+	if err != nil {
+		return err
+	}
 
 	// Get all Evaluationtypes
 	evaluationtypes, err := m.evaluationtypeDao.GetAll()
@@ -144,7 +155,10 @@ func (m *MetaController) MetaCurriculums(ctx echo.Context) error {
 	// MetaCurriculum contains all form choice data to create or modify a curriculum (Studiengang)
 	// returns: all focus (Fachrichtung), all fields (Schwerpunkt), all curriculumtypes, all users
 
-	// TODO: only allow course admin role on this endpoint
+	err := m.CheckUserRole(config.ROLE_COURSEADMIN, ctx)
+	if err != nil {
+		return err
+	}
 
 	var metaCurriculums models.MetaCurriculums
 
@@ -193,9 +207,49 @@ func (m *MetaController) MetaCurriculums(ctx echo.Context) error {
 func (m *MetaController) MyCoursesAsTeacher(ctx echo.Context) error {
 	// View of the course teacher
 	// returns: list of courses teached by current user with modules and study stage, list of all users
-	// TODO: check if user is teacher
 
-	return e.NewApiUnimplementedError()
+	err := m.CheckUserRole(config.ROLE_TEACHER, ctx)
+	if err != nil {
+		return err
+	}
+
+	user, err := m.GetUser(ctx)
+	if err != nil {
+		return err
+	}
+
+	var teacherCourses models.TeacherCourses
+
+	teacherCourses.Courses = make([]models.Course, len(user.TeachesCourses))
+	teacherCourses.Classes = make([]models.Class, 0)
+	for i := range user.TeachesCourses {
+		teacherCourses.Courses[i] = *user.TeachesCourses[i]
+
+		// here we create a list of all unique class start dates in selected courses
+		uniqueStartDates := make([]time.Time, 0)
+		for _, newSelected := range user.TeachesCourses[i].SelectedCourses {
+			alreadyExists := false
+			for _, existingDate := range uniqueStartDates {
+				if newSelected.ClassStartyear == existingDate {
+					alreadyExists = true
+					break
+				}
+			}
+			if !alreadyExists {
+				uniqueStartDates = append(uniqueStartDates, newSelected.ClassStartyear)
+			}
+		}
+
+		for _, uniqueDate := range uniqueStartDates {
+			newClass, err := m.classDao.Get(teacherCourses.Courses[i].ID, teacherCourses.Courses[i].Version, uniqueDate)
+			if err != nil {
+				return err
+			}
+			teacherCourses.Classes = append(teacherCourses.Classes, *newClass)
+		}
+	}
+
+	return m.Yeet(ctx, teacherCourses)
 }
 
 // @Summary		Get Curriculums as a student
@@ -211,9 +265,81 @@ func (m *MetaController) MyCoursesAsTeacher(ctx echo.Context) error {
 func (m *MetaController) MyCurriculumsAsStudent(ctx echo.Context) error {
 	// View of the student, general info
 	// returns: chosen curriculum with start year and curriculum type
-	// TODO: check if user is student
 
-	return e.NewApiUnimplementedError()
+	err := m.CheckUserRole(config.ROLE_STUDENT, ctx)
+	if err != nil {
+		return err
+	}
+
+	user, err := m.GetUser(ctx)
+	if err != nil {
+		return err
+	}
+
+	studentCurriculum := models.StudentCurriculums{
+		StartYear: user.ClassStartyear,
+	}
+
+	curriculum, err := m.curriculumDao.GetValidForTimepoint(user.CurriculumID, studentCurriculum.StartYear)
+	if err != nil {
+		return err
+	}
+
+	studentCurriculum.Curriculum = *curriculum
+
+	return m.Yeet(ctx, studentCurriculum)
+}
+
+// @Summary		Set start year and curriculumId as student
+// @Description	Set start year and curriculumId as student by userinfo from accesstoken
+// @Tags			meta, curriculums, users
+// @Param			id		path	uint		true	"Curriculum ID"
+// @Param			date	path	time.Time	true	"Class start date"
+// @Produce		json
+// @Success		200	{array}		models.User
+// @Failure		401	{object}	error.ApiError
+// @Failure		403	{object}	error.ApiError
+// @Failure		500	{object}	error.ApiError
+// @Router			/onboarding [put]
+// @Security		Bearer
+func (m *MetaController) SetStudentCurriculumLink(ctx echo.Context) error {
+	err := m.CheckUserRole(config.ROLE_STUDENT, ctx)
+	if err != nil {
+		return err
+	}
+
+	user, err := m.GetUser(ctx)
+	if err != nil {
+		return err
+	}
+
+	// Read id parameter from request
+	id, intErr := m.GetPathParamUint(ctx, "id")
+	if intErr != nil {
+		return e.NewDaoValidationError("id", "uint", m.GetPathParam(ctx, "id"))
+	}
+
+	// Read date paramater from request
+	date, intErr := m.GetPathParamTime(ctx, "date")
+	if intErr != nil {
+		return e.NewDaoValidationError("date", "time.Time", m.GetPathParam(ctx, "date"))
+	}
+
+	// check if there is such a curriculum
+	_, intErr = m.curriculumDao.GetValidForTimepoint(id, date)
+	if intErr != nil {
+		return intErr
+	}
+
+	user.CurriculumID = id
+	user.ClassStartyear = date
+
+	intErr = m.userDao.Update(*user)
+	if intErr != nil {
+		return intErr
+	}
+
+	return m.Yeet(ctx, *user)
 }
 
 // register all output endpoints to router
@@ -223,4 +349,5 @@ func RegisterV1MetaCourse(g *echo.Group, m *MetaController) {
 	g.GET("/curriculums/meta", m.MetaCurriculums)
 	g.GET("/courses/teacher", m.MyCoursesAsTeacher)
 	g.GET("/curriculums/student", m.MyCurriculumsAsStudent)
+	g.PUT("/onboarding", m.SetStudentCurriculumLink)
 }

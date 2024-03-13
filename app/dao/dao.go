@@ -524,6 +524,29 @@ func (c *CurriculumDao) Get(id uint, startValidity time.Time) (entity *models.Cu
 	return getTimedOrError[models.Curriculum](c.repo, id, startValidity)
 }
 
+// returns the active version of a curriculum at the time timePoint
+// returns an error if no active curriculum at that time exists
+func (c *CurriculumDao) GetValidForTimepoint(id uint, timePoint time.Time) (entity *models.Curriculum, err *e.ApiError) {
+	curriculums, err := c.GetAll()
+	if err != nil {
+		return nil, err
+	}
+
+	for i := range curriculums {
+		if curriculums[i].StartValidity.After(timePoint) {
+			continue
+		}
+
+		if !curriculums[i].EndValidity.IsZero() && curriculums[i].EndValidity.Before(timePoint) {
+			continue
+		}
+
+		return &curriculums[i], nil
+	}
+
+	return nil, e.NewDaoNotExistingError("curriculum", timePoint.String())
+}
+
 // Creates new curriculum
 func (c *CurriculumDao) Create(referenceEntity requestmodels.RefCurriculum) (returnEntity *models.Curriculum, err *e.ApiError) {
 	var internalError error
@@ -550,14 +573,21 @@ func (c *CurriculumDao) Create(referenceEntity requestmodels.RefCurriculum) (ret
 }
 
 func (c *CurriculumDao) convertRefCurriculumToCurriculum(ent requestmodels.RefCurriculum) (retEnt models.Curriculum, err *e.ApiError) {
-	endValidity, parseErr := ParseTime(ent.EndValidity, "02.01.2006")
-	if parseErr != nil {
-		err = e.NewApiUnimplementedError()
-		return
+	var endValidity time.Time
+	var parseErr error
+	if ent.EndValidity == "" {
+		// the current curriculum could have a end validity not set this means it is valid until the end of time
+		endValidity = time.Time{}
+	} else {
+		endValidity, parseErr = ParseTime(ent.EndValidity, "02.01.2006")
+		if parseErr != nil {
+			err = e.NewDaoValidationError("EndValidity", "date in format dd.MM.yyyy", ent.EndValidity)
+			return
+		}
 	}
 	startValidity, parseErr := ParseTime(ent.StartValidity, "02.01.2006")
 	if parseErr != nil {
-		err = e.NewApiUnimplementedError()
+		err = e.NewDaoValidationError("StartValidity", "date in format dd.MM.yyyy", ent.StartValidity)
 		return
 	}
 
@@ -709,6 +739,15 @@ func (c *SelectedCourseDao) Get(userId, courseId, courseVersion uint, classStart
 		return nil, e.NewDaoDbError()
 	}
 	return &internalEntity, nil
+}
+
+// Returns all slected courses for a year
+func (c *SelectedCourseDao) GetByYear(courseId, courseVersion uint, classStartYear time.Time) ([]models.SelectedCourse, *e.ApiError) {
+	internalEntity, internalError := c.repo.GetSelectedCourseByYear(courseId, courseVersion, classStartYear)
+	if internalError != nil {
+		return nil, e.NewDaoDbError()
+	}
+	return internalEntity, nil
 }
 
 type CourseDao struct {
@@ -1117,4 +1156,51 @@ func (u *UserDao) GetByEmail(email string) (entity *models.User, err *e.ApiError
 	}
 
 	return &userEntities[0], nil
+}
+
+type ClassDao struct {
+	userDao            *UserDao
+	selectedCourseDao  *SelectedCourseDao
+	examDao            *ExamDao
+	examEvaluationRepo *repository.ExamEvaluationRepository
+}
+
+// Create new dao with required repositories
+func NewClassDao(courseRepository *repository.CourseRepository, userRepository *repository.UserRepository, selectedCourseRepository *repository.SelectedCourseRepository, examRepository *repository.ExamRepository, roleRepository *repository.RoleRepository, examEvaluationRepository *repository.ExamEvaluationRepository) *ClassDao {
+	return &ClassDao{
+		userDao:            NewUserDao(userRepository, roleRepository),
+		selectedCourseDao:  NewSelectedCourseDao(selectedCourseRepository),
+		examDao:            NewExamDao(examRepository, courseRepository),
+		examEvaluationRepo: examEvaluationRepository,
+	}
+}
+
+func (c *ClassDao) Get(courseID, courseVersion uint, classStartyear time.Time) (*models.Class, *e.ApiError) {
+	class := &models.Class{CourseID: courseID, CourseVersion: courseVersion, ClassStartyear: classStartyear}
+
+	// with the selected courses we find all students assigned to this year i.e. the class
+	selectedCourses, err := c.selectedCourseDao.GetByYear(courseID, courseVersion, classStartyear)
+	if err != nil {
+		return nil, err
+	}
+
+	// we now get the user objects themself
+	class.Students = make([]models.User, len(selectedCourses))
+	for i := range selectedCourses {
+		usr, err := c.userDao.Get(selectedCourses[i].UserID)
+		if err != nil {
+			return nil, err
+		}
+		class.Students[i] = *usr
+	}
+
+	// evaluations we can select directly
+	evaluations, intErr := c.examEvaluationRepo.GetByCourseAndYear(courseID, courseVersion, classStartyear)
+	if intErr != nil {
+		return nil, e.NewDaoDbError()
+	}
+
+	class.ExamEvaluations = evaluations
+
+	return class, nil
 }

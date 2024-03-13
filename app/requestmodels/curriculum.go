@@ -9,3 +9,8 @@ type RefCurriculum struct {
 	Description      string         `json:"description" example:"Softwareentwicklung"`
 	Modules          []RefVersioned `json:"modules"`
 }
+
+type RefOnboarding struct {
+	StartDate    string `json:"startDate"`
+	CurriculumID uint   `json:"curriculumId"`
+}
