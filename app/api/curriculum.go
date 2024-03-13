@@ -1,6 +1,7 @@
 package api
 
 import (
+	"github.com/SmashGrade/backend/app/config"
 	"github.com/SmashGrade/backend/app/dao"
 	"github.com/SmashGrade/backend/app/db"
 	e "github.com/SmashGrade/backend/app/error"
@@ -40,6 +41,17 @@ func NewCurriculumController(provider db.Provider) *CurriculumController {
 // @Router			/curriculums [get]
 // @Security		Bearer
 func (c *CurriculumController) Curriculums(ctx echo.Context) error {
+	// Check Role
+	var allowedRoles []uint
+	allowedRoles = append(allowedRoles, config.ROLE_COURSEADMIN)
+	allowedRoles = append(allowedRoles, config.ROLE_FIELDMANAGER)
+	allowedRoles = append(allowedRoles, config.ROLE_TEACHER)
+	allowedRoles = append(allowedRoles, config.ROLE_STUDENT)
+	roleErr := c.CheckUserRoles(allowedRoles, ctx)
+	if roleErr != nil {
+		return roleErr
+	}
+
 	res, err := c.Dao.GetAll()
 	if err != nil {
 		return err
@@ -60,6 +72,17 @@ func (c *CurriculumController) Curriculums(ctx echo.Context) error {
 // @Router			/curriculums/{id}/{date} [get]
 // @Security		Bearer
 func (c *CurriculumController) Curriculum(ctx echo.Context) error {
+	// Check Role
+	var allowedRoles []uint
+	allowedRoles = append(allowedRoles, config.ROLE_COURSEADMIN)
+	allowedRoles = append(allowedRoles, config.ROLE_FIELDMANAGER)
+	allowedRoles = append(allowedRoles, config.ROLE_TEACHER)
+	allowedRoles = append(allowedRoles, config.ROLE_STUDENT)
+	roleErr := c.CheckUserRoles(allowedRoles, ctx)
+	if roleErr != nil {
+		return roleErr
+	}
+
 	// Read id parameter from request
 	id, err := c.GetPathParamUint(ctx, "id")
 	if err != nil {
@@ -95,6 +118,16 @@ func (c *CurriculumController) Curriculum(ctx echo.Context) error {
 // @Router			/curriculums [post]
 // @Security		Bearer
 func (c *CurriculumController) Create(ctx echo.Context) error {
+	// Check Role
+	var allowedRoles []uint
+	allowedRoles = append(allowedRoles, config.ROLE_COURSEADMIN)
+	allowedRoles = append(allowedRoles, config.ROLE_FIELDMANAGER)
+	allowedRoles = append(allowedRoles, config.ROLE_TEACHER)
+	roleErr := c.CheckUserRoles(allowedRoles, ctx)
+	if roleErr != nil {
+		return roleErr
+	}
+
 	curriculum := new(requestmodels.RefCurriculum)
 	// Read the request into curriculum
 	if err := ctx.Bind(curriculum); err != nil {
@@ -127,6 +160,16 @@ func (c *CurriculumController) Create(ctx echo.Context) error {
 // @Router			/curriculums/{id}/{date} [put]
 // @Security		Bearer
 func (c *CurriculumController) Update(ctx echo.Context) error {
+	// Check Role
+	var allowedRoles []uint
+	allowedRoles = append(allowedRoles, config.ROLE_COURSEADMIN)
+	allowedRoles = append(allowedRoles, config.ROLE_FIELDMANAGER)
+	allowedRoles = append(allowedRoles, config.ROLE_TEACHER)
+	roleErr := c.CheckUserRoles(allowedRoles, ctx)
+	if roleErr != nil {
+		return roleErr
+	}
+
 	// Read id parameter from request
 	id, err := c.GetPathParamUint(ctx, "id")
 	if err != nil {
@@ -171,6 +214,15 @@ func (c *CurriculumController) Update(ctx echo.Context) error {
 // @Router			/curriculums/{id}/{date} [delete]
 // @Security		Bearer
 func (c *CurriculumController) Delete(ctx echo.Context) error {
+	// Check Role
+	var allowedRoles []uint
+	allowedRoles = append(allowedRoles, config.ROLE_COURSEADMIN)
+	allowedRoles = append(allowedRoles, config.ROLE_FIELDMANAGER)
+	roleErr := c.CheckUserRoles(allowedRoles, ctx)
+	if roleErr != nil {
+		return roleErr
+	}
+
 	// Read id parameter from request
 	id, err := c.GetPathParamUint(ctx, "id")
 	if err != nil {

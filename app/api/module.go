@@ -1,6 +1,7 @@
 package api
 
 import (
+	"github.com/SmashGrade/backend/app/config"
 	"github.com/SmashGrade/backend/app/dao"
 	"github.com/SmashGrade/backend/app/db"
 	e "github.com/SmashGrade/backend/app/error"
@@ -23,7 +24,31 @@ func NewModuleController(provider db.Provider) *ModuleController {
 	}
 }
 
+// @Summary		Create a module
+// @Description	Create a module
+// @Tags			modules
+// @Produce		json
+// @Accept			json
+//
+// @Param			request	body		requestmodels.RefModule	true	"request body"
+//
+// @Success		200		{object}	models.Module
+// @Failure		401		{object}	error.ApiError
+// @Failure		403		{object}	error.ApiError
+// @Failure		500		{object}	error.ApiError
+// @Router			/modules [post]
+// @Security		Bearer
 func (c *ModuleController) Create(ctx echo.Context) error {
+	// Check Role
+	var allowedRoles []uint
+	allowedRoles = append(allowedRoles, config.ROLE_COURSEADMIN)
+	allowedRoles = append(allowedRoles, config.ROLE_FIELDMANAGER)
+	allowedRoles = append(allowedRoles, config.ROLE_TEACHER)
+	roleErr := c.CheckUserRoles(allowedRoles, ctx)
+	if roleErr != nil {
+		return roleErr
+	}
+
 	module := new(requestmodels.RefModule)
 	// Read the request into Reference
 	if err := ctx.Bind(module); err != nil {
@@ -38,7 +63,32 @@ func (c *ModuleController) Create(ctx echo.Context) error {
 	return c.Yeet(ctx, returnModule)
 }
 
+// @Summary		Create a new version of a module
+// @Description	Create a new version of a module
+// @Tags			modules
+// @Produce		json
+// @Accept			json
+//
+// @Param			request	body		requestmodels.RefModule	true	"request body"
+// @Param			id		path		uint					true	"Module ID"
+//
+// @Success		200		{object}	models.Module
+// @Failure		401		{object}	error.ApiError
+// @Failure		403		{object}	error.ApiError
+// @Failure		500		{object}	error.ApiError
+// @Router			/modules/{id} [post]
+// @Security		Bearer
 func (c *ModuleController) CreateVersion(ctx echo.Context) error {
+	// Check Role
+	var allowedRoles []uint
+	allowedRoles = append(allowedRoles, config.ROLE_COURSEADMIN)
+	allowedRoles = append(allowedRoles, config.ROLE_FIELDMANAGER)
+	allowedRoles = append(allowedRoles, config.ROLE_TEACHER)
+	roleErr := c.CheckUserRoles(allowedRoles, ctx)
+	if roleErr != nil {
+		return roleErr
+	}
+
 	id, err := c.GetPathParamUint(ctx, "id")
 	if err != nil {
 		return e.NewDaoValidationError("id", "uint", c.GetPathParam(ctx, "id"))
@@ -62,7 +112,33 @@ func (c *ModuleController) CreateVersion(ctx echo.Context) error {
 	return c.Yeet(ctx, returnModule)
 }
 
+// @Summary		Update a module
+// @Description	Update a module
+// @Tags			modules
+// @Produce		json
+// @Accept			json
+//
+// @Param			request	body		requestmodels.RefModule	true	"request body"
+// @Param			id		path		uint					true	"Module ID"
+// @Param			version	path		uint					true	"Module Version"
+//
+// @Success		200		{object}	models.Module
+// @Failure		401		{object}	error.ApiError
+// @Failure		403		{object}	error.ApiError
+// @Failure		500		{object}	error.ApiError
+// @Router			/modules/{id}/{version} [put]
+// @Security		Bearer
 func (c *ModuleController) Update(ctx echo.Context) error {
+	// Check Role
+	var allowedRoles []uint
+	allowedRoles = append(allowedRoles, config.ROLE_COURSEADMIN)
+	allowedRoles = append(allowedRoles, config.ROLE_FIELDMANAGER)
+	allowedRoles = append(allowedRoles, config.ROLE_TEACHER)
+	roleErr := c.CheckUserRoles(allowedRoles, ctx)
+	if roleErr != nil {
+		return roleErr
+	}
+
 	// Read id parameter from request
 	id, err := c.GetPathParamUint(ctx, "id")
 	if err != nil {
@@ -103,6 +179,17 @@ func (c *ModuleController) Update(ctx echo.Context) error {
 // @Router			/modules [get]
 // @Security		Bearer
 func (c *ModuleController) Modules(ctx echo.Context) error {
+	// Check Role
+	var allowedRoles []uint
+	allowedRoles = append(allowedRoles, config.ROLE_COURSEADMIN)
+	allowedRoles = append(allowedRoles, config.ROLE_FIELDMANAGER)
+	allowedRoles = append(allowedRoles, config.ROLE_TEACHER)
+	allowedRoles = append(allowedRoles, config.ROLE_STUDENT)
+	roleErr := c.CheckUserRoles(allowedRoles, ctx)
+	if roleErr != nil {
+		return roleErr
+	}
+
 	res, err := c.Dao.GetAll()
 	if err != nil {
 		return err
@@ -123,6 +210,17 @@ func (c *ModuleController) Modules(ctx echo.Context) error {
 // @Router			/modules/{id}/{version} [get]
 // @Security		Bearer
 func (c *ModuleController) Module(ctx echo.Context) error {
+	// Check Role
+	var allowedRoles []uint
+	allowedRoles = append(allowedRoles, config.ROLE_COURSEADMIN)
+	allowedRoles = append(allowedRoles, config.ROLE_FIELDMANAGER)
+	allowedRoles = append(allowedRoles, config.ROLE_TEACHER)
+	allowedRoles = append(allowedRoles, config.ROLE_STUDENT)
+	roleErr := c.CheckUserRoles(allowedRoles, ctx)
+	if roleErr != nil {
+		return roleErr
+	}
+
 	// Read id parameter from request
 	id, err := c.GetPathParamUint(ctx, "id")
 	if err != nil {
@@ -143,6 +241,15 @@ func (c *ModuleController) Module(ctx echo.Context) error {
 }
 
 func (c *ModuleController) Delete(ctx echo.Context) error {
+	// Check Role
+	var allowedRoles []uint
+	allowedRoles = append(allowedRoles, config.ROLE_COURSEADMIN)
+	allowedRoles = append(allowedRoles, config.ROLE_FIELDMANAGER)
+	roleErr := c.CheckUserRoles(allowedRoles, ctx)
+	if roleErr != nil {
+		return roleErr
+	}
+
 	id, err := c.GetPathParamUint(ctx, "id")
 	if err != nil {
 		return e.NewDaoValidationError("id", "uint", c.GetPathParam(ctx, "version"))

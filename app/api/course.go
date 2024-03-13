@@ -1,6 +1,7 @@
 package api
 
 import (
+	"github.com/SmashGrade/backend/app/config"
 	"github.com/SmashGrade/backend/app/dao"
 	"github.com/SmashGrade/backend/app/db"
 	e "github.com/SmashGrade/backend/app/error"
@@ -41,6 +42,17 @@ func NewCourseController(provider db.Provider) *CourseController {
 // @Router			/courses [get]
 // @Security		Bearer
 func (c *CourseController) Courses(ctx echo.Context) error {
+	// Check Role
+	var allowedRoles []uint
+	allowedRoles = append(allowedRoles, config.ROLE_COURSEADMIN)
+	allowedRoles = append(allowedRoles, config.ROLE_FIELDMANAGER)
+	allowedRoles = append(allowedRoles, config.ROLE_TEACHER)
+	allowedRoles = append(allowedRoles, config.ROLE_STUDENT)
+	roleErr := c.CheckUserRoles(allowedRoles, ctx)
+	if roleErr != nil {
+		return roleErr
+	}
+
 	res, err := c.Dao.GetAll()
 	if err != nil {
 		return err
@@ -61,6 +73,17 @@ func (c *CourseController) Courses(ctx echo.Context) error {
 // @Router			/courses/{id}/{version} [get]
 // @Security		Bearer
 func (c *CourseController) Course(ctx echo.Context) error {
+	// Check Role
+	var allowedRoles []uint
+	allowedRoles = append(allowedRoles, config.ROLE_COURSEADMIN)
+	allowedRoles = append(allowedRoles, config.ROLE_FIELDMANAGER)
+	allowedRoles = append(allowedRoles, config.ROLE_TEACHER)
+	allowedRoles = append(allowedRoles, config.ROLE_STUDENT)
+	roleErr := c.CheckUserRoles(allowedRoles, ctx)
+	if roleErr != nil {
+		return roleErr
+	}
+
 	// Read id parameter from request
 	id, err := c.GetPathParamUint(ctx, "id")
 	if err != nil {
@@ -97,6 +120,16 @@ func (c *CourseController) Course(ctx echo.Context) error {
 // @Router			/courses [post]
 // @Security		Bearer
 func (c *CourseController) Create(ctx echo.Context) error {
+	// Check Role
+	var allowedRoles []uint
+	allowedRoles = append(allowedRoles, config.ROLE_COURSEADMIN)
+	allowedRoles = append(allowedRoles, config.ROLE_FIELDMANAGER)
+	allowedRoles = append(allowedRoles, config.ROLE_TEACHER)
+	roleErr := c.CheckUserRoles(allowedRoles, ctx)
+	if roleErr != nil {
+		return roleErr
+	}
+
 	course := new(requestmodels.RefCourse)
 	// Read the request into Course
 	if err := ctx.Bind(course); err != nil {
@@ -127,6 +160,16 @@ func (c *CourseController) Create(ctx echo.Context) error {
 // @Router			/courses/{id} [post]
 // @Security		Bearer
 func (c *CourseController) CreateVersion(ctx echo.Context) error {
+	// Check Role
+	var allowedRoles []uint
+	allowedRoles = append(allowedRoles, config.ROLE_COURSEADMIN)
+	allowedRoles = append(allowedRoles, config.ROLE_FIELDMANAGER)
+	allowedRoles = append(allowedRoles, config.ROLE_TEACHER)
+	roleErr := c.CheckUserRoles(allowedRoles, ctx)
+	if roleErr != nil {
+		return roleErr
+	}
+
 	// Read id parameter from request
 
 	id, err := c.GetPathParamUint(ctx, "id")
@@ -169,6 +212,16 @@ func (c *CourseController) CreateVersion(ctx echo.Context) error {
 // @Router			/courses/{id}/{version} [put]
 // @Security		Bearer
 func (c *CourseController) Update(ctx echo.Context) error {
+	// Check Role
+	var allowedRoles []uint
+	allowedRoles = append(allowedRoles, config.ROLE_COURSEADMIN)
+	allowedRoles = append(allowedRoles, config.ROLE_FIELDMANAGER)
+	allowedRoles = append(allowedRoles, config.ROLE_TEACHER)
+	roleErr := c.CheckUserRoles(allowedRoles, ctx)
+	if roleErr != nil {
+		return roleErr
+	}
+
 	// Read id parameter from request
 	id, err := c.GetPathParamUint(ctx, "id")
 	if err != nil {
@@ -214,8 +267,16 @@ func (c *CourseController) Update(ctx echo.Context) error {
 // @Router			/courses/{id}/{version} [delete]
 // @Security		Bearer
 func (c *CourseController) Delete(ctx echo.Context) error {
-	// Read id parameter from request
+	// Check Role
+	var allowedRoles []uint
+	allowedRoles = append(allowedRoles, config.ROLE_COURSEADMIN)
+	allowedRoles = append(allowedRoles, config.ROLE_FIELDMANAGER)
+	roleErr := c.CheckUserRoles(allowedRoles, ctx)
+	if roleErr != nil {
+		return roleErr
+	}
 
+	// Read id parameter from request
 	id, err := c.GetPathParamUint(ctx, "id")
 	if err != nil {
 		return e.NewDaoValidationError("id", "uint", c.GetPathParam(ctx, "id"))
