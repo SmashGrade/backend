@@ -741,6 +741,15 @@ func (c *SelectedCourseDao) Get(userId, courseId, courseVersion uint, classStart
 	return &internalEntity, nil
 }
 
+// Returns all slected courses for a year
+func (c *SelectedCourseDao) GetByYear(courseId, courseVersion uint, classStartYear time.Time) ([]models.SelectedCourse, *e.ApiError) {
+	internalEntity, internalError := c.repo.GetSelectedCourseByYear(courseId, courseVersion, classStartYear)
+	if internalError != nil {
+		return nil, e.NewDaoDbError()
+	}
+	return internalEntity, nil
+}
+
 type CourseDao struct {
 	repo              *repository.CourseRepository
 	moduleDao         *ModuleDao
@@ -1147,4 +1156,51 @@ func (u *UserDao) GetByEmail(email string) (entity *models.User, err *e.ApiError
 	}
 
 	return &userEntities[0], nil
+}
+
+type ClassDao struct {
+	userDao            *UserDao
+	selectedCourseDao  *SelectedCourseDao
+	examDao            *ExamDao
+	examEvaluationRepo *repository.ExamEvaluationRepository
+}
+
+// Create new dao with required repositories
+func NewClassDao(courseRepository *repository.CourseRepository, userRepository *repository.UserRepository, selectedCourseRepository *repository.SelectedCourseRepository, examRepository *repository.ExamRepository, roleRepository *repository.RoleRepository, examEvaluationRepository *repository.ExamEvaluationRepository) *ClassDao {
+	return &ClassDao{
+		userDao:            NewUserDao(userRepository, roleRepository),
+		selectedCourseDao:  NewSelectedCourseDao(selectedCourseRepository),
+		examDao:            NewExamDao(examRepository, courseRepository),
+		examEvaluationRepo: examEvaluationRepository,
+	}
+}
+
+func (c *ClassDao) Get(courseID, courseVersion uint, classStartyear time.Time) (*models.Class, *e.ApiError) {
+	class := &models.Class{CourseID: courseID, CourseVersion: courseVersion, ClassStartyear: classStartyear}
+
+	// with the selected courses we find all students assigned to this year i.e. the class
+	selectedCourses, err := c.selectedCourseDao.GetByYear(courseID, courseVersion, classStartyear)
+	if err != nil {
+		return nil, err
+	}
+
+	// we now get the user objects themself
+	class.Students = make([]models.User, len(selectedCourses))
+	for i := range selectedCourses {
+		usr, err := c.userDao.Get(selectedCourses[i].UserID)
+		if err != nil {
+			return nil, err
+		}
+		class.Students[i] = *usr
+	}
+
+	// evaluations we can select directly
+	evaluations, intErr := c.examEvaluationRepo.GetByCourseAndYear(courseID, courseVersion, classStartyear)
+	if intErr != nil {
+		return nil, e.NewDaoDbError()
+	}
+
+	class.ExamEvaluations = evaluations
+
+	return class, nil
 }

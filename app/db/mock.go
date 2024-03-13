@@ -6,65 +6,190 @@ import (
 	"github.com/SmashGrade/backend/app/models"
 )
 
-func prefillMockDB(p Provider) {
-	p.DB().Table("roles").Create(&Role1)
-	p.DB().Table("roles").Create(&Role2)
+type Mock struct {
+	Table  string
+	Entity any
+}
 
-	p.DB().Table("users").Create(&User1)
-	p.DB().Table("users").Create(&User2)
-	p.DB().Table("users").Create(&User3)
-	p.DB().Table("users").Create(&User4)
-	p.DB().Table("users").Create(&User5)
+func prefillMockDB(p Provider) error {
+	mocks := []Mock{
+		{
+			Table:  "roles",
+			Entity: &Role1,
+		},
+		{
+			Table:  "roles",
+			Entity: &Role2,
+		},
+		{
+			Table:  "users",
+			Entity: &User1,
+		},
+		{
+			Table:  "users",
+			Entity: &User2,
+		},
+		{
+			Table:  "users",
+			Entity: &User3,
+		},
+		{
+			Table:  "users",
+			Entity: &User4,
+		},
+		{
+			Table:  "users",
+			Entity: &User5,
+		},
+		{
+			Table:  "fields",
+			Entity: &Field1,
+		},
+		{
+			Table:  "fields",
+			Entity: &Field2,
+		},
+		{
+			Table:  "curriculumtypes",
+			Entity: &CurriculumTyp1,
+		},
+		{
+			Table:  "curriculumtypes",
+			Entity: &CurriculumTyp2,
+		},
+		{
+			Table:  "curriculumtypes",
+			Entity: &CurriculumTyp3,
+		},
+		{
+			Table:  "states",
+			Entity: &State1,
+		},
+		{
+			Table:  "states",
+			Entity: &State2,
+		},
+		{
+			Table:  "focus",
+			Entity: &Focus1,
+		},
+		{
+			Table:  "focus",
+			Entity: &Focus2,
+		},
+		{
+			Table:  "curriculums",
+			Entity: &Curriculum1,
+		},
+		{
+			Table:  "curriculums",
+			Entity: &Curriculum2,
+		},
+		{
+			Table:  "evaluationtypes",
+			Entity: &EvaluationType1,
+		},
+		{
+			Table:  "evaluationtypes",
+			Entity: &EvaluationType2,
+		},
+		{
+			Table:  "study_stages",
+			Entity: &StudyStage1,
+		},
+		{
+			Table:  "study_stages",
+			Entity: &StudyStage2,
+		},
+		{
+			Table:  "modules",
+			Entity: &Module1,
+		},
+		{
+			Table:  "modules",
+			Entity: &Module2,
+		},
+		{
+			Table:  "courses",
+			Entity: &Course1,
+		},
+		{
+			Table:  "courses",
+			Entity: &Course2,
+		},
+		{
+			Table:  "courses",
+			Entity: &Course3,
+		},
+		{
+			Table:  "selected_courses",
+			Entity: &SelectedCourse1,
+		},
+		{
+			Table:  "selected_courses",
+			Entity: &SelectedCourse2,
+		},
+		{
+			Table:  "examtypes",
+			Entity: &Examtype1,
+		},
+		{
+			Table:  "examtypes",
+			Entity: &Examtype2,
+		},
+		{
+			Table:  "exams",
+			Entity: &Exam1,
+		},
+		{
+			Table:  "exams",
+			Entity: &Exam2,
+		},
+		{
+			Table:  "gradetypes",
+			Entity: &GradeType1,
+		},
+		{
+			Table:  "gradetypes",
+			Entity: &GradeType2,
+		},
+		{
+			Table:  "exam_evaluations",
+			Entity: &ExamEvaluation1,
+		},
+		{
+			Table:  "exam_evaluations",
+			Entity: &ExamEvaluation2,
+		},
+		{
+			Table:  "exam_evaluations",
+			Entity: &ExamEvaluation3,
+		},
+		{
+			Table:  "conversions",
+			Entity: &Conversion1,
+		},
+		{
+			Table:  "conversions",
+			Entity: &Conversion2,
+		},
+		{
+			Table:  "conversions",
+			Entity: &Conversion3,
+		},
+		{
+			Table:  "conversions",
+			Entity: &Conversion4,
+		},
+	}
 
-	p.DB().Table("fields").Create(&Field1)
-	p.DB().Table("fields").Create(&Field2)
-
-	p.DB().Table("curriculumtypes").Create(&CurriculumTyp3)
-	p.DB().Table("curriculumtypes").Create(&CurriculumTyp1)
-	p.DB().Table("curriculumtypes").Create(&CurriculumTyp2)
-
-	p.DB().Table("states").Create(&State1)
-	p.DB().Table("states").Create(&State2)
-
-	p.DB().Table("focus").Create(&Focus1)
-	p.DB().Table("focus").Create(&Focus2)
-
-	p.DB().Table("curriculums").Create(&Curriculum1)
-	p.DB().Table("curriculums").Create(&Curriculum2)
-
-	p.DB().Table("evaluationtypes").Create(&EvaluationType1)
-	p.DB().Table("evaluationtypes").Create(&EvaluationType2)
-
-	p.DB().Table("study_stages").Create(&StudyStage1)
-	p.DB().Table("study_stages").Create(&StudyStage2)
-
-	p.DB().Table("modules").Create(&Module1)
-	p.DB().Table("modules").Create(&Module2)
-
-	p.DB().Table("courses").Create(&Course1)
-	p.DB().Table("courses").Create(&Course2)
-	p.DB().Table("courses").Create(&Course3)
-
-	p.DB().Table("selected_courses").Create(&SelectedCourse1)
-	p.DB().Table("selected_courses").Create(&SelectedCourse2)
-
-	p.DB().Table("examtypes").Create(&Examtype1)
-	p.DB().Table("examtypes").Create(&Examtype2)
-
-	p.DB().Table("exams").Create(&Exam1)
-	p.DB().Table("exams").Create(&Exam2)
-
-	p.DB().Table("gradetypes").Create(&GradeType1)
-	p.DB().Table("gradetypes").Create(&GradeType2)
-
-	p.DB().Table("exam_evaluations").Create(&ExamEvaluation1)
-	p.DB().Table("exam_evaluations").Create(&ExamEvaluation2)
-	p.DB().Table("exam_evaluations").Create(&ExamEvaluation3)
-
-	p.DB().Table("conversions").Create(&Conversion1)
-	p.DB().Table("conversions").Create(&Conversion2)
-	p.DB().Table("conversions").Create(&Conversion3)
-	p.DB().Table("conversions").Create(&Conversion4)
+	for _, mock := range mocks {
+		res := p.DB().Table(mock.Table).FirstOrCreate(mock.Entity)
+		if res.Error != nil {
+			return res.Error
+		}
+	}
+	return nil
 }
 
 var Role1 = models.Role{
