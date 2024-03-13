@@ -33,6 +33,11 @@ func NewExamController(provider db.Provider) *ExamController {
 // @Router			/exams [get]
 // @Security		Bearer
 func (c *ExamController) Exams(ctx echo.Context) error {
+	// Check if the user has any role
+	if err := c.CheckUserAnyRole(ctx); err != nil {
+		return e.NewUnauthorizedError()
+	}
+
 	res, err := c.Dao.GetAll()
 	if err != nil {
 		return err
@@ -52,6 +57,11 @@ func (c *ExamController) Exams(ctx echo.Context) error {
 // @Router			/exams/{id} [get]
 // @Security		Bearer
 func (c *ExamController) Exam(ctx echo.Context) error {
+	// Check if the user has any role
+	if err := c.CheckUserAnyRole(ctx); err != nil {
+		return e.NewUnauthorizedError()
+	}
+
 	// Read id parameter from request
 	id, err := c.GetPathParamUint(ctx, "id")
 	if err != nil {

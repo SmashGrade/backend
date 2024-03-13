@@ -3,6 +3,7 @@ package api
 import (
 	"github.com/SmashGrade/backend/app/dao"
 	"github.com/SmashGrade/backend/app/db"
+	e "github.com/SmashGrade/backend/app/error"
 	"github.com/SmashGrade/backend/app/repository"
 	"github.com/labstack/echo/v4"
 )
@@ -43,7 +44,7 @@ func NewOutputController(provider db.Provider) *OutputController {
 		ctrl.gradetypeDao.CreateDefaults()
 		ctrl.evaluationtypeDao.CreateDefaults()
 		ctrl.examtypeDao.CreateDefaults()
-		ctrl.userDao.CreateDefaults() // this is not part of output but convinient to have here
+		ctrl.userDao.CreateDefaults()
 		provider.Config().Logger().Info("Creating defaults from config completed successfully")
 	}
 
@@ -61,6 +62,11 @@ func NewOutputController(provider db.Provider) *OutputController {
 // @Router			/states [get]
 // @Security		Bearer
 func (c *OutputController) States(ctx echo.Context) error {
+	// Check if the user has any role
+	if err := c.CheckUserAnyRole(ctx); err != nil {
+		return e.NewUnauthorizedError()
+	}
+
 	res, err := c.stateDao.GetAll()
 	if err != nil {
 		return err
@@ -79,6 +85,11 @@ func (c *OutputController) States(ctx echo.Context) error {
 // @Router			/curriculumtypes [get]
 // @Security		Bearer
 func (c *OutputController) Curriculumtypes(ctx echo.Context) error {
+	// Check if the user has any role
+	if err := c.CheckUserAnyRole(ctx); err != nil {
+		return e.NewUnauthorizedError()
+	}
+
 	res, err := c.curriculumytypeDao.GetAll()
 	if err != nil {
 		return err
@@ -97,6 +108,11 @@ func (c *OutputController) Curriculumtypes(ctx echo.Context) error {
 // @Router			/gradetypes [get]
 // @Security		Bearer
 func (c *OutputController) Gradetypes(ctx echo.Context) error {
+	// Check if the user has any role
+	if err := c.CheckUserAnyRole(ctx); err != nil {
+		return e.NewUnauthorizedError()
+	}
+
 	res, err := c.gradetypeDao.GetAll()
 	if err != nil {
 		return err
@@ -115,6 +131,11 @@ func (c *OutputController) Gradetypes(ctx echo.Context) error {
 // @Router			/evaluationtypes [get]
 // @Security		Bearer
 func (c *OutputController) Evaluationtypes(ctx echo.Context) error {
+	// Check if the user has any role
+	if err := c.CheckUserAnyRole(ctx); err != nil {
+		return e.NewUnauthorizedError()
+	}
+
 	res, err := c.evaluationtypeDao.GetAll()
 	if err != nil {
 		return err
@@ -133,6 +154,11 @@ func (c *OutputController) Evaluationtypes(ctx echo.Context) error {
 // @Router			/fields [get]
 // @Security		Bearer
 func (c *OutputController) Fields(ctx echo.Context) error {
+	// Check if the user has any role
+	if err := c.CheckUserAnyRole(ctx); err != nil {
+		return e.NewUnauthorizedError()
+	}
+
 	res, err := c.fieldDao.GetAll()
 	if err != nil {
 		return err
@@ -151,6 +177,11 @@ func (c *OutputController) Fields(ctx echo.Context) error {
 // @Router			/focuses [get]
 // @Security		Bearer
 func (c *OutputController) Focuses(ctx echo.Context) error {
+	// Check if the user has any role
+	if err := c.CheckUserAnyRole(ctx); err != nil {
+		return e.NewUnauthorizedError()
+	}
+
 	res, err := c.focusDao.GetAll()
 	if err != nil {
 		return err
@@ -169,6 +200,11 @@ func (c *OutputController) Focuses(ctx echo.Context) error {
 // @Router			/examtypes [get]
 // @Security		Bearer
 func (c *OutputController) Examtypes(ctx echo.Context) error {
+	// Check if the user has any role
+	if err := c.CheckUserAnyRole(ctx); err != nil {
+		return e.NewUnauthorizedError()
+	}
+
 	res, err := c.examtypeDao.GetAll()
 	if err != nil {
 		return err

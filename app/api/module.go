@@ -33,6 +33,11 @@ func NewModuleController(provider db.Provider) *ModuleController {
 // @Router			/modules [get]
 // @Security		Bearer
 func (c *ModuleController) Modules(ctx echo.Context) error {
+	// Check if the user has any role
+	if err := c.CheckUserAnyRole(ctx); err != nil {
+		return e.NewUnauthorizedError()
+	}
+
 	res, err := c.Dao.GetAll()
 	if err != nil {
 		return err
@@ -53,6 +58,11 @@ func (c *ModuleController) Modules(ctx echo.Context) error {
 // @Router			/modules/{id}/{version} [get]
 // @Security		Bearer
 func (c *ModuleController) Module(ctx echo.Context) error {
+	// Check if the user has any role
+	if err := c.CheckUserAnyRole(ctx); err != nil {
+		return e.NewUnauthorizedError()
+	}
+
 	// Read id parameter from request
 	id, err := c.GetPathParamUint(ctx, "id")
 	if err != nil {

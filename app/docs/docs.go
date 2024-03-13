@@ -1198,6 +1198,227 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Create a gradetype",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gradetype"
+                ],
+                "summary": "Create a gradetype",
+                "parameters": [
+                    {
+                        "description": "request body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Gradetype"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Gradetype"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    }
+                }
+            }
+        },
+        "/gradetypes/{id}": {
+            "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Update a gradetype",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "grapetype"
+                ],
+                "summary": "Update a gradetype",
+                "parameters": [
+                    {
+                        "description": "request body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Gradetype"
+                        }
+                    },
+                    {
+                        "type": "integer",
+                        "description": "GradeType ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Gradetype"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Delete a gradetype",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gradetypes"
+                ],
+                "summary": "Delete a gradetype",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "GradeType ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    }
+                }
+            }
+        },
+        "/gradetypes/{id}/": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get a specific gradetype",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gradetype"
+                ],
+                "summary": "Get a specific gradetype",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "GradeType ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Gradetype"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    }
+                }
             }
         },
         "/modules": {
@@ -1352,6 +1573,63 @@ const docTemplate = `{
                 }
             }
         },
+        "/onboarding": {
+            "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Set start year and curriculumId as student by userinfo from accesstoken",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "meta",
+                    "curriculums",
+                    "users"
+                ],
+                "summary": "Set start year and curriculumId as student",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Curriculum ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.User"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    }
+                }
+            }
+        },
         "/states": {
             "get": {
                 "security": [
@@ -1463,6 +1741,32 @@ const docTemplate = `{
                 "valid": {
                     "description": "Valid is true if Time is not NULL",
                     "type": "boolean"
+                }
+            }
+        },
+        "models.Class": {
+            "type": "object",
+            "properties": {
+                "classStartYear": {
+                    "type": "string"
+                },
+                "courseId": {
+                    "type": "integer"
+                },
+                "courseVersion": {
+                    "type": "integer"
+                },
+                "examEvaluations": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.ExamEvaluation"
+                    }
+                },
+                "students": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.User"
+                    }
                 }
             }
         },
@@ -1634,7 +1938,63 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "weighting": {
-                    "type": "number"
+                    "type": "integer"
+                }
+            }
+        },
+        "models.ExamEvaluation": {
+            "type": "object",
+            "properties": {
+                "created": {
+                    "type": "string"
+                },
+                "deleted": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "entryDate": {
+                    "type": "string"
+                },
+                "exam": {
+                    "$ref": "#/definitions/models.Exam"
+                },
+                "examID": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "originalValue": {
+                    "type": "string"
+                },
+                "orignialGradeTyp": {
+                    "$ref": "#/definitions/models.Gradetype"
+                },
+                "orignialGradeTypeID": {
+                    "type": "integer"
+                },
+                "registeredBy": {
+                    "$ref": "#/definitions/models.User"
+                },
+                "registeredByID": {
+                    "type": "integer"
+                },
+                "selectedCourse": {
+                    "$ref": "#/definitions/models.SelectedCourse"
+                },
+                "selectedCourseClassStartyear": {
+                    "type": "string"
+                },
+                "selectedCourseCourseID": {
+                    "type": "integer"
+                },
+                "selectedCourseCourseVersion": {
+                    "type": "integer"
+                },
+                "selectedCourseUserID": {
+                    "type": "integer"
+                },
+                "updated": {
+                    "type": "string"
                 }
             }
         },
@@ -1928,7 +2288,21 @@ const docTemplate = `{
             }
         },
         "models.StudentCurriculums": {
-            "type": "object"
+            "type": "object",
+            "properties": {
+                "curriculum": {
+                    "description": "Curriculumtype Curriculumtype // this is already in the curriculum",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.Curriculum"
+                        }
+                    ]
+                },
+                "startYear": {
+                    "description": "taken from the user or selectedcourse",
+                    "type": "string"
+                }
+            }
         },
         "models.StudyStage": {
             "type": "object",
@@ -1954,7 +2328,21 @@ const docTemplate = `{
             }
         },
         "models.TeacherCourses": {
-            "type": "object"
+            "type": "object",
+            "properties": {
+                "classes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Class"
+                    }
+                },
+                "courses": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Course"
+                    }
+                }
+            }
         },
         "models.User": {
             "type": "object",
@@ -1964,6 +2352,9 @@ const docTemplate = `{
                 },
                 "created": {
                     "type": "string"
+                },
+                "curriculumId": {
+                    "type": "integer"
                 },
                 "deleted": {
                     "$ref": "#/definitions/gorm.DeletedAt"

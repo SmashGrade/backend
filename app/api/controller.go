@@ -189,3 +189,25 @@ func (c *BaseController) CheckUserRole(roleId uint, ctx echo.Context) *e.ApiErro
 
 	return nil
 }
+
+// Allows the user to access the endpoint if the user has any role
+// returns nil if the claim is valid
+func (c *BaseController) CheckUserAnyRole(ctx echo.Context) *e.ApiError {
+	// Check if authentication has been disabled
+	// Return nil no matter what claims are present
+	if !c.Provider.Config().AuthConfig.Enabled {
+		return nil
+	}
+
+	user, err := c.GetUser(ctx)
+	if err != nil {
+		return err
+	}
+
+	if !user.HasAnyRole() {
+		return e.NewClaimMissingError("any")
+	}
+
+	return nil
+
+}

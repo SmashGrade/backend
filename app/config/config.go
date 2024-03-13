@@ -16,18 +16,18 @@ import (
 )
 
 // Version of the API
-const VERSION string = "0.8.0"
+const VERSION string = "0.8.1"
 
 const (
 	// Roles
-	ROLE_COURSEADMIN  = 1
-	ROLE_FIELDMANAGER = 2
-	ROLE_TEACHER      = 3
-	ROLE_STUDENT      = 4
+	ROLE_COURSEADMIN  uint = 1
+	ROLE_FIELDMANAGER uint = 2
+	ROLE_TEACHER      uint = 3
+	ROLE_STUDENT      uint = 4
 	// Grade types
-	GRADETYPE_NONE    = 1
-	GRADETYPE_NOTE    = 2
-	GRADETYPE_PERCENT = 3
+	GRADETYPE_NONE    uint = 1
+	GRADETYPE_NOTE    uint = 2
+	GRADETYPE_PERCENT uint = 3
 )
 
 // APIConfig is used to define the configuration of the API

@@ -20,6 +20,7 @@ type Router struct {
 	user       *UserController
 	exam       *ExamController
 	meta       *MetaController
+	gradetype  *GradeTypeController
 }
 
 // NewRouter creates a new router
@@ -35,6 +36,7 @@ func NewRouter(e *echo.Echo, p db.Provider) *Router {
 		user:       NewUserController(p),
 		exam:       NewExamController(p),
 		meta:       NewMetaController(p),
+		gradetype:  NewGradeTypeController(p),
 	}
 }
 
@@ -57,4 +59,5 @@ func (r *Router) RegisterV1() {
 	RegisterV1Exams(v1, r.exam)
 	RegisterV1MetaCourse(v1, r.meta)
 	RegisterV1Curriculums(v1, r.curriculum)
+	RegisterV1GradeTypes(v1, r.gradetype)
 }
