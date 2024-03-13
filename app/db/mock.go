@@ -15,11 +15,11 @@ func prefillMockDB(p Provider) error {
 	mocks := []Mock{
 		{
 			Table:  "roles",
-			Entity: &Role1,
+			Entity: &RoleStudent,
 		},
 		{
 			Table:  "roles",
-			Entity: &Role2,
+			Entity: &RoleDozent,
 		},
 		{
 			Table:  "users",
@@ -192,17 +192,26 @@ func prefillMockDB(p Provider) error {
 	return nil
 }
 
-var Role1 = models.Role{
+var RoleStudent = models.Role{
 	Basemodel: models.Basemodel{
-		ID: 1,
+		ID: 4,
 	},
 	Description: "Student",
+	Claim:       "Student",
 }
-var Role2 = models.Role{
+var RoleDozent = models.Role{
+	Basemodel: models.Basemodel{
+		ID: 3,
+	},
+	Description: "Dozent",
+	Claim:       "Dozent",
+}
+var RoleFieldmanager = models.Role{
 	Basemodel: models.Basemodel{
 		ID: 2,
 	},
-	Description: "Dozent",
+	Description: "Fachbereichsleiter",
+	Claim:       "Fachbereichsleiter",
 }
 
 var User1 = models.User{
@@ -212,7 +221,7 @@ var User1 = models.User{
 	Name:  "Kurt Munter",
 	Email: "kurt.munter@hftm.ch",
 	Roles: []*models.Role{
-		&Role2,
+		&RoleDozent, &RoleFieldmanager,
 	},
 }
 var User2 = models.User{
@@ -223,7 +232,7 @@ var User2 = models.User{
 	Email:          "jakob.ferber@hftm.ch",
 	ClassStartyear: time.Date(2021, time.April, 1, 12, 0, 0, 0, time.UTC),
 	Roles: []*models.Role{
-		&Role1,
+		&RoleStudent,
 	},
 }
 var User3 = models.User{
@@ -234,7 +243,7 @@ var User3 = models.User{
 	Email:          "rafael.stauffer@hftm.ch",
 	ClassStartyear: time.Date(2021, time.April, 1, 12, 0, 0, 0, time.UTC),
 	Roles: []*models.Role{
-		&Role1,
+		&RoleStudent,
 	},
 }
 var User4 = models.User{
@@ -244,7 +253,7 @@ var User4 = models.User{
 	Name:  "Bruno Borer",
 	Email: "bruno.borer@hftm.ch",
 	Roles: []*models.Role{
-		&Role2,
+		&RoleDozent,
 	},
 }
 var User5 = models.User{
@@ -254,7 +263,7 @@ var User5 = models.User{
 	Name:  "Simeon Liniger",
 	Email: "simeon.liniger@hftm.ch",
 	Roles: []*models.Role{
-		&Role2,
+		&RoleDozent,
 	},
 }
 
