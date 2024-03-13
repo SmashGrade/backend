@@ -42,3 +42,11 @@ func (r *ExamEvaluationRepository) DeleteExamEvaluation(id,
 		id, registeredById, selectedCourseUserId, selectedCourseCourseId, selectedCourseCourseVersion, selectedCourseClassStartyear, examId).Delete(&models.ExamEvaluation{}).Error
 
 }
+
+func (r *ExamEvaluationRepository) GetByCourseAndYear(selectedCourseCourseId,
+	selectedCourseCourseVersion uint, selectedCourseClassStartyear time.Time) (examEvaluations []models.ExamEvaluation, err error) {
+	result := r.Provider.DB().Where("selected_course_course_id = ? AND selected_course_course_version = ? AND selected_course_class_startyear = ?",
+		selectedCourseCourseId, selectedCourseCourseVersion, selectedCourseClassStartyear).Find(&examEvaluations)
+	err = result.Error
+	return
+}

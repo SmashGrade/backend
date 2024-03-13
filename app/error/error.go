@@ -119,3 +119,10 @@ func NewDaoNotExistingError(objectName, referenceKey string) *ApiError {
 		Msg:    fmt.Sprintf("Object '%v' with key '%v' not found", objectName, referenceKey),
 	}
 }
+
+func NewClaimMissingError(claim string) *ApiError {
+	return &ApiError{
+		Status: 403,
+		Msg:    fmt.Sprintf("Claim '%v' is required to access this", claim),
+	}
+}

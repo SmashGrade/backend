@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/SmashGrade/backend/app/config"
 	"github.com/SmashGrade/backend/app/dao"
 	"github.com/SmashGrade/backend/app/db"
 	e "github.com/SmashGrade/backend/app/error"
@@ -155,4 +156,31 @@ func (c *BaseController) GetUser(ctx echo.Context) (*models.User, *e.ApiError) {
 
 	// Return the user
 	return crudUser, nil
+}
+
+// check if a user has a role by roleId
+// returns nil if the claim is valid
+func (c *BaseController) CheckUserRole(roleId uint, ctx echo.Context) *e.ApiError {
+
+	cfg := config.NewAPIConfig()
+	var requiredRole *config.RoleConfig = nil
+	for i := range cfg.Roles {
+		if cfg.Roles[i].Id == roleId {
+			requiredRole = &cfg.Roles[i]
+		}
+	}
+	if requiredRole == nil {
+		return e.NewDaoReferenceIdError("role", roleId)
+	}
+
+	user, err := c.GetUser(ctx)
+	if err != nil {
+		return err
+	}
+
+	if !user.HasRole(roleId) {
+		return e.NewClaimMissingError(requiredRole.ClaimName)
+	}
+
+	return nil
 }

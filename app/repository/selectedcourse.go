@@ -29,6 +29,16 @@ func (r *SelectedCourseRepository) GetSelectedCourse(
 	return
 }
 
+func (r *SelectedCourseRepository) GetSelectedCourseByYear(courseId, courseVersion uint, classStartyear time.Time) (selectedCourses []models.SelectedCourse, err error) {
+	result := r.Provider.DB().
+		Where("course_id = ? AND course_version = ? AND class_startyear = ?",
+			courseId,
+			courseVersion,
+			classStartyear).Find(&selectedCourses)
+	err = result.Error
+	return
+}
+
 func (r *SelectedCourseRepository) DeleteSelectedCourse(
 	userId, courseId, courseVersion uint, classStartyear time.Time) error {
 	return r.Provider.DB().

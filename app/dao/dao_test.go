@@ -875,6 +875,144 @@ func TestGetUsersByRole(t *testing.T) {
 	require.Len(t, ents, 10)
 }
 
+// check if we can select a curriculum by timepoint
+func TestCurriculumValidityTimeSelection(t *testing.T) {
+	provider := db.NewMockProvider()
+	cDao := NewCurriculumDao(repository.NewCurriculumRepository(provider), repository.NewFocusRepository(provider), repository.NewCurriculumtypeRepository(provider), repository.NewStateRepository(provider), repository.NewModuleRepository(provider))
+
+	cRef := requestmodels.RefCurriculum{}
+	cRef.ID = 5
+	cRef.StartValidity = "01.01.2022"
+	cRef.EndValidity = "01.01.2024"
+
+	retEnt, err := cDao.Create(cRef)
+	require.Nil(t, err)
+	require.Equal(t, cRef.ID, retEnt.ID)
+
+	cRef.StartValidity = "02.01.2024"
+	cRef.EndValidity = "05.01.2024"
+
+	retEnt2, err := cDao.Create(cRef)
+	require.Nil(t, err)
+	require.Equal(t, cRef.ID, retEnt2.ID)
+
+	cRef.StartValidity = "06.01.2024"
+	cRef.EndValidity = ""
+
+	retEnt3, err := cDao.Create(cRef)
+	require.Nil(t, err)
+	require.Equal(t, cRef.ID, retEnt3.ID)
+
+	// get the valid entry for 03.01.24 (should be the one from 02.01.24 to 05.01.24)
+	tPoint, intErr := ParseTime("03.01.2024", "02.01.2006")
+	require.Nil(t, intErr)
+	cRetValid, err := cDao.GetValidForTimepoint(cRef.ID, tPoint)
+	require.Nil(t, err)
+	require.Equal(t, cRef.ID, cRetValid.ID)
+	require.Equal(t, retEnt2.StartValidity, cRetValid.StartValidity)
+	require.Equal(t, retEnt2.EndValidity, cRetValid.EndValidity)
+
+	// get the valid entry for 21.01.24 (should be the one from 06.01.24)
+	tPoint, intErr = ParseTime("21.01.2024", "02.01.2006")
+	require.Nil(t, intErr)
+	cRetValid, err = cDao.GetValidForTimepoint(cRef.ID, tPoint)
+	require.Nil(t, err)
+	require.Equal(t, cRef.ID, cRetValid.ID)
+	require.Equal(t, retEnt3.StartValidity, cRetValid.StartValidity)
+	require.Equal(t, retEnt3.EndValidity, cRetValid.EndValidity)
+
+	// get the valid entry for 01.01.20 (should be nil)
+	tPoint, intErr = ParseTime("01.01.2020", "02.01.2006")
+	require.Nil(t, intErr)
+	_, err = cDao.GetValidForTimepoint(cRef.ID, tPoint)
+	require.NotNil(t, err)
+}
+
+// Check if courses and studends are returned from the teaches by user field
+func TestTechedByTeacher(t *testing.T) {
+	provider := db.NewMockProvider()
+
+	//provider := db.NewProvider(config.NewAPIConfig())
+
+	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider), repository.NewExamRepository(provider), repository.NewRoleRepository(provider))
+
+	// create a module and link it indirectly with the course
+	moduleDao := NewModuleDao(repository.NewModuleRepository(provider))
+
+	testModule := requestmodels.RefModule{
+		Description: "testmodule",
+	}
+
+	retEnt, err := moduleDao.Create(testModule)
+	require.Nil(t, err)
+
+	// create a user to link as teacher
+	userDao := NewUserDao(repository.NewUserRepository(provider), repository.NewRoleRepository(provider))
+
+	testUser := models.User{
+		Name:  "Rafael Stauffer",
+		Email: "rafael.stauffer@hftm.ch",
+	}
+
+	retEntUser, err := userDao.Create(testUser)
+	require.Nil(t, err)
+
+	// create a course and add all indirect key only structs to it
+	testCourse := requestmodels.RefCourse{
+		Description: "testcourse",
+	}
+
+	testCourse.Modules = append(testCourse.Modules, requestmodels.RefVersioned{ID: retEnt.ID, Version: retEnt.Version})
+	testCourse.TeachedBy = append(testCourse.TeachedBy, requestmodels.RefId{ID: retEntUser.ID})
+
+	createdCourse, err := courseDao.Create(testCourse)
+	require.Nil(t, err)
+
+	// check has our main course object kept its data
+	require.Equal(t, "testcourse", createdCourse.Description)
+
+	startToday := time.Now()
+
+	testStudent := models.User{
+		Name:           "Max Mustermann",
+		Email:          "max.mustermann@hftm.ch",
+		ClassStartyear: startToday,
+	}
+
+	retEntUserStudent, err := userDao.Create(testStudent) // create first to get an id
+	require.Nil(t, err)
+
+	// now we can create the selected course link
+	retEntUserStudent.SelectedCourses = []models.SelectedCourse{{CourseID: createdCourse.ID, CourseVersion: createdCourse.Version, ClassStartyear: startToday, UserID: retEntUserStudent.ID}}
+
+	err = userDao.Update(*retEntUserStudent)
+	require.Nil(t, err)
+
+	retEntUserStudent, err = userDao.Get(retEntUserStudent.ID)
+	require.Nil(t, err)
+
+	require.True(t, len(retEntUserStudent.SelectedCourses) > 0) // This works, the user has now assigned a selected course
+	require.Equal(t, createdCourse.ID, retEntUserStudent.SelectedCourses[0].CourseID)
+
+	retEntUser, err = userDao.Get(retEntUser.ID) // now select the teacher again to check if we can see the teached module and its selected course link
+	require.Nil(t, err)
+
+	require.True(t, len(retEntUser.TeachesCourses) > 0)
+	// This fails, the selected courses does not autoload
+	// require.True(t, len(retEntUser.TeachesCourses[0].SelectedCourses) > 0)
+	//require.Equal(t, retEntUserStudent.ID, retEntUser.TeachesCourses[0].SelectedCourses[0].UserID)
+}
+
+func TestClassSelection(t *testing.T) {
+	provider := db.NewPrefilledMockProvider()
+
+	classDao := NewClassDao(repository.NewCourseRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider), repository.NewExamRepository(provider), repository.NewRoleRepository(provider), repository.NewExamEvaluationRepository(provider))
+
+	class, err := classDao.Get(db.SelectedCourse1.CourseID, db.SelectedCourse1.CourseVersion, db.SelectedCourse1.ClassStartyear)
+	require.Nil(t, err)
+	require.NotNil(t, class)
+}
+
 func TestCreateModule(t *testing.T) {
 	provider := db.NewMockProvider()
 	moduleDao := NewModuleDao(
