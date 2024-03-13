@@ -1012,3 +1012,18 @@ func TestClassSelection(t *testing.T) {
 	require.Nil(t, err)
 	require.NotNil(t, class)
 }
+
+// check if a list of teachers can be extracted from a prefilled mock provider to check for role id bugs
+func TestGetTeachersForMeta(t *testing.T) {
+	provider := db.NewPrefilledMockProvider()
+
+	userDao := NewUserDao(repository.NewUserRepository(provider), repository.NewRoleRepository(provider))
+
+	err := userDao.CreateDefaults() // create the roles
+	require.Nil(t, err)
+
+	// Get all Teachers
+	teachers, err := userDao.GetTeachers()
+	require.Nil(t, err)
+	require.NotEmpty(t, teachers)
+}
