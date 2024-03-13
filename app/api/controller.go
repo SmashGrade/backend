@@ -184,3 +184,21 @@ func (c *BaseController) CheckUserRole(roleId uint, ctx echo.Context) *e.ApiErro
 
 	return nil
 }
+
+// CheckUserRoles loops through multiple roles to check if any is correct.
+// If a correct role is found, it returns nil; otherwise, it returns an error.
+func (c *BaseController) CheckUserRoles(roleIDs []uint, ctx echo.Context) *e.ApiError {
+	if len(roleIDs) == 0 {
+		return e.NewDaoReferenceIdError("role", 0)
+	}
+
+	var lastError *e.ApiError
+	for _, roleID := range roleIDs {
+		if err := c.CheckUserRole(roleID, ctx); err == nil {
+			return nil
+		} else {
+			lastError = err
+		}
+	}
+	return lastError
+}
