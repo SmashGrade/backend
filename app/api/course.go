@@ -42,15 +42,9 @@ func NewCourseController(provider db.Provider) *CourseController {
 // @Router			/courses [get]
 // @Security		Bearer
 func (c *CourseController) Courses(ctx echo.Context) error {
-	// Check Role
-	var allowedRoles []uint
-	allowedRoles = append(allowedRoles, config.ROLE_COURSEADMIN)
-	allowedRoles = append(allowedRoles, config.ROLE_FIELDMANAGER)
-	allowedRoles = append(allowedRoles, config.ROLE_TEACHER)
-	allowedRoles = append(allowedRoles, config.ROLE_STUDENT)
-	roleErr := c.CheckUserRoles(allowedRoles, ctx)
-	if roleErr != nil {
-		return roleErr
+	// Check if the user has any role
+	if err := c.CheckUserAnyRole(ctx); err != nil {
+		return err
 	}
 
 	res, err := c.Dao.GetAll()
@@ -73,15 +67,9 @@ func (c *CourseController) Courses(ctx echo.Context) error {
 // @Router			/courses/{id}/{version} [get]
 // @Security		Bearer
 func (c *CourseController) Course(ctx echo.Context) error {
-	// Check Role
-	var allowedRoles []uint
-	allowedRoles = append(allowedRoles, config.ROLE_COURSEADMIN)
-	allowedRoles = append(allowedRoles, config.ROLE_FIELDMANAGER)
-	allowedRoles = append(allowedRoles, config.ROLE_TEACHER)
-	allowedRoles = append(allowedRoles, config.ROLE_STUDENT)
-	roleErr := c.CheckUserRoles(allowedRoles, ctx)
-	if roleErr != nil {
-		return roleErr
+	// Check if the user has any role
+	if err := c.CheckUserAnyRole(ctx); err != nil {
+		return err
 	}
 
 	// Read id parameter from request
@@ -287,7 +275,7 @@ func (c *CourseController) Delete(ctx echo.Context) error {
 		return e.NewDaoValidationError("version", "uint", c.GetPathParam(ctx, "version"))
 	}
 
-	// Let dao create the Course
+	// Let dao delete the Course
 	daoErr := c.Dao.Delete(id, version)
 	if daoErr != nil {
 		return daoErr

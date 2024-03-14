@@ -16,6 +16,7 @@ type User struct {
 	CurriculumID    uint             `json:"curriculumId"`
 }
 
+// Returns true if the user has the role with the given id
 func (u User) HasRole(roleId uint) bool {
 	for i := range u.Roles {
 		if u.Roles[i].ID == roleId {
@@ -23,4 +24,9 @@ func (u User) HasRole(roleId uint) bool {
 		}
 	}
 	return false
+}
+
+// Returns true if the user has any role
+func (u User) HasAnyRole() bool {
+	return len(u.Roles) > 0
 }

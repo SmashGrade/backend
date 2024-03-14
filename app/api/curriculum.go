@@ -41,15 +41,9 @@ func NewCurriculumController(provider db.Provider) *CurriculumController {
 // @Router			/curriculums [get]
 // @Security		Bearer
 func (c *CurriculumController) Curriculums(ctx echo.Context) error {
-	// Check Role
-	var allowedRoles []uint
-	allowedRoles = append(allowedRoles, config.ROLE_COURSEADMIN)
-	allowedRoles = append(allowedRoles, config.ROLE_FIELDMANAGER)
-	allowedRoles = append(allowedRoles, config.ROLE_TEACHER)
-	allowedRoles = append(allowedRoles, config.ROLE_STUDENT)
-	roleErr := c.CheckUserRoles(allowedRoles, ctx)
-	if roleErr != nil {
-		return roleErr
+	// Check if the user has any role
+	if err := c.CheckUserAnyRole(ctx); err != nil {
+		return err
 	}
 
 	res, err := c.Dao.GetAll()
@@ -72,15 +66,9 @@ func (c *CurriculumController) Curriculums(ctx echo.Context) error {
 // @Router			/curriculums/{id}/{date} [get]
 // @Security		Bearer
 func (c *CurriculumController) Curriculum(ctx echo.Context) error {
-	// Check Role
-	var allowedRoles []uint
-	allowedRoles = append(allowedRoles, config.ROLE_COURSEADMIN)
-	allowedRoles = append(allowedRoles, config.ROLE_FIELDMANAGER)
-	allowedRoles = append(allowedRoles, config.ROLE_TEACHER)
-	allowedRoles = append(allowedRoles, config.ROLE_STUDENT)
-	roleErr := c.CheckUserRoles(allowedRoles, ctx)
-	if roleErr != nil {
-		return roleErr
+	// Check if the user has any role
+	if err := c.CheckUserAnyRole(ctx); err != nil {
+		return err
 	}
 
 	// Read id parameter from request

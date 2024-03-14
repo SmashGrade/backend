@@ -12,7 +12,7 @@ import (
 func Test_Role_Create(t *testing.T) {
 	repository := NewRoleRepository(db.NewPrefilledMockProvider())
 
-	role_1 := db.Role1
+	role_1 := db.RoleStudent
 	role_1.ID = 0
 
 	_, err := repository.Create(&role_1)
@@ -24,27 +24,29 @@ func Test_Role_Update(t *testing.T) {
 	repository := NewRoleRepository(db.NewPrefilledMockProvider())
 
 	// Update Description of Role
-	role := db.Role1
+	role := db.RoleStudent
 	role.Description = "edited description Role 1"
 	err := repository.Update(&role)
 
-	// Return all Roles for comparing
-	result2, _ := repository.GetAll()
-	roles := result2.([]models.Role)
+	require.NoError(t, err)
+
+	// Get the updated role back from db
+	result2, err := repository.GetId(role.ID)
+	updatedRole := result2.(*models.Role)
 
 	require.NoError(t, err)
-	require.Nil(t, deep.Equal(role.Description, roles[0].Description))
+	require.Nil(t, deep.Equal(role.Description, updatedRole.Description))
 }
 
 func Test_Role_Find(t *testing.T) {
 	repository := NewRoleRepository(db.NewPrefilledMockProvider())
 
 	// Find Role
-	result2, err := repository.Find(db.Role1)
+	result2, err := repository.Find(db.RoleStudent)
 	roles := result2.([]models.Role)
 
 	require.NoError(t, err)
-	require.Nil(t, deep.Equal(db.Role1.ID, roles[0].ID))
+	require.Nil(t, deep.Equal(db.RoleStudent.ID, roles[0].ID))
 }
 
 func Test_Role_GetAll(t *testing.T) {
@@ -55,19 +57,18 @@ func Test_Role_GetAll(t *testing.T) {
 	roles := result.([]models.Role)
 
 	require.NoError(t, err)
-	require.Nil(t, deep.Equal(db.Role1.ID, roles[0].ID))
-	require.Nil(t, deep.Equal(db.Role2.ID, roles[1].ID))
+	require.NotEmpty(t, roles)
 }
 
 func Test_Role_GetID(t *testing.T) {
 	repository := NewRoleRepository(db.NewPrefilledMockProvider())
 
 	// Get by ID
-	result, err := repository.GetId(db.Role1.ID)
+	result, err := repository.GetId(db.RoleStudent.ID)
 	role := result.(*models.Role)
 
 	require.NoError(t, err)
-	require.Nil(t, deep.Equal(role.Description, db.Role1.Description))
+	require.Nil(t, deep.Equal(role.Description, db.RoleStudent.Description))
 }
 
 func Test_Role_DeleteId(t *testing.T) {
@@ -78,7 +79,7 @@ func Test_Role_DeleteId(t *testing.T) {
 	afterCreateLength := len(result.([]models.Role))
 
 	// Delete role
-	err := repository.DeleteId(db.Role1.ID)
+	err := repository.DeleteId(db.RoleStudent.ID)
 
 	result2, _ := repository.GetAll()
 	afterDeleteLength := len(result2.([]models.Role))

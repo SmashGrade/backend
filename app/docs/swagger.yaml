@@ -15,6 +15,23 @@ definitions:
         description: Valid is true if Time is not NULL
         type: boolean
     type: object
+  models.Class:
+    properties:
+      classStartYear:
+        type: string
+      courseId:
+        type: integer
+      courseVersion:
+        type: integer
+      examEvaluations:
+        items:
+          $ref: '#/definitions/models.ExamEvaluation'
+        type: array
+      students:
+        items:
+          $ref: '#/definitions/models.User'
+        type: array
+    type: object
   models.Course:
     properties:
       created:
@@ -126,7 +143,44 @@ definitions:
       updated:
         type: string
       weighting:
-        type: number
+        type: integer
+    type: object
+  models.ExamEvaluation:
+    properties:
+      created:
+        type: string
+      deleted:
+        $ref: '#/definitions/gorm.DeletedAt'
+      entryDate:
+        type: string
+      exam:
+        $ref: '#/definitions/models.Exam'
+      examID:
+        type: integer
+      id:
+        type: integer
+      originalValue:
+        type: string
+      orignialGradeTyp:
+        $ref: '#/definitions/models.Gradetype'
+      orignialGradeTypeID:
+        type: integer
+      registeredBy:
+        $ref: '#/definitions/models.User'
+      registeredByID:
+        type: integer
+      selectedCourse:
+        $ref: '#/definitions/models.SelectedCourse'
+      selectedCourseClassStartyear:
+        type: string
+      selectedCourseCourseID:
+        type: integer
+      selectedCourseCourseVersion:
+        type: integer
+      selectedCourseUserID:
+        type: integer
+      updated:
+        type: string
     type: object
   models.Examtype:
     properties:
@@ -318,6 +372,14 @@ definitions:
         type: string
     type: object
   models.StudentCurriculums:
+    properties:
+      curriculum:
+        allOf:
+        - $ref: '#/definitions/models.Curriculum'
+        description: Curriculumtype Curriculumtype // this is already in the curriculum
+      startYear:
+        description: taken from the user or selectedcourse
+        type: string
     type: object
   models.StudyStage:
     properties:
@@ -335,6 +397,15 @@ definitions:
         type: string
     type: object
   models.TeacherCourses:
+    properties:
+      classes:
+        items:
+          $ref: '#/definitions/models.Class'
+        type: array
+      courses:
+        items:
+          $ref: '#/definitions/models.Course'
+        type: array
     type: object
   models.User:
     properties:
@@ -342,6 +413,8 @@ definitions:
         type: string
       created:
         type: string
+      curriculumId:
+        type: integer
       deleted:
         $ref: '#/definitions/gorm.DeletedAt'
       email:
@@ -1210,6 +1283,147 @@ paths:
       summary: Get all grade types
       tags:
       - gradetypes
+    post:
+      consumes:
+      - application/json
+      description: Create a gradetype
+      parameters:
+      - description: request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.Gradetype'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Gradetype'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.ApiError'
+      security:
+      - Bearer: []
+      summary: Create a gradetype
+      tags:
+      - gradetype
+  /gradetypes/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a gradetype
+      parameters:
+      - description: GradeType ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.ApiError'
+      security:
+      - Bearer: []
+      summary: Delete a gradetype
+      tags:
+      - gradetypes
+    put:
+      consumes:
+      - application/json
+      description: Update a gradetype
+      parameters:
+      - description: request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.Gradetype'
+      - description: GradeType ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Gradetype'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.ApiError'
+      security:
+      - Bearer: []
+      summary: Update a gradetype
+      tags:
+      - grapetype
+  /gradetypes/{id}/:
+    get:
+      description: Get a specific gradetype
+      parameters:
+      - description: GradeType ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Gradetype'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.ApiError'
+      security:
+      - Bearer: []
+      summary: Get a specific gradetype
+      tags:
+      - gradetype
   /modules:
     get:
       description: Get all modules
@@ -1307,6 +1521,43 @@ paths:
       tags:
       - meta
       - modules
+  /onboarding:
+    put:
+      description: Set start year and curriculumId as student by userinfo from accesstoken
+      parameters:
+      - description: Curriculum ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.User'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.ApiError'
+      security:
+      - Bearer: []
+      summary: Set start year and curriculumId as student
+      tags:
+      - meta
+      - curriculums
+      - users
   /states:
     get:
       description: Get all states
