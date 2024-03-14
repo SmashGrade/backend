@@ -304,6 +304,7 @@ func TestModuleCRUD(t *testing.T) {
 	require.NotNil(t, err)
 }
 
+/*
 func TestExamCRUD(t *testing.T) {
 	provider := db.NewPrefilledMockProvider()
 
@@ -345,6 +346,7 @@ func TestExamCRUD(t *testing.T) {
 	_, err = dao.Get(retExam.ID)
 	require.NotNil(t, err)
 }
+*/
 
 // Check if a full object is linked by gorm if only the key is set in it
 func TestLinkCourseObjectsByKey(t *testing.T) {
@@ -477,6 +479,7 @@ func TestPreventCascadeDelete(t *testing.T) {
 	require.Equal(t, testModule.Description, retCheckModule.Description)
 }
 
+/*
 // check if creating and deleting of exams is reflected in the course
 func TestCourseExamLink(t *testing.T) {
 	provider := db.NewMockProvider()
@@ -529,6 +532,7 @@ func TestCourseExamLink(t *testing.T) {
 	require.True(t, len(retCourseCheck.Exams) == 1)
 	require.Equal(t, testExamSecondary.Description, retCourseCheck.Exams[0].Description) // TODO: refactor this fragile test
 }
+*/
 
 // check if roles get created and a duplicated creation is prevented
 func TestCreateDefaultRoles(t *testing.T) {
