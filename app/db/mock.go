@@ -22,6 +22,14 @@ func prefillMockDB(p Provider) error {
 			Entity: &RoleDozent,
 		},
 		{
+			Table:  "roles",
+			Entity: &RoleKursadmin,
+		},
+		{
+			Table:  "roles",
+			Entity: &RoleFieldmanager,
+		},
+		{
 			Table:  "users",
 			Entity: &User1,
 		},
@@ -213,6 +221,13 @@ var RoleFieldmanager = models.Role{
 	Description: "Fachbereichsleiter",
 	Claim:       "Fachbereichsleiter",
 }
+var RoleKursadmin = models.Role{
+	Basemodel: models.Basemodel{
+		ID: 1,
+	},
+	Description: "Kursadministrator",
+	Claim:       "Kursadministrator",
+}
 
 var User1 = models.User{
 	Basemodel: models.Basemodel{
@@ -221,7 +236,7 @@ var User1 = models.User{
 	Name:  "Kurt Munter",
 	Email: "kurt.munter@hftm.ch",
 	Roles: []*models.Role{
-		&RoleDozent, &RoleFieldmanager,
+		&RoleDozent, &RoleKursadmin, &RoleFieldmanager,
 	},
 }
 var User2 = models.User{
