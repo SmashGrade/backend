@@ -55,15 +55,15 @@ func (c *ExamevaluationController) GetAllMyExamEvaluationsAsStudent(ctx echo.Con
 // @Tags			evaluations
 // @Produce		json
 //
-// @Param			id		path	uint		true	"Course ID"
-// @Param			version		path	uint		true	"Course Version"
+// @Param			courseid		path	uint		true	"Course ID"
+// @Param			courseversion		path	uint		true	"Course Version"
 // @Param			year	path	time.Time	true	"SelectedCourse StartYear"
 //
 // @Success		200	{array}		models.ExamEvaluation
 // @Failure		401	{object}	error.ApiError
 // @Failure		403	{object}	error.ApiError
 // @Failure		500	{object}	error.ApiError
-// @Router			/evaluations/class/{id}/{version}/{year}/teacher [get]
+// @Router			/evaluations/{courseid}/{courseversion}/{year}/teacher [get]
 // @Security		Bearer
 func (c *ExamevaluationController) GetAllExamEvaluationsForAClassAsTeacher(ctx echo.Context) error {
 	return e.NewApiUnimplementedError()
@@ -74,15 +74,15 @@ func (c *ExamevaluationController) GetAllExamEvaluationsForAClassAsTeacher(ctx e
 // @Tags			evaluations
 // @Produce		json
 //
-// @Param			id		path	uint		true	"Course ID"
-// @Param			version		path	uint		true	"Course Version"
+// @Param			courseid		path	uint		true	"Course ID"
+// @Param			courseversion		path	uint		true	"Course Version"
 // @Param			year	path	time.Time	true	"SelectedCourse StartYear"
 //
 // @Success		200	{array}		models.ExamEvaluation
 // @Failure		401	{object}	error.ApiError
 // @Failure		403	{object}	error.ApiError
 // @Failure		500	{object}	error.ApiError
-// @Router			/evaluations/class/{id}/{version}/{year}/me [get]
+// @Router			/evaluations/{courseid}/{courseversion}/{year}/me [get]
 // @Security		Bearer
 func (c *ExamevaluationController) GetAllExamEvaluationsForAClassAsStudent(ctx echo.Context) error {
 	return e.NewApiUnimplementedError()
@@ -93,8 +93,8 @@ func (c *ExamevaluationController) GetAllExamEvaluationsForAClassAsStudent(ctx e
 // @Tags			evaluations
 // @Produce		json
 //
-// @Param			id		path	uint		true	"Course ID"
-// @Param			version		path	uint		true	"Course Version"
+// @Param			courseid		path	uint		true	"Course ID"
+// @Param			courseversion		path	uint		true	"Course Version"
 // @Param			year	path	time.Time	true	"SelectedCourse StartYear"
 // @Param			examid		path	uint		true	"Exam ID"
 //
@@ -102,7 +102,7 @@ func (c *ExamevaluationController) GetAllExamEvaluationsForAClassAsStudent(ctx e
 // @Failure		401	{object}	error.ApiError
 // @Failure		403	{object}	error.ApiError
 // @Failure		500	{object}	error.ApiError
-// @Router			/evaluations/class/{id}/{version}/{year}/{examid}/me [get]
+// @Router			/evaluations/{courseid}/{courseversion}/{year}/{examid}/me [get]
 // @Security		Bearer
 func (c *ExamevaluationController) GetExamEvaluationsForATestAsStudent(ctx echo.Context) error {
 	return e.NewApiUnimplementedError()
@@ -113,8 +113,8 @@ func (c *ExamevaluationController) GetExamEvaluationsForATestAsStudent(ctx echo.
 // @Tags			evaluations
 // @Produce		json
 //
-// @Param			id		path	uint		true	"Course ID"
-// @Param			version		path	uint		true	"Course Version"
+// @Param			courseid		path	uint		true	"Course ID"
+// @Param			courseversion		path	uint		true	"Course Version"
 // @Param			year	path	time.Time	true	"SelectedCourse StartYear"
 // @Param			examid		path	uint		true	"Exam ID"
 // @Param			userid		path	uint		true	"User ID"
@@ -123,7 +123,7 @@ func (c *ExamevaluationController) GetExamEvaluationsForATestAsStudent(ctx echo.
 // @Failure		401	{object}	error.ApiError
 // @Failure		403	{object}	error.ApiError
 // @Failure		500	{object}	error.ApiError
-// @Router			/evaluations/class/{id}/{version}/{year}/{examid}/{userid} [get]
+// @Router			/evaluations/{courseid}/{courseversion}/{year}/{examid}/{userid} [get]
 // @Security		Bearer
 func (c *ExamevaluationController) GetExamEvaluationsForATest(ctx echo.Context) error {
 	return e.NewApiUnimplementedError()
@@ -134,8 +134,8 @@ func (c *ExamevaluationController) GetExamEvaluationsForATest(ctx echo.Context) 
 // @Tags			evaluations
 // @Produce		json
 //
-// @Param			id		path	uint		true	"Course ID"
-// @Param			version		path	uint		true	"Course Version"
+// @Param			courseid		path	uint		true	"Course ID"
+// @Param			courseversion		path	uint		true	"Course Version"
 // @Param			year	path	time.Time	true	"SelectedCourse StartYear"
 // @Param			examid		path	uint		true	"Exam ID"
 //
@@ -143,7 +143,7 @@ func (c *ExamevaluationController) GetExamEvaluationsForATest(ctx echo.Context) 
 // @Failure		401	{object}	error.ApiError
 // @Failure		403	{object}	error.ApiError
 // @Failure		500	{object}	error.ApiError
-// @Router			/evaluations/class/{id}/{version}/{year}/{examid}/teacher [get]
+// @Router			/evaluations/{courseid}/{courseversion}/{year}/{examid}/teacher [get]
 // @Security		Bearer
 func (c *ExamevaluationController) GetAllExamEvaluationsForATestAsTeacher(ctx echo.Context) error {
 	return e.NewApiUnimplementedError()
@@ -173,17 +173,18 @@ func (c *ExamevaluationController) CreateNewExamEvaluation(ctx echo.Context) err
 // @Accept			json
 //
 // @Param			request	body		requestmodels.RefExamEvaluation	true	"request body"
-// @Param			id		path	uint		true	"Course ID"
-// @Param			version		path	uint		true	"Course Version"
+// @Param			courseid		path	uint		true	"Course ID"
+// @Param			courseversion		path	uint		true	"Course Version"
 // @Param			year	path	time.Time	true	"SelectedCourse StartYear"
 // @Param			examid		path	uint		true	"Exam ID"
 // @Param			userid		path	uint		true	"User ID"
+// @Param			evaluationid		path	uint		true	"Evaluation ID"
 //
 // @Success		200		{object}	models.Curriculum
 // @Failure		401		{object}	error.ApiError
 // @Failure		403		{object}	error.ApiError
 // @Failure		500		{object}	error.ApiError
-// @Router			/evaluations/{id}/{date} [put]
+// @Router			/evaluations/{courseid}/{courseversion}/{year}/{examid}/{userid}/{evaluationid} [put]
 // @Security		Bearer
 func (c *ExamevaluationController) UpdateExamEvaluation(ctx echo.Context) error {
 	return e.NewApiUnimplementedError()
@@ -195,17 +196,18 @@ func (c *ExamevaluationController) UpdateExamEvaluation(ctx echo.Context) error 
 // @Produce		json
 // @Accept			json
 //
-// @Param			id		path	uint		true	"Course ID"
-// @Param			version		path	uint		true	"Course Version"
+// @Param			courseid		path	uint		true	"Course ID"
+// @Param			courseversion		path	uint		true	"Course Version"
 // @Param			year	path	time.Time	true	"SelectedCourse StartYear"
 // @Param			examid		path	uint		true	"Exam ID"
 // @Param			userid		path	uint		true	"User ID"
+// @Param			evaluationid		path	uint		true	"Evaluation ID"
 //
 // @Success		200
 // @Failure		401	{object}	error.ApiError
 // @Failure		403	{object}	error.ApiError
 // @Failure		500	{object}	error.ApiError
-// @Router			/evaluations/class/{id}/{version}/{year}/{examid}/{userid} [delete]
+// @Router			/evaluations/{courseid}/{courseversion}/{year}/{examid}/{userid}/{evaluationid} [delete]
 // @Security		Bearer
 func (c *ExamevaluationController) DeleteExamEvaluation(ctx echo.Context) error {
 	return e.NewApiUnimplementedError()
@@ -215,12 +217,12 @@ func (c *ExamevaluationController) DeleteExamEvaluation(ctx echo.Context) error 
 func RegisterV1Examevaluations(g *echo.Group, c *ExamevaluationController) {
 	g.GET("/evaluations", c.GetAllExamEvaluations)
 	g.GET("/evaluations/me", c.GetAllMyExamEvaluationsAsStudent)
-	g.GET("/evaluations/class/:id/:version/:year/teacher", c.GetAllExamEvaluationsForAClassAsTeacher)
-	g.GET("/evaluations/class/:id/:version/:year/me", c.GetAllExamEvaluationsForAClassAsStudent)
-	g.GET("/evaluations/class/:id/:version/:year/:examid/me", c.GetExamEvaluationsForATestAsStudent)
-	g.GET("/evaluations/class/:id/:version/:year/:examid/:userid", c.GetExamEvaluationsForATest)
-	g.GET("/evaluations/class/:id/:version/:year/:examid/teacher", c.GetAllExamEvaluationsForATestAsTeacher)
+	g.GET("/evaluations/:courseid/:courseversion/:year/teacher", c.GetAllExamEvaluationsForAClassAsTeacher)
+	g.GET("/evaluations/:courseid/:courseversion/:year/me", c.GetAllExamEvaluationsForAClassAsStudent)
+	g.GET("/evaluations/:courseid/:courseversion/:year/:examid/me", c.GetExamEvaluationsForATestAsStudent)
+	g.GET("/evaluations/:courseid/:courseversion/:year/:examid/:userid", c.GetExamEvaluationsForATest)
+	g.GET("/evaluations/:courseid/:courseversion/:year/:examid/teacher", c.GetAllExamEvaluationsForATestAsTeacher)
 	g.POST("/evaluations", c.CreateNewExamEvaluation)
-	g.PUT("/evaluations/class/:id/:version/:year/:examid/:userid", c.UpdateExamEvaluation)
-	g.DELETE("/evaluations/class/:id/:version/:year/:examid/:userid", c.DeleteExamEvaluation)
+	g.PUT("/evaluations/:courseid/:courseversion/:year/:examid/:userid/:evaluationid", c.UpdateExamEvaluation)
+	g.DELETE("/evaluations/:courseid/:courseversion/:year/:examid/:userid/:evaluationid", c.DeleteExamEvaluation)
 }
