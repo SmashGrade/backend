@@ -10,33 +10,35 @@ import (
 
 // Router is the main router for the API
 type Router struct {
-	echo       *echo.Echo
-	config     *config.APIConfig
-	auth       *auth.AuthProvider
-	course     *CourseController
-	module     *ModuleController
-	curriculum *CurriculumController
-	output     *OutputController
-	user       *UserController
-	exam       *ExamController
-	meta       *MetaController
-	gradetype  *GradeTypeController
+	echo           *echo.Echo
+	config         *config.APIConfig
+	auth           *auth.AuthProvider
+	course         *CourseController
+	module         *ModuleController
+	curriculum     *CurriculumController
+	output         *OutputController
+	user           *UserController
+	exam           *ExamController
+	meta           *MetaController
+	gradetype      *GradeTypeController
+	examevaluation *ExamevaluationController
 }
 
 // NewRouter creates a new router
 func NewRouter(e *echo.Echo, p db.Provider) *Router {
 	return &Router{
-		echo:       e,
-		config:     p.Config(),
-		auth:       auth.NewAuthProvider(p.Config()),
-		course:     NewCourseController(p),
-		module:     NewModuleController(p),
-		curriculum: NewCurriculumController(p),
-		output:     NewOutputController(p),
-		user:       NewUserController(p),
-		exam:       NewExamController(p),
-		meta:       NewMetaController(p),
-		gradetype:  NewGradeTypeController(p),
+		echo:           e,
+		config:         p.Config(),
+		auth:           auth.NewAuthProvider(p.Config()),
+		course:         NewCourseController(p),
+		module:         NewModuleController(p),
+		curriculum:     NewCurriculumController(p),
+		output:         NewOutputController(p),
+		user:           NewUserController(p),
+		exam:           NewExamController(p),
+		meta:           NewMetaController(p),
+		gradetype:      NewGradeTypeController(p),
+		examevaluation: NewExamevaluationController(p),
 	}
 }
 
@@ -60,4 +62,5 @@ func (r *Router) RegisterV1() {
 	RegisterV1MetaCourse(v1, r.meta)
 	RegisterV1Curriculums(v1, r.curriculum)
 	RegisterV1GradeTypes(v1, r.gradetype)
+	RegisterV1Examevaluations(v1, r.examevaluation)
 }
