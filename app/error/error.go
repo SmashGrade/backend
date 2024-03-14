@@ -59,10 +59,10 @@ func HandleEchoError(err error, c echo.Context) {
 
 }
 
-func NewUnauthorizedError() *ApiError {
+func NewUnauthorizedError(msg string) *ApiError {
 	return &ApiError{
 		Status: 401,
-		Msg:    "Unauthorized. Please use a valid bearer token",
+		Msg:    fmt.Sprintf("Unauthorized: %s", msg),
 	}
 }
 

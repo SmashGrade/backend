@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"net/mail"
 	"slices"
 	"strconv"
@@ -97,28 +98,24 @@ func (c *BaseController) GetUser(ctx echo.Context) (*models.User, *e.ApiError) {
 	userRaw := ctx.Get("user")
 	// Middleware does not have a user key, so we return unauthorized
 	if userRaw == nil {
-		ctx.Logger().Error("Authorized endpoint called without a bearer token. Request denied.")
-		return nil, e.NewUnauthorizedError()
+		return nil, e.NewUnauthorizedError("Authorized endpoint called without a bearer token. Request denied.")
 	}
 	// Check if the user key is a valid jwt token
 	user, ok := userRaw.(*jwt.Token)
 	if !ok {
-		ctx.Logger().Error("Authorized endpoint called without a valid bearer token. Request denied.")
-		return nil, e.NewUnauthorizedError()
+		return nil, e.NewUnauthorizedError("Authorized endpoint called with invalid bearer token. Request denied.")
 	}
 	// Check if the user is valid
 	// This is a workaround to get the claims from the token as the default map can not be converted to a struct
 	marshalledClaims, err := json.Marshal(user.Claims)
 	if err != nil {
-		ctx.Logger().Error("Authorized endpoint called without valid claims. Request denied.")
-		return nil, e.NewUnauthorizedError()
+		return nil, e.NewUnauthorizedError("Authorized endpoint called with invalid claims. Request denied.")
 	}
 	// Build the clains as struct from the marshalled claims
 	claims := TokenClaim{}
 	err = json.Unmarshal(marshalledClaims, &claims)
 	if err != nil {
-		ctx.Logger().Error("Authorized endpoint called without valid claims. Request denied.")
-		return nil, e.NewUnauthorizedError()
+		return nil, e.NewUnauthorizedError("Authorized endpoint called with invalid claims. Request denied.")
 	}
 
 	// Create a list of roles from the claims
@@ -136,15 +133,13 @@ func (c *BaseController) GetUser(ctx echo.Context) (*models.User, *e.ApiError) {
 	// Check if the email is valid
 	_, emailInvalidErr := mail.ParseAddress(claims.Email)
 	if emailInvalidErr != nil {
-		ctx.Logger().Errorf("Authorized endpoint called with invalid email address: %s. Request denied.", claims.Email)
-		return nil, e.NewUnauthorizedError()
+		return nil, e.NewUnauthorizedError(fmt.Sprintf("Authorized endpoint called with invalid email address: %s. Request denied.", claims.Email))
 	}
 
 	// Check if the email address of the user is allowed to access the application
 	emailDomain := claims.Email[strings.Index(claims.Email, "@")+1:]
 	if !slices.Contains(c.Provider.Config().AllowedDomains, emailDomain) {
-		ctx.Logger().Errorf("Authorized endpoint called with unauthorized email address: %s. Request denied.", claims.Email)
-		return nil, e.NewUnauthorizedError()
+		return nil, e.NewUnauthorizedError(fmt.Sprintf("Authorized endpoint called with unauthorized email domain: %s. Request denied.", claims.Email))
 	}
 
 	// Create the user object from the claims
@@ -157,8 +152,7 @@ func (c *BaseController) GetUser(ctx echo.Context) (*models.User, *e.ApiError) {
 	// Ensure that the database contains the user and that the user is updated based on the claims
 	crudUser, crudErr := c.UserDao.CreateOrUpdateByEmail(userEntity)
 	if crudErr != nil {
-		ctx.Logger().Error("Error creating or updating user in database. Request denied.")
-		return nil, e.NewUnauthorizedError()
+		return nil, e.NewUnauthorizedError("Error creating or updating user in database. Request denied.")
 	}
 
 	// Return the user
@@ -212,7 +206,13 @@ func (c *BaseController) CheckUserAnyRole(ctx echo.Context) *e.ApiError {
 	}
 
 	if !user.HasAnyRole() {
-		return e.NewClaimMissingError("any")
+		// Build a list of valid claims
+		allRoleClaims := ""
+		for _, role := range c.Provider.Config().Roles {
+			allRoleClaims += role.ClaimName + ", "
+		}
+		// Return the list as error
+		return e.NewClaimMissingError(allRoleClaims)
 	}
 
 	return nil
