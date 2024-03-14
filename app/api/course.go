@@ -42,8 +42,8 @@ func NewCourseController(provider db.Provider) *CourseController {
 // @Security		Bearer
 func (c *CourseController) Courses(ctx echo.Context) error {
 	// Check if the user has any role
-	if err := c.CheckUserAnyRole(ctx); err != nil {
-		return e.NewUnauthorizedError()
+	if authError := c.CheckUserAnyRole(ctx); authError != nil {
+		return authError
 	}
 
 	res, err := c.Dao.GetAll()
@@ -67,8 +67,8 @@ func (c *CourseController) Courses(ctx echo.Context) error {
 // @Security		Bearer
 func (c *CourseController) Course(ctx echo.Context) error {
 	// Check if the user has any role
-	if err := c.CheckUserAnyRole(ctx); err != nil {
-		return e.NewUnauthorizedError()
+	if authErr := c.CheckUserAnyRole(ctx); authErr != nil {
+		return authErr
 	}
 
 	// Read id parameter from request
@@ -107,6 +107,12 @@ func (c *CourseController) Course(ctx echo.Context) error {
 // @Router			/courses [post]
 // @Security		Bearer
 func (c *CourseController) Create(ctx echo.Context) error {
+	// Check if the user has required roles
+	authErr := c.CheckUserRoles(ROLEGROUP_TEACHER, ctx)
+	if authErr != nil {
+		return authErr
+	}
+
 	course := new(requestmodels.RefCourse)
 	// Read the request into Course
 	if err := ctx.Bind(course); err != nil {
@@ -137,6 +143,11 @@ func (c *CourseController) Create(ctx echo.Context) error {
 // @Router			/courses/{id} [post]
 // @Security		Bearer
 func (c *CourseController) CreateVersion(ctx echo.Context) error {
+	// Check if the user has required roles
+	authErr := c.CheckUserRoles(ROLEGROUP_TEACHER, ctx)
+	if authErr != nil {
+		return authErr
+	}
 
 	// Read id parameter from request
 	id, err := c.GetPathParamUint(ctx, "id")
@@ -179,6 +190,12 @@ func (c *CourseController) CreateVersion(ctx echo.Context) error {
 // @Router			/courses/{id}/{version} [put]
 // @Security		Bearer
 func (c *CourseController) Update(ctx echo.Context) error {
+	// Check if the user has required roles
+	authErr := c.CheckUserRoles(ROLEGROUP_TEACHER, ctx)
+	if authErr != nil {
+		return authErr
+	}
+
 	// Read id parameter from request
 	id, err := c.GetPathParamUint(ctx, "id")
 	if err != nil {
@@ -224,8 +241,13 @@ func (c *CourseController) Update(ctx echo.Context) error {
 // @Router			/courses/{id}/{version} [delete]
 // @Security		Bearer
 func (c *CourseController) Delete(ctx echo.Context) error {
-	// Read id parameter from request
+	// Check if the user has required roles
+	authErr := c.CheckUserRoles(ROLEGROUP_ADMIN, ctx)
+	if authErr != nil {
+		return authErr
+	}
 
+	// Read id parameter from request
 	id, err := c.GetPathParamUint(ctx, "id")
 	if err != nil {
 		return e.NewDaoValidationError("id", "uint", c.GetPathParam(ctx, "id"))

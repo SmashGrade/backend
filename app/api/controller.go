@@ -31,6 +31,13 @@ type TokenClaim struct {
 	jwt.RegisteredClaims
 }
 
+// Predefined roleGroups
+var (
+	ROLEGROUP_ADMIN   = []uint{config.ROLE_COURSEADMIN, config.ROLE_FIELDMANAGER}
+	ROLEGROUP_TEACHER = []uint{config.ROLE_COURSEADMIN, config.ROLE_FIELDMANAGER, config.ROLE_TEACHER}
+	ROLEGROUP_STUDENT = []uint{config.ROLE_COURSEADMIN, config.ROLE_FIELDMANAGER, config.ROLE_TEACHER, config.ROLE_STUDENT}
+)
+
 // Constructor for BaseController
 func NewBaseController(provider db.Provider) *BaseController {
 	return &BaseController{
@@ -215,17 +222,20 @@ func (c *BaseController) CheckUserAnyRole(ctx echo.Context) *e.ApiError {
 // CheckUserRoles loops through multiple roles to check if any is correct.
 // If a correct role is found, it returns nil; otherwise, it returns an error.
 func (c *BaseController) CheckUserRoles(roleIDs []uint, ctx echo.Context) *e.ApiError {
-	if len(roleIDs) == 0 {
+
+	// Check if the length of the roleIDs is 0
+	if len(roleIDs) < 1 {
 		return e.NewDaoReferenceIdError("role", 0)
 	}
 
-	var lastError *e.ApiError
+	// This error will always contain the last roles claim error
+	var err *e.ApiError
 	for _, roleID := range roleIDs {
-		if err := c.CheckUserRole(roleID, ctx); err == nil {
+		// We don't need to check if authentication is disabled here, as the CheckUserRole function does that for us
+		if err = c.CheckUserRole(roleID, ctx); err == nil {
 			return nil
-		} else {
-			lastError = err
 		}
 	}
-	return lastError
+	// Return the error if nothing was found
+	return err
 }

@@ -262,7 +262,7 @@ func TestModuleCRUD(t *testing.T) {
 	testDescr := "testdescr"
 
 	// Create
-	retModule, err := dao.Create(models.Module{
+	retModule, err := dao.Create(requestmodels.RefModule{
 		Description: testDescr,
 	})
 	require.Nil(t, err)
@@ -282,7 +282,7 @@ func TestModuleCRUD(t *testing.T) {
 
 	// Update
 	newTestDescr := "wowee"
-	newModule := models.Module{
+	newModule := requestmodels.RefModule{
 		Description: newTestDescr,
 	}
 	newModule.ID = retModule.ID
@@ -357,7 +357,7 @@ func TestLinkCourseObjectsByKey(t *testing.T) {
 	// create a module and link it indirectly with the course
 	moduleDao := NewModuleDao(repository.NewModuleRepository(provider))
 
-	testModule := models.Module{
+	testModule := requestmodels.RefModule{
 		Description: "testmodule",
 	}
 
@@ -453,7 +453,7 @@ func TestPreventCascadeDelete(t *testing.T) {
 	// create a module and link it indirectly with the course
 	moduleDao := NewModuleDao(repository.NewModuleRepository(provider))
 
-	testModule := models.Module{
+	testModule := requestmodels.RefModule{
 		Description: "testmodule",
 	}
 
@@ -939,7 +939,7 @@ func TestTechedByTeacher(t *testing.T) {
 	// create a module and link it indirectly with the course
 	moduleDao := NewModuleDao(repository.NewModuleRepository(provider))
 
-	testModule := models.Module{
+	testModule := requestmodels.RefModule{
 		Description: "testmodule",
 	}
 
@@ -1026,4 +1026,194 @@ func TestGetTeachersForMeta(t *testing.T) {
 	teachers, err := userDao.GetTeachers()
 	require.Nil(t, err)
 	require.NotEmpty(t, teachers)
+}
+
+func TestCreateModule(t *testing.T) {
+	provider := db.NewMockProvider()
+	moduleDao := NewModuleDao(
+		repository.NewModuleRepository(provider),
+	)
+
+	// Prefill Data with mock data for the module
+	state := db.State1
+	studyStage := db.StudyStage2
+	evaluationType := db.EvaluationType1
+	curriculum1 := db.Curriculum1
+	curriculum2 := db.Curriculum2
+	provider.DB().Table("states").Create(&state)
+	provider.DB().Table("study_stages").Create(&studyStage)
+	provider.DB().Table("evaluationtypes").Create(&evaluationType)
+	provider.DB().Table("curriculums").Create(&curriculum1)
+	provider.DB().Table("curriculums").Create(&curriculum2)
+
+	mustHaveId, _ := moduleDao.repo.GetNextId()
+	// Create a new Module and add Values
+	module := requestmodels.RefModule{
+		Description: "Schnittstellen-Technologien",
+		Number:      "IN123",
+	}
+	module.State.ID = state.ID
+	module.StudyStage.ID = studyStage.ID
+	module.EvaluationType.ID = evaluationType.ID
+	module.Curriculums = []requestmodels.RefTimed{
+		{
+			ID:            curriculum1.ID,
+			StartValidity: "01.04.2021",
+		},
+		{
+			ID:            curriculum2.ID,
+			StartValidity: "01.04.2021",
+		},
+	}
+
+	// Create new Module in Database
+	createdModule, err := moduleDao.Create(module)
+
+	require.Nil(t, err)
+	// Dependencies
+	require.Equal(t, state.Description, createdModule.State.Description)
+	require.Equal(t, studyStage.Description, createdModule.StudyStage.Description)
+	require.Equal(t, evaluationType.Description, createdModule.EvaluationType.Description)
+	require.Equal(t, curriculum1.ID, createdModule.Curriculums[0].ID)
+	require.Equal(t, curriculum2.ID, createdModule.Curriculums[1].ID)
+	require.Equal(t, curriculum1.StartValidity, createdModule.Curriculums[0].StartValidity)
+	require.Equal(t, curriculum2.StartValidity, createdModule.Curriculums[1].StartValidity)
+
+	// Correct ID
+	require.Equal(t, mustHaveId, createdModule.ID)
+	// The Version has to be 1
+	require.Equal(t, uint(1), createdModule.Version)
+
+	// Create another Module with same ID
+	module.ID = createdModule.ID
+
+	createVersionModule, err := moduleDao.Create(module)
+
+	require.Nil(t, err)
+	// Dependencies
+	require.Equal(t, state.Description, createVersionModule.State.Description)
+	require.Equal(t, studyStage.Description, createVersionModule.StudyStage.Description)
+	require.Equal(t, evaluationType.Description, createVersionModule.EvaluationType.Description)
+	require.Equal(t, curriculum1.ID, createVersionModule.Curriculums[0].ID)
+	require.Equal(t, curriculum2.ID, createVersionModule.Curriculums[1].ID)
+	require.Equal(t, curriculum1.StartValidity, createVersionModule.Curriculums[0].StartValidity)
+	require.Equal(t, curriculum2.StartValidity, createVersionModule.Curriculums[1].StartValidity)
+
+	// Correct ID
+	require.Equal(t, mustHaveId, createVersionModule.ID)
+	// The Version has to be 2
+	require.Equal(t, uint(2), createVersionModule.Version)
+}
+
+func TestGetAllModules(t *testing.T) {
+	provider := db.NewPrefilledMockProvider()
+	moduleDao := NewModuleDao(repository.NewModuleRepository(provider))
+
+	modules, err := moduleDao.GetAll()
+
+	require.Nil(t, err)
+
+	// There are two modules in the prefild Mockdatabase
+	require.Equal(t, 2, len(modules))
+
+	// Dependencies
+	// Module 1
+	require.Equal(t, db.State1.Description, modules[0].State.Description)
+	require.Equal(t, db.StudyStage1.Description, modules[0].StudyStage.Description)
+	require.Equal(t, db.EvaluationType1.Description, modules[0].EvaluationType.Description)
+	require.Equal(t, db.Curriculum1.ID, modules[0].Curriculums[0].ID)
+	require.Equal(t, db.Curriculum2.ID, modules[0].Curriculums[1].ID)
+	// Module 2
+	require.Equal(t, db.State1.Description, modules[1].State.Description)
+	require.Equal(t, db.StudyStage1.Description, modules[1].StudyStage.Description)
+	require.Equal(t, db.EvaluationType1.Description, modules[1].EvaluationType.Description)
+	require.Equal(t, db.Curriculum1.ID, modules[1].Curriculums[0].ID)
+	require.Equal(t, db.Curriculum2.ID, modules[1].Curriculums[1].ID)
+
+	// Correct ID and Version
+	require.Equal(t, db.Module1.ID, modules[0].ID)
+	require.Equal(t, db.Module1.Version, modules[0].Version)
+
+	require.Equal(t, db.Module2.ID, modules[1].ID)
+	require.Equal(t, db.Module2.Version, modules[1].Version)
+}
+
+func TestGetOneModule(t *testing.T) {
+	provider := db.NewPrefilledMockProvider()
+	moduleDao := NewModuleDao(repository.NewModuleRepository(provider))
+
+	module, err := moduleDao.Get(2, 1)
+
+	require.Nil(t, err)
+
+	// Dependencies
+	require.Equal(t, db.State1.Description, module.State.Description)
+	require.Equal(t, db.StudyStage1.Description, module.StudyStage.Description)
+	require.Equal(t, db.EvaluationType1.Description, module.EvaluationType.Description)
+	require.Equal(t, db.Curriculum1.ID, module.Curriculums[0].ID)
+	require.Equal(t, db.Curriculum2.ID, module.Curriculums[1].ID)
+
+	// Correct ID and Version
+	require.Equal(t, db.Module2.ID, module.ID)
+	require.Equal(t, db.Module2.Version, module.Version)
+}
+
+func TestUpdateModule(t *testing.T) {
+	provider := db.NewPrefilledMockProvider()
+	moduleDao := NewModuleDao(repository.NewModuleRepository(provider))
+
+	// Change a module
+	refModule := requestmodels.RefModule{
+		Description: "Kleines 1x1",
+	}
+	refModule.State.ID = db.State2.ID
+	refModule.StudyStage.ID = db.StudyStage2.ID
+	refModule.EvaluationType.ID = db.EvaluationType2.ID
+	refModule.Curriculums = []requestmodels.RefTimed{
+		{
+			ID:            db.Curriculum1.ID,
+			StartValidity: "01.04.2021",
+		},
+	}
+
+	refModule.ID = 2
+	refModule.Version = 1
+
+	// Update Module2
+	err := moduleDao.Update(refModule)
+	require.Nil(t, err)
+
+	module, err := moduleDao.Get(2, 1)
+
+	require.Nil(t, err)
+
+	// Dependencies
+	require.Equal(t, db.State2.Description, module.State.Description)
+	require.Equal(t, db.StudyStage2.Description, module.StudyStage.Description)
+	require.Equal(t, db.EvaluationType2.Description, module.EvaluationType.Description)
+	require.Equal(t, db.Curriculum1.ID, module.Curriculums[0].ID)
+}
+
+func TestDeleteModule(t *testing.T) {
+	provider := db.NewPrefilledMockProvider()
+	moduleDao := NewModuleDao(repository.NewModuleRepository(provider))
+
+	// Get all Modules to get length
+	modules, err := moduleDao.GetAll()
+	require.Nil(t, err)
+
+	lengthModules := len(modules)
+
+	// Delete Modules
+	for _, c := range modules {
+		err := moduleDao.Delete(c.ID, c.Version)
+		require.Nil(t, err)
+		lengthModules = lengthModules - 1
+	}
+
+	// Get New length of modules
+	modulesAfterDelete, err := moduleDao.GetAll()
+	require.Nil(t, err)
+
+	require.Equal(t, lengthModules, len(modulesAfterDelete))
 }

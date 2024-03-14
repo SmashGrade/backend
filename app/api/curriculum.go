@@ -41,8 +41,8 @@ func NewCurriculumController(provider db.Provider) *CurriculumController {
 // @Security		Bearer
 func (c *CurriculumController) Curriculums(ctx echo.Context) error {
 	// Check if the user has any role
-	if err := c.CheckUserAnyRole(ctx); err != nil {
-		return e.NewUnauthorizedError()
+	if authErr := c.CheckUserAnyRole(ctx); authErr != nil {
+		return authErr
 	}
 
 	res, err := c.Dao.GetAll()
@@ -66,8 +66,8 @@ func (c *CurriculumController) Curriculums(ctx echo.Context) error {
 // @Security		Bearer
 func (c *CurriculumController) Curriculum(ctx echo.Context) error {
 	// Check if the user has any role
-	if err := c.CheckUserAnyRole(ctx); err != nil {
-		return e.NewUnauthorizedError()
+	if authErr := c.CheckUserAnyRole(ctx); authErr != nil {
+		return authErr
 	}
 
 	// Read id parameter from request
@@ -105,6 +105,12 @@ func (c *CurriculumController) Curriculum(ctx echo.Context) error {
 // @Router			/curriculums [post]
 // @Security		Bearer
 func (c *CurriculumController) Create(ctx echo.Context) error {
+	// Check if the user has required roles
+	authErr := c.CheckUserRoles(ROLEGROUP_TEACHER, ctx)
+	if authErr != nil {
+		return authErr
+	}
+
 	curriculum := new(requestmodels.RefCurriculum)
 	// Read the request into curriculum
 	if err := ctx.Bind(curriculum); err != nil {
@@ -137,6 +143,12 @@ func (c *CurriculumController) Create(ctx echo.Context) error {
 // @Router			/curriculums/{id}/{date} [put]
 // @Security		Bearer
 func (c *CurriculumController) Update(ctx echo.Context) error {
+	// Check if the user has required roles
+	authErr := c.CheckUserRoles(ROLEGROUP_TEACHER, ctx)
+	if authErr != nil {
+		return authErr
+	}
+
 	// Read id parameter from request
 	id, err := c.GetPathParamUint(ctx, "id")
 	if err != nil {
@@ -181,6 +193,12 @@ func (c *CurriculumController) Update(ctx echo.Context) error {
 // @Router			/curriculums/{id}/{date} [delete]
 // @Security		Bearer
 func (c *CurriculumController) Delete(ctx echo.Context) error {
+	// Check if the user has required roles
+	authErr := c.CheckUserRoles(ROLEGROUP_ADMIN, ctx)
+	if authErr != nil {
+		return authErr
+	}
+
 	// Read id parameter from request
 	id, err := c.GetPathParamUint(ctx, "id")
 	if err != nil {

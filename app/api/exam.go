@@ -34,8 +34,8 @@ func NewExamController(provider db.Provider) *ExamController {
 // @Security		Bearer
 func (c *ExamController) Exams(ctx echo.Context) error {
 	// Check if the user has any role
-	if err := c.CheckUserAnyRole(ctx); err != nil {
-		return e.NewUnauthorizedError()
+	if authErr := c.CheckUserAnyRole(ctx); authErr != nil {
+		return authErr
 	}
 
 	res, err := c.Dao.GetAll()
@@ -58,8 +58,8 @@ func (c *ExamController) Exams(ctx echo.Context) error {
 // @Security		Bearer
 func (c *ExamController) Exam(ctx echo.Context) error {
 	// Check if the user has any role
-	if err := c.CheckUserAnyRole(ctx); err != nil {
-		return e.NewUnauthorizedError()
+	if authErr := c.CheckUserAnyRole(ctx); authErr != nil {
+		return authErr
 	}
 
 	// Read id parameter from request

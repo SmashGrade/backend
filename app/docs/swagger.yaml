@@ -499,6 +499,31 @@ definitions:
       id:
         type: integer
     type: object
+  requestmodels.RefModule:
+    properties:
+      courses:
+        items:
+          $ref: '#/definitions/requestmodels.RefVersioned'
+        type: array
+      curriculums:
+        items:
+          $ref: '#/definitions/requestmodels.RefTimed'
+        type: array
+      description:
+        type: string
+      evaluationType:
+        $ref: '#/definitions/requestmodels.RefId'
+      id:
+        type: integer
+      number:
+        type: string
+      state:
+        $ref: '#/definitions/requestmodels.RefId'
+      studyStage:
+        $ref: '#/definitions/requestmodels.RefId'
+      version:
+        type: integer
+    type: object
   requestmodels.RefSelectedCourse:
     properties:
       classStartYear:
@@ -511,6 +536,15 @@ definitions:
         type: boolean
       userId:
         type: integer
+    type: object
+  requestmodels.RefTimed:
+    properties:
+      id:
+        example: 1
+        type: integer
+      startvalidity:
+        example: 02.01.2006
+        type: string
     type: object
   requestmodels.RefVersioned:
     properties:
@@ -1453,6 +1487,82 @@ paths:
       summary: Get all modules
       tags:
       - modules
+    post:
+      consumes:
+      - application/json
+      description: Create a module
+      parameters:
+      - description: request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/requestmodels.RefModule'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Module'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.ApiError'
+      security:
+      - Bearer: []
+      summary: Create a module
+      tags:
+      - modules
+  /modules/{id}:
+    post:
+      consumes:
+      - application/json
+      description: Create a new version of a module
+      parameters:
+      - description: request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/requestmodels.RefModule'
+      - description: Module ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Module'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.ApiError'
+      security:
+      - Bearer: []
+      summary: Create a new version of a module
+      tags:
+      - modules
   /modules/{id}/{version}:
     get:
       description: Get a specific module
@@ -1489,6 +1599,51 @@ paths:
       security:
       - Bearer: []
       summary: Get a specific module
+      tags:
+      - modules
+    put:
+      consumes:
+      - application/json
+      description: Update a module
+      parameters:
+      - description: request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/requestmodels.RefModule'
+      - description: Module ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Module Version
+        in: path
+        name: version
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Module'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.ApiError'
+      security:
+      - Bearer: []
+      summary: Update a module
       tags:
       - modules
   /modules/meta:

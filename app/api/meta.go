@@ -98,37 +98,38 @@ func (m *MetaController) MetaCourses(ctx echo.Context) error {
 // @Failure		500	{object}	error.ApiError
 // @Router			/modules/meta [get]
 // @Security		Bearer
-func (m *MetaController) MetaModules(ctx echo.Context) error {
+func (c *MetaController) MetaModules(ctx echo.Context) error {
 	// MetaModules has all the data the Frontend needs to Create or Modify a Module.
 	// returns: all evaluation types, all curriculum, all curriculum types, all courses
 	// These are Preselected Items
 	var metaModules models.MetaModules
 
-	err := m.CheckUserRole(config.ROLE_COURSEADMIN, ctx)
-	if err != nil {
-		return err
+	// Check if the user has required roles
+	authErr := c.CheckUserRoles(ROLEGROUP_ADMIN, ctx)
+	if authErr != nil {
+		return authErr
 	}
 
 	// Get all Evaluationtypes
-	evaluationtypes, err := m.evaluationtypeDao.GetAll()
+	evaluationtypes, err := c.evaluationtypeDao.GetAll()
 	if err != nil {
 		return err
 	}
 
 	// Get all Curriculums
-	curriculums, err := m.curriculumDao.GetAll()
+	curriculums, err := c.curriculumDao.GetAll()
 	if err != nil {
 		return err
 	}
 
 	// Get all Curriculumtypes
-	curriculumtypes, err := m.curriculumtypeDao.GetAll()
+	curriculumtypes, err := c.curriculumtypeDao.GetAll()
 	if err != nil {
 		return err
 	}
 
 	// Get all courses
-	courses, err := m.courseDao.GetAll()
+	courses, err := c.courseDao.GetAll()
 	if err != nil {
 		return err
 	}
@@ -138,7 +139,7 @@ func (m *MetaController) MetaModules(ctx echo.Context) error {
 	metaModules.Curriculumtypes = curriculumtypes
 	metaModules.Courses = courses
 
-	return m.Yeet(ctx, metaModules)
+	return c.Yeet(ctx, metaModules)
 }
 
 // @Summary		Get Metadata for Curriculums
@@ -151,37 +152,38 @@ func (m *MetaController) MetaModules(ctx echo.Context) error {
 // @Failure		500	{object}	error.ApiError
 // @Router			/curriculums/meta [get]
 // @Security		Bearer
-func (m *MetaController) MetaCurriculums(ctx echo.Context) error {
+func (c *MetaController) MetaCurriculums(ctx echo.Context) error {
 	// MetaCurriculum contains all form choice data to create or modify a curriculum (Studiengang)
 	// returns: all focus (Fachrichtung), all fields (Schwerpunkt), all curriculumtypes, all users
 
-	err := m.CheckUserRole(config.ROLE_COURSEADMIN, ctx)
-	if err != nil {
-		return err
+	// Check if the user has required roles
+	authErr := c.CheckUserRoles(ROLEGROUP_ADMIN, ctx)
+	if authErr != nil {
+		return authErr
 	}
 
 	var metaCurriculums models.MetaCurriculums
 
 	// Get all Teachers
-	teachers, err := m.userDao.GetTeachers()
+	teachers, err := c.userDao.GetTeachers()
 	if err != nil {
 		return err
 	}
 
 	// Get all Curriculumtypes
-	curriculumtypes, err := m.curriculumtypeDao.GetAll()
+	curriculumtypes, err := c.curriculumtypeDao.GetAll()
 	if err != nil {
 		return err
 	}
 
 	// get all focus
-	focuses, err := m.focusDao.GetAll()
+	focuses, err := c.focusDao.GetAll()
 	if err != nil {
 		return err
 	}
 
 	// get all fields
-	fields, err := m.fieldDao.GetAll()
+	fields, err := c.fieldDao.GetAll()
 	if err != nil {
 		return err
 	}
@@ -191,7 +193,7 @@ func (m *MetaController) MetaCurriculums(ctx echo.Context) error {
 	metaCurriculums.Focuses = focuses
 	metaCurriculums.Fields = fields
 
-	return m.Yeet(ctx, metaCurriculums)
+	return c.Yeet(ctx, metaCurriculums)
 }
 
 // @Summary		Get your Courses as a teacher
@@ -204,16 +206,17 @@ func (m *MetaController) MetaCurriculums(ctx echo.Context) error {
 // @Failure		500	{object}	error.ApiError
 // @Router			/courses/teacher [get]
 // @Security		Bearer
-func (m *MetaController) MyCoursesAsTeacher(ctx echo.Context) error {
+func (c *MetaController) MyCoursesAsTeacher(ctx echo.Context) error {
 	// View of the course teacher
 	// returns: list of courses teached by current user with modules and study stage, list of all users
 
-	err := m.CheckUserRole(config.ROLE_TEACHER, ctx)
-	if err != nil {
-		return err
+	// Check if the user has required roles
+	authErr := c.CheckUserRoles(ROLEGROUP_TEACHER, ctx)
+	if authErr != nil {
+		return authErr
 	}
 
-	user, err := m.GetUser(ctx)
+	user, err := c.GetUser(ctx)
 	if err != nil {
 		return err
 	}
@@ -241,7 +244,7 @@ func (m *MetaController) MyCoursesAsTeacher(ctx echo.Context) error {
 		}
 
 		for _, uniqueDate := range uniqueStartDates {
-			newClass, err := m.classDao.Get(teacherCourses.Courses[i].ID, teacherCourses.Courses[i].Version, uniqueDate)
+			newClass, err := c.classDao.Get(teacherCourses.Courses[i].ID, teacherCourses.Courses[i].Version, uniqueDate)
 			if err != nil {
 				return err
 			}
@@ -249,7 +252,7 @@ func (m *MetaController) MyCoursesAsTeacher(ctx echo.Context) error {
 		}
 	}
 
-	return m.Yeet(ctx, teacherCourses)
+	return c.Yeet(ctx, teacherCourses)
 }
 
 // @Summary		Get Curriculums as a student
@@ -262,16 +265,17 @@ func (m *MetaController) MyCoursesAsTeacher(ctx echo.Context) error {
 // @Failure		500	{object}	error.ApiError
 // @Router			/curriculums/student [get]
 // @Security		Bearer
-func (m *MetaController) MyCurriculumsAsStudent(ctx echo.Context) error {
+func (c *MetaController) MyCurriculumsAsStudent(ctx echo.Context) error {
 	// View of the student, general info
 	// returns: chosen curriculum with start year and curriculum type
 
-	err := m.CheckUserRole(config.ROLE_STUDENT, ctx)
-	if err != nil {
-		return err
+	// Check if the user has required roles
+	authErr := c.CheckUserRoles(ROLEGROUP_STUDENT, ctx)
+	if authErr != nil {
+		return authErr
 	}
 
-	user, err := m.GetUser(ctx)
+	user, err := c.GetUser(ctx)
 	if err != nil {
 		return err
 	}
@@ -280,14 +284,14 @@ func (m *MetaController) MyCurriculumsAsStudent(ctx echo.Context) error {
 		StartYear: user.ClassStartyear,
 	}
 
-	curriculum, err := m.curriculumDao.GetValidForTimepoint(user.CurriculumID, studentCurriculum.StartYear)
+	curriculum, err := c.curriculumDao.GetValidForTimepoint(user.CurriculumID, studentCurriculum.StartYear)
 	if err != nil {
 		return err
 	}
 
 	studentCurriculum.Curriculum = *curriculum
 
-	return m.Yeet(ctx, studentCurriculum)
+	return c.Yeet(ctx, studentCurriculum)
 }
 
 // @Summary		Set start year and curriculumId as student
@@ -302,31 +306,32 @@ func (m *MetaController) MyCurriculumsAsStudent(ctx echo.Context) error {
 // @Failure		500	{object}	error.ApiError
 // @Router			/onboarding [put]
 // @Security		Bearer
-func (m *MetaController) SetStudentCurriculumLink(ctx echo.Context) error {
-	err := m.CheckUserRole(config.ROLE_STUDENT, ctx)
-	if err != nil {
-		return err
+func (c *MetaController) SetStudentCurriculumLink(ctx echo.Context) error {
+	// Check if the user has required roles
+	authErr := c.CheckUserRoles(ROLEGROUP_STUDENT, ctx)
+	if authErr != nil {
+		return authErr
 	}
 
-	user, err := m.GetUser(ctx)
+	user, err := c.GetUser(ctx)
 	if err != nil {
 		return err
 	}
 
 	// Read id parameter from request
-	id, intErr := m.GetPathParamUint(ctx, "id")
+	id, intErr := c.GetPathParamUint(ctx, "id")
 	if intErr != nil {
-		return e.NewDaoValidationError("id", "uint", m.GetPathParam(ctx, "id"))
+		return e.NewDaoValidationError("id", "uint", c.GetPathParam(ctx, "id"))
 	}
 
 	// Read date paramater from request
-	date, intErr := m.GetPathParamTime(ctx, "date")
+	date, intErr := c.GetPathParamTime(ctx, "date")
 	if intErr != nil {
-		return e.NewDaoValidationError("date", "time.Time", m.GetPathParam(ctx, "date"))
+		return e.NewDaoValidationError("date", "time.Time", c.GetPathParam(ctx, "date"))
 	}
 
 	// check if there is such a curriculum
-	_, tpErr := m.curriculumDao.GetValidForTimepoint(id, date)
+	_, tpErr := c.curriculumDao.GetValidForTimepoint(id, date)
 	if tpErr != nil {
 		return tpErr
 	}
@@ -334,12 +339,12 @@ func (m *MetaController) SetStudentCurriculumLink(ctx echo.Context) error {
 	user.CurriculumID = id
 	user.ClassStartyear = date
 
-	updErr := m.userDao.Update(*user)
+	updErr := c.userDao.Update(*user)
 	if updErr != nil {
 		return updErr
 	}
 
-	return m.Yeet(ctx, *user)
+	return c.Yeet(ctx, *user)
 }
 
 // register all output endpoints to router
