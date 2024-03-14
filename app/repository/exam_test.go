@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/SmashGrade/backend/app/db"
@@ -85,4 +86,23 @@ func Test_Exam_DeleteId(t *testing.T) {
 
 	require.NoError(t, err)
 	require.Nil(t, deep.Equal(afterCreateLength-1, afterDeleteLength))
+}
+
+func TestExamGetFromCourse(t *testing.T) {
+	repository := NewExamRepository(db.NewPrefilledMockProvider())
+
+	// Get all from a course 2 version 1 (There are none)
+	result, err := repository.GetFromCourse(2, 1)
+
+	require.NoError(t, err)
+	require.Nil(t, deep.Equal(0, len(result)))
+
+	// Get all from a course 2 version 2 (There are two)
+	result, err = repository.GetFromCourse(2, 2)
+
+	require.NoError(t, err)
+	require.Nil(t, deep.Equal(2, len(result)))
+
+	fmt.Println(result)
+
 }
