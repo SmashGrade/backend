@@ -1,7 +1,6 @@
 package api
 
 import (
-	"github.com/SmashGrade/backend/app/config"
 	"github.com/SmashGrade/backend/app/dao"
 	"github.com/SmashGrade/backend/app/db"
 	e "github.com/SmashGrade/backend/app/error"
@@ -39,14 +38,10 @@ func NewModuleController(provider db.Provider) *ModuleController {
 // @Router			/modules [post]
 // @Security		Bearer
 func (c *ModuleController) Create(ctx echo.Context) error {
-	// Check Role
-	var allowedRoles []uint
-	allowedRoles = append(allowedRoles, config.ROLE_COURSEADMIN)
-	allowedRoles = append(allowedRoles, config.ROLE_FIELDMANAGER)
-	allowedRoles = append(allowedRoles, config.ROLE_TEACHER)
-	roleErr := c.CheckUserRoles(allowedRoles, ctx)
-	if roleErr != nil {
-		return roleErr
+	// Check if the user has required roles
+	authErr := c.CheckUserRoles(ROLEGROUP_TEACHER, ctx)
+	if authErr != nil {
+		return authErr
 	}
 
 	module := new(requestmodels.RefModule)
@@ -79,14 +74,10 @@ func (c *ModuleController) Create(ctx echo.Context) error {
 // @Router			/modules/{id} [post]
 // @Security		Bearer
 func (c *ModuleController) CreateVersion(ctx echo.Context) error {
-	// Check Role
-	var allowedRoles []uint
-	allowedRoles = append(allowedRoles, config.ROLE_COURSEADMIN)
-	allowedRoles = append(allowedRoles, config.ROLE_FIELDMANAGER)
-	allowedRoles = append(allowedRoles, config.ROLE_TEACHER)
-	roleErr := c.CheckUserRoles(allowedRoles, ctx)
-	if roleErr != nil {
-		return roleErr
+	// Check if the user has required roles
+	authErr := c.CheckUserRoles(ROLEGROUP_TEACHER, ctx)
+	if authErr != nil {
+		return authErr
 	}
 
 	id, err := c.GetPathParamUint(ctx, "id")
@@ -129,14 +120,10 @@ func (c *ModuleController) CreateVersion(ctx echo.Context) error {
 // @Router			/modules/{id}/{version} [put]
 // @Security		Bearer
 func (c *ModuleController) Update(ctx echo.Context) error {
-	// Check Role
-	var allowedRoles []uint
-	allowedRoles = append(allowedRoles, config.ROLE_COURSEADMIN)
-	allowedRoles = append(allowedRoles, config.ROLE_FIELDMANAGER)
-	allowedRoles = append(allowedRoles, config.ROLE_TEACHER)
-	roleErr := c.CheckUserRoles(allowedRoles, ctx)
-	if roleErr != nil {
-		return roleErr
+	// Check if the user has required roles
+	authErr := c.CheckUserRoles(ROLEGROUP_TEACHER, ctx)
+	if authErr != nil {
+		return authErr
 	}
 
 	// Read id parameter from request
@@ -180,8 +167,8 @@ func (c *ModuleController) Update(ctx echo.Context) error {
 // @Security		Bearer
 func (c *ModuleController) Modules(ctx echo.Context) error {
 	// Check if the user has any role
-	if err := c.CheckUserAnyRole(ctx); err != nil {
-		return e.NewUnauthorizedError()
+	if authErr := c.CheckUserAnyRole(ctx); authErr != nil {
+		return authErr
 	}
 
 	res, err := c.Dao.GetAll()
@@ -204,15 +191,9 @@ func (c *ModuleController) Modules(ctx echo.Context) error {
 // @Router			/modules/{id}/{version} [get]
 // @Security		Bearer
 func (c *ModuleController) Module(ctx echo.Context) error {
-	// Check Role
-	var allowedRoles []uint
-	allowedRoles = append(allowedRoles, config.ROLE_COURSEADMIN)
-	allowedRoles = append(allowedRoles, config.ROLE_FIELDMANAGER)
-	allowedRoles = append(allowedRoles, config.ROLE_TEACHER)
-	allowedRoles = append(allowedRoles, config.ROLE_STUDENT)
-	roleErr := c.CheckUserRoles(allowedRoles, ctx)
-	if roleErr != nil {
-		return roleErr
+	// Check if the user has any role
+	if authErr := c.CheckUserAnyRole(ctx); authErr != nil {
+		return authErr
 	}
 
 	// Read id parameter from request
@@ -235,13 +216,10 @@ func (c *ModuleController) Module(ctx echo.Context) error {
 }
 
 func (c *ModuleController) Delete(ctx echo.Context) error {
-	// Check Role
-	var allowedRoles []uint
-	allowedRoles = append(allowedRoles, config.ROLE_COURSEADMIN)
-	allowedRoles = append(allowedRoles, config.ROLE_FIELDMANAGER)
-	roleErr := c.CheckUserRoles(allowedRoles, ctx)
-	if roleErr != nil {
-		return roleErr
+	// Check if the user has required roles
+	authErr := c.CheckUserRoles(ROLEGROUP_ADMIN, ctx)
+	if authErr != nil {
+		return authErr
 	}
 
 	id, err := c.GetPathParamUint(ctx, "id")

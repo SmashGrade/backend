@@ -1,7 +1,6 @@
 package api
 
 import (
-	"github.com/SmashGrade/backend/app/config"
 	"github.com/SmashGrade/backend/app/dao"
 	"github.com/SmashGrade/backend/app/db"
 	e "github.com/SmashGrade/backend/app/error"
@@ -35,6 +34,10 @@ func NewGradeTypeController(provider db.Provider) *GradeTypeController {
 // @Router			/gradetypes [get]
 // @Security		Bearer
 func (c *GradeTypeController) GradeTypes(ctx echo.Context) error {
+	// Check if the user has any role
+	if authErr := c.CheckUserAnyRole(ctx); authErr != nil {
+		return authErr
+	}
 	res, err := c.Dao.GetAll()
 	if err != nil {
 		return err
@@ -55,8 +58,8 @@ func (c *GradeTypeController) GradeTypes(ctx echo.Context) error {
 // @Security		Bearer
 func (c *GradeTypeController) GradeType(ctx echo.Context) error {
 	// Check if the user has any role
-	if err := c.CheckUserAnyRole(ctx); err != nil {
-		return e.NewUnauthorizedError()
+	if authErr := c.CheckUserAnyRole(ctx); authErr != nil {
+		return authErr
 	}
 
 	// Read id parameter from request
@@ -89,9 +92,10 @@ func (c *GradeTypeController) GradeType(ctx echo.Context) error {
 // @Router			/gradetypes [post]
 // @Security		Bearer
 func (c *GradeTypeController) Create(ctx echo.Context) error {
-	// Check if the user has the correct role
-	if err := c.CheckUserRole(config.ROLE_COURSEADMIN, ctx); err != nil {
-		return e.NewUnauthorizedError()
+	// Check if the user has required roles
+	authErr := c.CheckUserRoles(ROLEGROUP_ADMIN, ctx)
+	if authErr != nil {
+		return authErr
 	}
 
 	gradeType := new(models.Gradetype)
@@ -124,9 +128,10 @@ func (c *GradeTypeController) Create(ctx echo.Context) error {
 // @Router			/gradetypes/{id} [put]
 // @Security		Bearer
 func (c *GradeTypeController) Update(ctx echo.Context) error {
-	// Check if the user has the correct role
-	if err := c.CheckUserRole(config.ROLE_COURSEADMIN, ctx); err != nil {
-		return e.NewUnauthorizedError()
+	// Check if the user has required roles
+	authErr := c.CheckUserRoles(ROLEGROUP_ADMIN, ctx)
+	if authErr != nil {
+		return authErr
 	}
 
 	// Read id parameter from request
@@ -167,9 +172,10 @@ func (c *GradeTypeController) Update(ctx echo.Context) error {
 // @Router			/gradetypes/{id} [delete]
 // @Security		Bearer
 func (c *GradeTypeController) Delete(ctx echo.Context) error {
-	// Check if the user has the correct role
-	if err := c.CheckUserRole(config.ROLE_COURSEADMIN, ctx); err != nil {
-		return e.NewUnauthorizedError()
+	// Check if the user has required roles
+	authErr := c.CheckUserRoles(ROLEGROUP_ADMIN, ctx)
+	if authErr != nil {
+		return authErr
 	}
 
 	// Read id parameter from request

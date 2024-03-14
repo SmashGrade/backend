@@ -1,7 +1,6 @@
 package api
 
 import (
-	"github.com/SmashGrade/backend/app/config"
 	"github.com/SmashGrade/backend/app/dao"
 	"github.com/SmashGrade/backend/app/db"
 	e "github.com/SmashGrade/backend/app/error"
@@ -42,8 +41,8 @@ func NewCurriculumController(provider db.Provider) *CurriculumController {
 // @Security		Bearer
 func (c *CurriculumController) Curriculums(ctx echo.Context) error {
 	// Check if the user has any role
-	if err := c.CheckUserAnyRole(ctx); err != nil {
-		return err
+	if authErr := c.CheckUserAnyRole(ctx); authErr != nil {
+		return authErr
 	}
 
 	res, err := c.Dao.GetAll()
@@ -67,8 +66,8 @@ func (c *CurriculumController) Curriculums(ctx echo.Context) error {
 // @Security		Bearer
 func (c *CurriculumController) Curriculum(ctx echo.Context) error {
 	// Check if the user has any role
-	if err := c.CheckUserAnyRole(ctx); err != nil {
-		return err
+	if authErr := c.CheckUserAnyRole(ctx); authErr != nil {
+		return authErr
 	}
 
 	// Read id parameter from request
@@ -106,14 +105,10 @@ func (c *CurriculumController) Curriculum(ctx echo.Context) error {
 // @Router			/curriculums [post]
 // @Security		Bearer
 func (c *CurriculumController) Create(ctx echo.Context) error {
-	// Check Role
-	var allowedRoles []uint
-	allowedRoles = append(allowedRoles, config.ROLE_COURSEADMIN)
-	allowedRoles = append(allowedRoles, config.ROLE_FIELDMANAGER)
-	allowedRoles = append(allowedRoles, config.ROLE_TEACHER)
-	roleErr := c.CheckUserRoles(allowedRoles, ctx)
-	if roleErr != nil {
-		return roleErr
+	// Check if the user has required roles
+	authErr := c.CheckUserRoles(ROLEGROUP_TEACHER, ctx)
+	if authErr != nil {
+		return authErr
 	}
 
 	curriculum := new(requestmodels.RefCurriculum)
@@ -148,14 +143,10 @@ func (c *CurriculumController) Create(ctx echo.Context) error {
 // @Router			/curriculums/{id}/{date} [put]
 // @Security		Bearer
 func (c *CurriculumController) Update(ctx echo.Context) error {
-	// Check Role
-	var allowedRoles []uint
-	allowedRoles = append(allowedRoles, config.ROLE_COURSEADMIN)
-	allowedRoles = append(allowedRoles, config.ROLE_FIELDMANAGER)
-	allowedRoles = append(allowedRoles, config.ROLE_TEACHER)
-	roleErr := c.CheckUserRoles(allowedRoles, ctx)
-	if roleErr != nil {
-		return roleErr
+	// Check if the user has required roles
+	authErr := c.CheckUserRoles(ROLEGROUP_TEACHER, ctx)
+	if authErr != nil {
+		return authErr
 	}
 
 	// Read id parameter from request
@@ -202,13 +193,10 @@ func (c *CurriculumController) Update(ctx echo.Context) error {
 // @Router			/curriculums/{id}/{date} [delete]
 // @Security		Bearer
 func (c *CurriculumController) Delete(ctx echo.Context) error {
-	// Check Role
-	var allowedRoles []uint
-	allowedRoles = append(allowedRoles, config.ROLE_COURSEADMIN)
-	allowedRoles = append(allowedRoles, config.ROLE_FIELDMANAGER)
-	roleErr := c.CheckUserRoles(allowedRoles, ctx)
-	if roleErr != nil {
-		return roleErr
+	// Check if the user has required roles
+	authErr := c.CheckUserRoles(ROLEGROUP_ADMIN, ctx)
+	if authErr != nil {
+		return authErr
 	}
 
 	// Read id parameter from request
