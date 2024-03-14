@@ -41,6 +41,11 @@ func NewCourseController(provider db.Provider) *CourseController {
 // @Router			/courses [get]
 // @Security		Bearer
 func (c *CourseController) Courses(ctx echo.Context) error {
+	// Check if the user has any role
+	if err := c.CheckUserAnyRole(ctx); err != nil {
+		return e.NewUnauthorizedError()
+	}
+
 	res, err := c.Dao.GetAll()
 	if err != nil {
 		return err
@@ -61,6 +66,11 @@ func (c *CourseController) Courses(ctx echo.Context) error {
 // @Router			/courses/{id}/{version} [get]
 // @Security		Bearer
 func (c *CourseController) Course(ctx echo.Context) error {
+	// Check if the user has any role
+	if err := c.CheckUserAnyRole(ctx); err != nil {
+		return e.NewUnauthorizedError()
+	}
+
 	// Read id parameter from request
 	id, err := c.GetPathParamUint(ctx, "id")
 	if err != nil {
@@ -127,8 +137,8 @@ func (c *CourseController) Create(ctx echo.Context) error {
 // @Router			/courses/{id} [post]
 // @Security		Bearer
 func (c *CourseController) CreateVersion(ctx echo.Context) error {
-	// Read id parameter from request
 
+	// Read id parameter from request
 	id, err := c.GetPathParamUint(ctx, "id")
 	if err != nil {
 		return e.NewDaoValidationError("id", "uint", c.GetPathParam(ctx, "id"))
@@ -226,7 +236,7 @@ func (c *CourseController) Delete(ctx echo.Context) error {
 		return e.NewDaoValidationError("version", "uint", c.GetPathParam(ctx, "version"))
 	}
 
-	// Let dao create the Course
+	// Let dao delete the Course
 	daoErr := c.Dao.Delete(id, version)
 	if daoErr != nil {
 		return daoErr

@@ -326,17 +326,17 @@ func (m *MetaController) SetStudentCurriculumLink(ctx echo.Context) error {
 	}
 
 	// check if there is such a curriculum
-	_, intErr = m.curriculumDao.GetValidForTimepoint(id, date)
-	if intErr != nil {
-		return intErr
+	_, tpErr := m.curriculumDao.GetValidForTimepoint(id, date)
+	if tpErr != nil {
+		return tpErr
 	}
 
 	user.CurriculumID = id
 	user.ClassStartyear = date
 
-	intErr = m.userDao.Update(*user)
-	if intErr != nil {
-		return intErr
+	updErr := m.userDao.Update(*user)
+	if updErr != nil {
+		return updErr
 	}
 
 	return m.Yeet(ctx, *user)

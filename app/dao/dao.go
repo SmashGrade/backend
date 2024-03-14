@@ -333,6 +333,26 @@ func (c *GradeTypeDao) Create(entity models.Gradetype) (returnEntity *models.Gra
 	return internalEntity.(*models.Gradetype), nil
 }
 
+// Update grade type
+func (c *GradeTypeDao) Update(entity models.Gradetype) *e.ApiError {
+	internalError := c.repo.Update(&entity)
+
+	if internalError != nil {
+		e.NewDaoDbError()
+	}
+
+	return nil
+}
+
+// Delete GradeType with id
+func (c *GradeTypeDao) Delete(id uint) *e.ApiError {
+	internalError := c.repo.DeleteId(id)
+	if internalError != nil {
+		return e.NewDaoDbError()
+	}
+	return nil
+}
+
 // Create default values for grade type
 func (c *GradeTypeDao) CreateDefaults() *e.ApiError {
 	existingEntities, err := c.GetAll()
@@ -344,7 +364,7 @@ func (c *GradeTypeDao) CreateDefaults() *e.ApiError {
 
 		existingFound := false
 		for _, existing := range existingEntities {
-			if v == existing.Description {
+			if v.Description == existing.Description {
 				existingFound = true
 				break
 			}
@@ -354,7 +374,7 @@ func (c *GradeTypeDao) CreateDefaults() *e.ApiError {
 		}
 
 		_, err := c.Create(models.Gradetype{
-			Description: v,
+			Description: v.Description,
 		})
 		if err != nil {
 			return err

@@ -28,9 +28,12 @@ examEvaluationTypes:
 - code: E
   description: Modul bestanden, wenn alle Kurse erfüllt sind. (Art. 32)
 gradeTypes:
-- Kein Eintrag
-- Note (1-6)
-- Prozentwert (0-100)
+- id: 1
+  description: Kein Eintrag
+- id: 2
+  description: Note (1-6)
+- id: 3
+  description: Prozentwert (0-100)
 states:
 - Aktiv
 - Inaktiv

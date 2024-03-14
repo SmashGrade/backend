@@ -162,11 +162,16 @@ func (c *BaseController) GetUser(ctx echo.Context) (*models.User, *e.ApiError) {
 // returns nil if the claim is valid
 func (c *BaseController) CheckUserRole(roleId uint, ctx echo.Context) *e.ApiError {
 
-	cfg := config.NewAPIConfig()
+	// Check if authentication has been disabled
+	// Return nil no matter what claims are present
+	if !c.Provider.Config().AuthConfig.Enabled {
+		return nil
+	}
+
 	var requiredRole *config.RoleConfig = nil
-	for i := range cfg.Roles {
-		if cfg.Roles[i].Id == roleId {
-			requiredRole = &cfg.Roles[i]
+	for i := range c.Provider.Config().Roles {
+		if c.Provider.Config().Roles[i].Id == roleId {
+			requiredRole = &c.Provider.Config().Roles[i]
 		}
 	}
 	if requiredRole == nil {
@@ -183,4 +188,44 @@ func (c *BaseController) CheckUserRole(roleId uint, ctx echo.Context) *e.ApiErro
 	}
 
 	return nil
+}
+
+// Allows the user to access the endpoint if the user has any role
+// returns nil if the claim is valid
+func (c *BaseController) CheckUserAnyRole(ctx echo.Context) *e.ApiError {
+	// Check if authentication has been disabled
+	// Return nil no matter what claims are present
+	if !c.Provider.Config().AuthConfig.Enabled {
+		return nil
+	}
+
+	user, err := c.GetUser(ctx)
+	if err != nil {
+		return err
+	}
+
+	if !user.HasAnyRole() {
+		return e.NewClaimMissingError("any")
+	}
+
+	return nil
+
+}
+
+// CheckUserRoles loops through multiple roles to check if any is correct.
+// If a correct role is found, it returns nil; otherwise, it returns an error.
+func (c *BaseController) CheckUserRoles(roleIDs []uint, ctx echo.Context) *e.ApiError {
+	if len(roleIDs) == 0 {
+		return e.NewDaoReferenceIdError("role", 0)
+	}
+
+	var lastError *e.ApiError
+	for _, roleID := range roleIDs {
+		if err := c.CheckUserRole(roleID, ctx); err == nil {
+			return nil
+		} else {
+			lastError = err
+		}
+	}
+	return lastError
 }

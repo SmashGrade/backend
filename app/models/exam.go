@@ -8,5 +8,5 @@ type Exam struct {
 	ExamtypeID    uint     `json:"-"`
 	Examtype      Examtype `json:"examtype"`
 	Description   string   `json:"description"`
-	Weighting     float64  `json:"weighting"`
+	Weighting     uint     `json:"weighting"`
 }
