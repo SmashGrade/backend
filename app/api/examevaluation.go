@@ -190,9 +190,9 @@ func (c *ExamevaluationController) UpdateExamEvaluation(ctx echo.Context) error 
 	return e.NewApiUnimplementedError()
 }
 
-// @Summary		Delete a curriculum
-// @Description	Delete a curriculum
-// @Tags			curriculums
+// @Summary		Delete a exam evaluation
+// @Description	Delete a exam evaluation
+// @Tags			evaluations
 // @Produce		json
 // @Accept			json
 //
