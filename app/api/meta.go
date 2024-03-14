@@ -33,14 +33,14 @@ func NewMetaController(provider db.Provider) *MetaController {
 		BaseController:    NewBaseController(provider),
 		userDao:           dao.NewUserDao(repository.NewUserRepository(provider), repository.NewRoleRepository(provider)),
 		moduleDao:         dao.NewModuleDao(repository.NewModuleRepository(provider)),
-		courseDao:         dao.NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider), repository.NewExamRepository(provider), repository.NewRoleRepository(provider)),
+		courseDao:         dao.NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider), repository.NewExamRepository(provider), repository.NewRoleRepository(provider), repository.NewExamtypeRepository(provider)),
 		curriculumDao:     dao.NewCurriculumDao(repository.NewCurriculumRepository(provider), repository.NewFocusRepository(provider), repository.NewCurriculumtypeRepository(provider), repository.NewStateRepository(provider), repository.NewModuleRepository(provider)),
 		examtypeDao:       dao.NewExamtypeDao(repository.NewExamtypeRepository(provider)),
 		evaluationtypeDao: dao.NewEvaluationTypeDao(repository.NewEvaluationtypeRepository(provider)),
 		curriculumtypeDao: dao.NewCurriculumTypeDao(repository.NewCurriculumtypeRepository(provider)),
 		focusDao:          dao.NewFocusDao(repository.NewFocusRepository(provider)),
 		fieldDao:          dao.NewFieldDao(repository.NewFieldRepository(provider)),
-		classDao:          dao.NewClassDao(repository.NewCourseRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider), repository.NewExamRepository(provider), repository.NewRoleRepository(provider), repository.NewExamEvaluationRepository(provider)),
+		classDao:          dao.NewClassDao(repository.NewCourseRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider), repository.NewExamRepository(provider), repository.NewRoleRepository(provider), repository.NewExamEvaluationRepository(provider), repository.NewExamtypeRepository(provider)),
 	}
 }
 

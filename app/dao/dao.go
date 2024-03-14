@@ -718,7 +718,7 @@ func (m *ModuleDao) convertRefModuleToModule(ent requestmodels.RefModule) (retEn
 
 	// Get linked Courses
 	// The Dao is created here, or else the dao will be Referencing eachother and almost all dao have to be added to module, course and curriculum
-	courseDao := NewCourseDao(repository.NewCourseRepository(m.repo.Provider), repository.NewModuleRepository(m.repo.Provider), repository.NewUserRepository(m.repo.Provider), repository.NewSelectedCourseRepository(m.repo.Provider), repository.NewExamRepository(m.repo.Provider), repository.NewRoleRepository(m.repo.Provider))
+	courseDao := NewCourseDao(repository.NewCourseRepository(m.repo.Provider), repository.NewModuleRepository(m.repo.Provider), repository.NewUserRepository(m.repo.Provider), repository.NewSelectedCourseRepository(m.repo.Provider), repository.NewExamRepository(m.repo.Provider), repository.NewRoleRepository(m.repo.Provider), repository.NewExamtypeRepository(m.repo.Provider))
 	var resolvedCourseList []*models.Course
 	for _, course := range ent.Courses {
 		resCours, internalError := courseDao.Get(course.ID, course.Version)
@@ -892,13 +892,13 @@ type CourseDao struct {
 }
 
 // Create new dao with required repositories
-func NewCourseDao(courseRepository *repository.CourseRepository, moduleRepository *repository.ModuleRepository, userRepository *repository.UserRepository, selectedCourseRepository *repository.SelectedCourseRepository, examRepository *repository.ExamRepository, roleRepository *repository.RoleRepository) *CourseDao {
+func NewCourseDao(courseRepository *repository.CourseRepository, moduleRepository *repository.ModuleRepository, userRepository *repository.UserRepository, selectedCourseRepository *repository.SelectedCourseRepository, examRepository *repository.ExamRepository, roleRepository *repository.RoleRepository, examtyeRepository *repository.ExamtypeRepository) *CourseDao {
 	return &CourseDao{
 		repo:              courseRepository,
 		moduleDao:         NewModuleDao(moduleRepository),
 		userDao:           NewUserDao(userRepository, roleRepository),
 		selectedCourseDao: NewSelectedCourseDao(selectedCourseRepository),
-		examDao:           NewExamDao(examRepository, courseRepository),
+		examDao:           NewExamDao(examRepository),
 	}
 }
 
@@ -1052,22 +1052,56 @@ func (c *CourseDao) Delete(id, version uint) *e.ApiError {
 }
 
 type ExamDao struct {
-	examRepo   *repository.ExamRepository
-	courseRepo *repository.CourseRepository
+	examRepo *repository.ExamRepository
 }
 
 // Create new exam dao with all used providers
-func NewExamDao(examRepository *repository.ExamRepository, courseRepository *repository.CourseRepository) *ExamDao {
+func NewExamDao(examRepository *repository.ExamRepository) *ExamDao {
 	return &ExamDao{
-		examRepo:   examRepository,
-		courseRepo: courseRepository,
+		examRepo: examRepository,
 	}
+}
+
+func (ex *ExamDao) convertRefExamToExam(ent requestmodels.RefExam) (retEnt models.Exam, err *e.ApiError) {
+	retEnt = models.Exam{
+		Description: ent.Description,
+		Weighting:   ent.Weighting,
+	}
+
+	retEnt.ID = ent.ID
+
+	courseDao := NewCourseDao(repository.NewCourseRepository(ex.examRepo.Provider), repository.NewModuleRepository(ex.examRepo.Provider), repository.NewUserRepository(ex.examRepo.Provider), repository.NewSelectedCourseRepository(ex.examRepo.Provider), repository.NewExamRepository(ex.examRepo.Provider), repository.NewRoleRepository(ex.examRepo.Provider), repository.NewExamtypeRepository(ex.examRepo.Provider))
+	if ent.Course.ID != 0 && ent.Course.Version != 0 {
+		resCourse, internalError := courseDao.Get(ent.Course.ID, ent.Course.Version)
+		if internalError != nil {
+			err = e.NewDaoReferenceVersionedError("course", ent.Course.ID, ent.Course.Version)
+			return
+		}
+		retEnt.Course = *resCourse
+	}
+
+	examTypeDao := NewExamtypeDao(repository.NewExamtypeRepository(ex.examRepo.Provider))
+	if ent.ExamType.ID != 0 {
+		resExamType, internalError := examTypeDao.Get(ent.ExamType.ID)
+		if internalError != nil {
+			err = e.NewDaoReferenceIdError("examtye", ent.ExamType.ID)
+		}
+		retEnt.Examtype = *resExamType
+	}
+
+	return retEnt, nil
 }
 
 // Returns a list of exams for a specific course
 func (ex *ExamDao) GetForCourse(courseId, courseVersion uint) (entities []models.Exam, err *e.ApiError) {
-	// courseEnt, err := ex.courseRepo.GetVersioned(courseId, courseVersion) // TODO: waiting for uuid fix
-	return nil, e.NewDaoUnimplementedError()
+
+	exams, internalError := ex.examRepo.GetFromCourse(courseId, courseVersion)
+	if internalError != nil {
+		return nil, e.NewDaoDbError()
+
+	}
+
+	return exams, nil
 }
 
 // Returns a single exam by id
@@ -1080,14 +1114,41 @@ func (ex *ExamDao) GetAll() (entities []models.Exam, err *e.ApiError) {
 	return getAllOrError[models.Exam](ex.examRepo)
 }
 
-// Creates a new exam for a course
-func (ex *ExamDao) Create(entity models.Exam) (returnEntity *models.Exam, err *e.ApiError) {
-	return createOrError(ex.examRepo, entity)
+// Creates a new exam
+func (ex *ExamDao) Create(referenceEntity requestmodels.RefExam) (returnEntity *models.Exam, err *e.ApiError) {
+	var internalError error
+
+	// convert RefExam to exam
+	entity, err := ex.convertRefExamToExam(referenceEntity)
+	if err != nil {
+		return nil, err
+	}
+
+	internalEntity, internalError := ex.examRepo.Create(&entity)
+	if internalError != nil {
+		return nil, e.NewDaoDbError()
+	}
+
+	return internalEntity.(*models.Exam), nil
 }
 
-// Updates an existing exam for a course
-func (ex *ExamDao) Update(entity models.Exam) *e.ApiError {
-	internalError := ex.examRepo.Update(entity)
+// Update a exam
+func (ex *ExamDao) Update(referenceEntity requestmodels.RefExam) *e.ApiError {
+	existingEntity, err := ex.Get(referenceEntity.ID)
+	if err != nil {
+		return e.NewDaoNotExistingError("exam", fmt.Sprintf("id: %v", referenceEntity.ID))
+	}
+
+	entity, err := ex.convertRefExamToExam(referenceEntity)
+
+	// add in existing id
+	entity.ID = existingEntity.ID
+
+	if err != nil {
+		return err
+	}
+
+	internalError := ex.examRepo.Update(&entity)
 	if internalError != nil {
 		return e.NewDaoDbError()
 	}
@@ -1299,11 +1360,11 @@ type ClassDao struct {
 }
 
 // Create new dao with required repositories
-func NewClassDao(courseRepository *repository.CourseRepository, userRepository *repository.UserRepository, selectedCourseRepository *repository.SelectedCourseRepository, examRepository *repository.ExamRepository, roleRepository *repository.RoleRepository, examEvaluationRepository *repository.ExamEvaluationRepository) *ClassDao {
+func NewClassDao(courseRepository *repository.CourseRepository, userRepository *repository.UserRepository, selectedCourseRepository *repository.SelectedCourseRepository, examRepository *repository.ExamRepository, roleRepository *repository.RoleRepository, examEvaluationRepository *repository.ExamEvaluationRepository, examtyeRepository *repository.ExamtypeRepository) *ClassDao {
 	return &ClassDao{
 		userDao:            NewUserDao(userRepository, roleRepository),
 		selectedCourseDao:  NewSelectedCourseDao(selectedCourseRepository),
-		examDao:            NewExamDao(examRepository, courseRepository),
+		examDao:            NewExamDao(examRepository),
 		examEvaluationRepo: examEvaluationRepository,
 	}
 }

@@ -20,7 +20,7 @@ func TestMagicSmoke(t *testing.T) {
 
 	repo := repository.NewCourseRepository(provider)
 
-	dao := NewCourseDao(repo, repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider), repository.NewExamRepository(provider), repository.NewRoleRepository(provider))
+	dao := NewCourseDao(repo, repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider), repository.NewExamRepository(provider), repository.NewRoleRepository(provider), repository.NewExamtypeRepository(provider))
 
 	courseEnt := requestmodels.RefCourse{Description: "Lol"}
 
@@ -38,7 +38,7 @@ func TestGetAll(t *testing.T) {
 
 	repo := repository.NewCourseRepository(provider)
 
-	dao := NewCourseDao(repo, repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider), repository.NewExamRepository(provider), repository.NewRoleRepository(provider))
+	dao := NewCourseDao(repo, repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider), repository.NewExamRepository(provider), repository.NewRoleRepository(provider), repository.NewExamtypeRepository(provider))
 
 	courseEnt := requestmodels.RefCourse{Description: "Lol"}
 
@@ -218,7 +218,7 @@ func TestCreateCourseVersion(t *testing.T) {
 
 	//provider := db.NewProvider(config.NewAPIConfig())
 
-	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider), repository.NewExamRepository(provider), repository.NewRoleRepository(provider))
+	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider), repository.NewExamRepository(provider), repository.NewRoleRepository(provider), repository.NewExamtypeRepository(provider))
 
 	testCourse := requestmodels.RefCourse{
 		Description: "testcourse",
@@ -307,7 +307,7 @@ func TestModuleCRUD(t *testing.T) {
 func TestExamCRUD(t *testing.T) {
 	provider := db.NewPrefilledMockProvider()
 
-	dao := NewExamDao(repository.NewExamRepository(provider), repository.NewCourseRepository(provider))
+	dao := NewExamDao(repository.NewExamRepository(provider))
 
 	testDescr := "testdescr"
 
@@ -352,7 +352,7 @@ func TestLinkCourseObjectsByKey(t *testing.T) {
 
 	//provider := db.NewProvider(config.NewAPIConfig())
 
-	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider), repository.NewExamRepository(provider), repository.NewRoleRepository(provider))
+	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider), repository.NewExamRepository(provider), repository.NewRoleRepository(provider), repository.NewExamtypeRepository(provider))
 
 	// create a module and link it indirectly with the course
 	moduleDao := NewModuleDao(repository.NewModuleRepository(provider))
@@ -404,7 +404,7 @@ func TestErrorAtNonexistingLink(t *testing.T) {
 
 	//provider := db.NewProvider(config.NewAPIConfig())
 
-	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider), repository.NewExamRepository(provider), repository.NewRoleRepository(provider))
+	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider), repository.NewExamRepository(provider), repository.NewRoleRepository(provider), repository.NewExamtypeRepository(provider))
 
 	nonexistantOnlyIDModule := requestmodels.RefVersioned{}
 	nonexistantOnlyIDModule.ID = 234
@@ -428,7 +428,7 @@ func TestErrorAtValidationError(t *testing.T) {
 
 	//provider := db.NewProvider(config.NewAPIConfig())
 
-	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider), repository.NewExamRepository(provider), repository.NewRoleRepository(provider))
+	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider), repository.NewExamRepository(provider), repository.NewRoleRepository(provider), repository.NewExamtypeRepository(provider))
 
 	testCourse := requestmodels.RefCourse{
 		Description: "testcourse",
@@ -448,7 +448,7 @@ func TestPreventCascadeDelete(t *testing.T) {
 
 	//provider := db.NewProvider(config.NewAPIConfig())
 
-	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider), repository.NewExamRepository(provider), repository.NewRoleRepository(provider))
+	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider), repository.NewExamRepository(provider), repository.NewRoleRepository(provider), repository.NewExamtypeRepository(provider))
 
 	// create a module and link it indirectly with the course
 	moduleDao := NewModuleDao(repository.NewModuleRepository(provider))
@@ -481,9 +481,9 @@ func TestPreventCascadeDelete(t *testing.T) {
 func TestCourseExamLink(t *testing.T) {
 	provider := db.NewMockProvider()
 
-	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider), repository.NewExamRepository(provider), repository.NewRoleRepository(provider))
+	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider), repository.NewExamRepository(provider), repository.NewRoleRepository(provider), repository.NewExamtypeRepository(provider))
 
-	examDao := NewExamDao(repository.NewExamRepository(provider), repository.NewCourseRepository(provider))
+	examDao := NewExamDao(repository.NewExamRepository(provider))
 
 	testExam := models.Exam{
 		Description: "testexam",
@@ -934,7 +934,7 @@ func TestTechedByTeacher(t *testing.T) {
 
 	//provider := db.NewProvider(config.NewAPIConfig())
 
-	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider), repository.NewExamRepository(provider), repository.NewRoleRepository(provider))
+	courseDao := NewCourseDao(repository.NewCourseRepository(provider), repository.NewModuleRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider), repository.NewExamRepository(provider), repository.NewRoleRepository(provider), repository.NewExamtypeRepository(provider))
 
 	// create a module and link it indirectly with the course
 	moduleDao := NewModuleDao(repository.NewModuleRepository(provider))
@@ -1006,7 +1006,7 @@ func TestTechedByTeacher(t *testing.T) {
 func TestClassSelection(t *testing.T) {
 	provider := db.NewPrefilledMockProvider()
 
-	classDao := NewClassDao(repository.NewCourseRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider), repository.NewExamRepository(provider), repository.NewRoleRepository(provider), repository.NewExamEvaluationRepository(provider))
+	classDao := NewClassDao(repository.NewCourseRepository(provider), repository.NewUserRepository(provider), repository.NewSelectedCourseRepository(provider), repository.NewExamRepository(provider), repository.NewRoleRepository(provider), repository.NewExamEvaluationRepository(provider), repository.NewExamtypeRepository(provider))
 
 	class, err := classDao.Get(db.SelectedCourse1.CourseID, db.SelectedCourse1.CourseVersion, db.SelectedCourse1.ClassStartyear)
 	require.Nil(t, err)
