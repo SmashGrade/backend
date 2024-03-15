@@ -82,14 +82,3 @@ func TestGetAll(t *testing.T) {
 		require.NoError(t, err)
 	}
 }
-
-func getAllOrError[outputModel any](repo Repository) (outputSlice []outputModel) {
-	internalSlice, internalErr := repo.GetAll()
-	if internalErr != nil {
-		//err = e.NewDaoDbError()
-		return
-	}
-
-	outputSlice = internalSlice.([]outputModel)
-	return
-}
