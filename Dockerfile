@@ -1,6 +1,6 @@
 # two stage build
 
-FROM docker.io/golang:1.21.6 AS build
+FROM docker.io/golang:1.22.0 AS build
 
 WORKDIR /app
 
@@ -29,6 +29,7 @@ ENV API_DB_CONNECTION_STR "sqlite:///app/data/data.db"
 
 EXPOSE 9000
 VOLUME ["/app/data"]
+VOLUME ["/app/config"]
 
 WORKDIR /app
 

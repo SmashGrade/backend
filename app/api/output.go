@@ -7,7 +7,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-// contains all output list only endpoints to fill frontend drop downs and co
+// Implements output for frontend lists
 
 // All list outputs under one big object
 type OutputController struct {
@@ -19,6 +19,7 @@ type OutputController struct {
 	fieldDao           *dao.FieldDao
 	focusDao           *dao.FocusDao
 	examtypeDao        *dao.ExamtypeDao
+	userDao            *dao.UserDao
 }
 
 // Constructor for output controller
@@ -32,6 +33,7 @@ func NewOutputController(provider db.Provider) *OutputController {
 		fieldDao:           dao.NewFieldDao(repository.NewFieldRepository(provider)),
 		focusDao:           dao.NewFocusDao(repository.NewFocusRepository(provider)),
 		examtypeDao:        dao.NewExamtypeDao(repository.NewExamtypeRepository(provider)),
+		userDao:            dao.NewUserDao(repository.NewUserRepository(provider), repository.NewRoleRepository(provider)),
 	}
 
 	if provider.Config().AutoMigrate {
@@ -41,6 +43,7 @@ func NewOutputController(provider db.Provider) *OutputController {
 		ctrl.gradetypeDao.CreateDefaults()
 		ctrl.evaluationtypeDao.CreateDefaults()
 		ctrl.examtypeDao.CreateDefaults()
+		ctrl.userDao.CreateDefaults()
 		provider.Config().Logger().Info("Creating defaults from config completed successfully")
 	}
 
@@ -58,6 +61,11 @@ func NewOutputController(provider db.Provider) *OutputController {
 // @Router			/states [get]
 // @Security		Bearer
 func (c *OutputController) States(ctx echo.Context) error {
+	// Check if the user has any role
+	if authErr := c.CheckUserAnyRole(ctx); authErr != nil {
+		return authErr
+	}
+
 	res, err := c.stateDao.GetAll()
 	if err != nil {
 		return err
@@ -76,6 +84,11 @@ func (c *OutputController) States(ctx echo.Context) error {
 // @Router			/curriculumtypes [get]
 // @Security		Bearer
 func (c *OutputController) Curriculumtypes(ctx echo.Context) error {
+	// Check if the user has any role
+	if authErr := c.CheckUserAnyRole(ctx); authErr != nil {
+		return authErr
+	}
+
 	res, err := c.curriculumytypeDao.GetAll()
 	if err != nil {
 		return err
@@ -94,6 +107,11 @@ func (c *OutputController) Curriculumtypes(ctx echo.Context) error {
 // @Router			/gradetypes [get]
 // @Security		Bearer
 func (c *OutputController) Gradetypes(ctx echo.Context) error {
+	// Check if the user has any role
+	if authErr := c.CheckUserAnyRole(ctx); authErr != nil {
+		return authErr
+	}
+
 	res, err := c.gradetypeDao.GetAll()
 	if err != nil {
 		return err
@@ -112,6 +130,11 @@ func (c *OutputController) Gradetypes(ctx echo.Context) error {
 // @Router			/evaluationtypes [get]
 // @Security		Bearer
 func (c *OutputController) Evaluationtypes(ctx echo.Context) error {
+	// Check if the user has any role
+	if authErr := c.CheckUserAnyRole(ctx); authErr != nil {
+		return authErr
+	}
+
 	res, err := c.evaluationtypeDao.GetAll()
 	if err != nil {
 		return err
@@ -130,6 +153,11 @@ func (c *OutputController) Evaluationtypes(ctx echo.Context) error {
 // @Router			/fields [get]
 // @Security		Bearer
 func (c *OutputController) Fields(ctx echo.Context) error {
+	// Check if the user has any role
+	if authErr := c.CheckUserAnyRole(ctx); authErr != nil {
+		return authErr
+	}
+
 	res, err := c.fieldDao.GetAll()
 	if err != nil {
 		return err
@@ -148,6 +176,11 @@ func (c *OutputController) Fields(ctx echo.Context) error {
 // @Router			/focuses [get]
 // @Security		Bearer
 func (c *OutputController) Focuses(ctx echo.Context) error {
+	// Check if the user has any role
+	if authErr := c.CheckUserAnyRole(ctx); authErr != nil {
+		return authErr
+	}
+
 	res, err := c.focusDao.GetAll()
 	if err != nil {
 		return err
@@ -166,6 +199,11 @@ func (c *OutputController) Focuses(ctx echo.Context) error {
 // @Router			/examtypes [get]
 // @Security		Bearer
 func (c *OutputController) Examtypes(ctx echo.Context) error {
+	// Check if the user has any role
+	if authErr := c.CheckUserAnyRole(ctx); authErr != nil {
+		return authErr
+	}
+
 	res, err := c.examtypeDao.GetAll()
 	if err != nil {
 		return err

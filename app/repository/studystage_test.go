@@ -12,7 +12,7 @@ import (
 func Test_StudyStage_Create(t *testing.T) {
 	repository := NewStudyStageRepository(db.NewPrefilledMockProvider())
 
-	studyStage_1 := db.StudyStage_1()
+	studyStage_1 := db.StudyStage1
 	studyStage_1.ID = 0
 
 	_, err := repository.Create(&studyStage_1)
@@ -24,7 +24,7 @@ func Test_StudyStage_Update(t *testing.T) {
 	repository := NewStudyStageRepository(db.NewPrefilledMockProvider())
 
 	// Update Description of StudyStage
-	studyStage := db.StudyStage_1()
+	studyStage := db.StudyStage1
 	studyStage.Description = "edited description StudyStage 1"
 	err := repository.Update(&studyStage)
 
@@ -40,11 +40,11 @@ func Test_StudyStage_Find(t *testing.T) {
 	repository := NewStudyStageRepository(db.NewPrefilledMockProvider())
 
 	// Find StudyStage
-	result2, err := repository.Find(db.StudyStage_1())
+	result2, err := repository.Find(db.StudyStage1)
 	studyStages := result2.([]models.StudyStage)
 
 	require.NoError(t, err)
-	require.Nil(t, deep.Equal(db.StudyStage_1().ID, studyStages[0].ID))
+	require.Nil(t, deep.Equal(db.StudyStage1.ID, studyStages[0].ID))
 }
 
 func Test_StudyStage_GetAll(t *testing.T) {
@@ -55,19 +55,19 @@ func Test_StudyStage_GetAll(t *testing.T) {
 	studyStages := result.([]models.StudyStage)
 
 	require.NoError(t, err)
-	require.Nil(t, deep.Equal(db.StudyStage_1().ID, studyStages[0].ID))
-	require.Nil(t, deep.Equal(db.StudyStage_2().ID, studyStages[1].ID))
+	require.Nil(t, deep.Equal(db.StudyStage1.ID, studyStages[0].ID))
+	require.Nil(t, deep.Equal(db.StudyStage2.ID, studyStages[1].ID))
 }
 
 func Test_StudyStage_GetID(t *testing.T) {
 	repository := NewStudyStageRepository(db.NewPrefilledMockProvider())
 
 	// Get by ID
-	result, err := repository.GetId(db.StudyStage_1().ID)
+	result, err := repository.GetId(db.StudyStage1.ID)
 	studyStage := result.(*models.StudyStage)
 
 	require.NoError(t, err)
-	require.Nil(t, deep.Equal(studyStage.Description, db.StudyStage_1().Description))
+	require.Nil(t, deep.Equal(studyStage.Description, db.StudyStage1.Description))
 }
 
 func Test_StudyStage_DeleteId(t *testing.T) {
@@ -78,7 +78,7 @@ func Test_StudyStage_DeleteId(t *testing.T) {
 	afterCreateLength := len(result.([]models.StudyStage))
 
 	// Delete studyStage
-	err := repository.DeleteId(db.StudyStage_1().ID)
+	err := repository.DeleteId(db.StudyStage1.ID)
 
 	result2, _ := repository.GetAll()
 	afterDeleteLength := len(result2.([]models.StudyStage))

@@ -67,6 +67,219 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Create a course",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "courses"
+                ],
+                "summary": "Create a course",
+                "parameters": [
+                    {
+                        "description": "request body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requestmodels.RefCourse"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Course"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    }
+                }
+            }
+        },
+        "/courses/meta": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get Metadata for Course",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "meta",
+                    "courses"
+                ],
+                "summary": "Get Metadata for Course",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.MetaCourse"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    }
+                }
+            }
+        },
+        "/courses/teacher": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get Courses as a teacher selected by teached by userinfo from accesstoken",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "meta",
+                    "courses"
+                ],
+                "summary": "Get your Courses as a teacher",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.TeacherCourses"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    }
+                }
+            }
+        },
+        "/courses/{id}": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Create a new version of a course",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "courses"
+                ],
+                "summary": "Create a new version of a course",
+                "parameters": [
+                    {
+                        "description": "request body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requestmodels.RefCourse"
+                        }
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Course ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Course"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    }
+                }
             }
         },
         "/courses/{id}/{version}": {
@@ -106,6 +319,491 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/models.Course"
                         }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Update a course",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "courses"
+                ],
+                "summary": "Update a course",
+                "parameters": [
+                    {
+                        "description": "request body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requestmodels.RefCourse"
+                        }
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Course ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Course Version",
+                        "name": "version",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Course"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Delete a course",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "courses"
+                ],
+                "summary": "Delete a course",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Course ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Course Version",
+                        "name": "version",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    }
+                }
+            }
+        },
+        "/curriculums": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get all curriculums",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "curriculums"
+                ],
+                "summary": "Get all curriculums",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Curriculum"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Create a curriculum",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "curriculums"
+                ],
+                "summary": "Create a curriculum",
+                "parameters": [
+                    {
+                        "description": "request body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requestmodels.RefCurriculum"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Curriculum"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    }
+                }
+            }
+        },
+        "/curriculums/meta": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get Metadata for Curriculums",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "meta",
+                    "curriculums"
+                ],
+                "summary": "Get Metadata for Curriculums",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.MetaCurriculums"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    }
+                }
+            }
+        },
+        "/curriculums/student": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get Curriculums as a student selected by userinfo from accesstoken",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "meta",
+                    "curriculums"
+                ],
+                "summary": "Get Curriculums as a student",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.StudentCurriculums"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    }
+                }
+            }
+        },
+        "/curriculums/{id}/{date}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get a specific curriculum",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "curriculums"
+                ],
+                "summary": "Get a specific curriculum",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Curriculum ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Curriculum"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Update a curriculum",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "curriculums"
+                ],
+                "summary": "Update a curriculum",
+                "parameters": [
+                    {
+                        "description": "request body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requestmodels.RefCurriculum"
+                        }
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Curriculum ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Curriculum"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Delete a curriculum",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "curriculums"
+                ],
+                "summary": "Delete a curriculum",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Curriculum ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
                     },
                     "401": {
                         "description": "Unauthorized",
@@ -500,6 +1198,227 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Create a gradetype",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gradetype"
+                ],
+                "summary": "Create a gradetype",
+                "parameters": [
+                    {
+                        "description": "request body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Gradetype"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Gradetype"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    }
+                }
+            }
+        },
+        "/gradetypes/{id}": {
+            "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Update a gradetype",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "grapetype"
+                ],
+                "summary": "Update a gradetype",
+                "parameters": [
+                    {
+                        "description": "request body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Gradetype"
+                        }
+                    },
+                    {
+                        "type": "integer",
+                        "description": "GradeType ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Gradetype"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Delete a gradetype",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gradetypes"
+                ],
+                "summary": "Delete a gradetype",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "GradeType ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    }
+                }
+            }
+        },
+        "/gradetypes/{id}/": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get a specific gradetype",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gradetype"
+                ],
+                "summary": "Get a specific gradetype",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "GradeType ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Gradetype"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    }
+                }
             }
         },
         "/modules": {
@@ -525,6 +1444,172 @@ const docTemplate = `{
                             "items": {
                                 "$ref": "#/definitions/models.Module"
                             }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Create a module",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "modules"
+                ],
+                "summary": "Create a module",
+                "parameters": [
+                    {
+                        "description": "request body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requestmodels.RefModule"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Module"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    }
+                }
+            }
+        },
+        "/modules/meta": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get Metadata for Module",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "meta",
+                    "modules"
+                ],
+                "summary": "Get Metadata for Module",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.MetaModules"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    }
+                }
+            }
+        },
+        "/modules/{id}": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Create a new version of a module",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "modules"
+                ],
+                "summary": "Create a new version of a module",
+                "parameters": [
+                    {
+                        "description": "request body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requestmodels.RefModule"
+                        }
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Module ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Module"
                         }
                     },
                     "401": {
@@ -584,6 +1669,132 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/models.Module"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Update a module",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "modules"
+                ],
+                "summary": "Update a module",
+                "parameters": [
+                    {
+                        "description": "request body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requestmodels.RefModule"
+                        }
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Module ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Module Version",
+                        "name": "version",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Module"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/error.ApiError"
+                        }
+                    }
+                }
+            }
+        },
+        "/onboarding": {
+            "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Set start year and curriculumId as student by userinfo from accesstoken",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "meta",
+                    "curriculums",
+                    "users"
+                ],
+                "summary": "Set start year and curriculumId as student",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Curriculum ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.User"
+                            }
                         }
                     },
                     "401": {
@@ -721,6 +1932,32 @@ const docTemplate = `{
                 }
             }
         },
+        "models.Class": {
+            "type": "object",
+            "properties": {
+                "classStartYear": {
+                    "type": "string"
+                },
+                "courseId": {
+                    "type": "integer"
+                },
+                "courseVersion": {
+                    "type": "integer"
+                },
+                "examEvaluations": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.ExamEvaluation"
+                    }
+                },
+                "students": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.User"
+                    }
+                }
+            }
+        },
         "models.Course": {
             "type": "object",
             "properties": {
@@ -732,6 +1969,12 @@ const docTemplate = `{
                 },
                 "description": {
                     "type": "string"
+                },
+                "exams": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Exam"
+                    }
                 },
                 "id": {
                     "type": "integer"
@@ -883,7 +2126,63 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "weighting": {
-                    "type": "number"
+                    "type": "integer"
+                }
+            }
+        },
+        "models.ExamEvaluation": {
+            "type": "object",
+            "properties": {
+                "created": {
+                    "type": "string"
+                },
+                "deleted": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "entryDate": {
+                    "type": "string"
+                },
+                "exam": {
+                    "$ref": "#/definitions/models.Exam"
+                },
+                "examID": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "originalValue": {
+                    "type": "string"
+                },
+                "orignialGradeTyp": {
+                    "$ref": "#/definitions/models.Gradetype"
+                },
+                "orignialGradeTypeID": {
+                    "type": "integer"
+                },
+                "registeredBy": {
+                    "$ref": "#/definitions/models.User"
+                },
+                "registeredByID": {
+                    "type": "integer"
+                },
+                "selectedCourse": {
+                    "$ref": "#/definitions/models.SelectedCourse"
+                },
+                "selectedCourseClassStartyear": {
+                    "type": "string"
+                },
+                "selectedCourseCourseID": {
+                    "type": "integer"
+                },
+                "selectedCourseCourseVersion": {
+                    "type": "integer"
+                },
+                "selectedCourseUserID": {
+                    "type": "integer"
+                },
+                "updated": {
+                    "type": "string"
                 }
             }
         },
@@ -976,6 +2275,87 @@ const docTemplate = `{
                 }
             }
         },
+        "models.MetaCourse": {
+            "type": "object",
+            "properties": {
+                "examtypes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Examtype"
+                    }
+                },
+                "modules": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Module"
+                    }
+                },
+                "teachers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.User"
+                    }
+                }
+            }
+        },
+        "models.MetaCurriculums": {
+            "type": "object",
+            "properties": {
+                "curriculumtypes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Curriculumtype"
+                    }
+                },
+                "fields": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Field"
+                    }
+                },
+                "focuses": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Focus"
+                    }
+                },
+                "teachers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.User"
+                    }
+                }
+            }
+        },
+        "models.MetaModules": {
+            "type": "object",
+            "properties": {
+                "courses": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Course"
+                    }
+                },
+                "curriculums": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Curriculum"
+                    }
+                },
+                "curriculumtypes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Curriculumtype"
+                    }
+                },
+                "evaluationtype": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Evaluationtype"
+                    }
+                }
+            }
+        },
         "models.Module": {
             "type": "object",
             "properties": {
@@ -1026,6 +2406,9 @@ const docTemplate = `{
         "models.Role": {
             "type": "object",
             "properties": {
+                "claim": {
+                    "type": "string"
+                },
                 "created": {
                     "type": "string"
                 },
@@ -1092,6 +2475,23 @@ const docTemplate = `{
                 }
             }
         },
+        "models.StudentCurriculums": {
+            "type": "object",
+            "properties": {
+                "curriculum": {
+                    "description": "Curriculumtype Curriculumtype // this is already in the curriculum",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.Curriculum"
+                        }
+                    ]
+                },
+                "startYear": {
+                    "description": "taken from the user or selectedcourse",
+                    "type": "string"
+                }
+            }
+        },
         "models.StudyStage": {
             "type": "object",
             "properties": {
@@ -1115,6 +2515,23 @@ const docTemplate = `{
                 }
             }
         },
+        "models.TeacherCourses": {
+            "type": "object",
+            "properties": {
+                "classes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Class"
+                    }
+                },
+                "courses": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Course"
+                    }
+                }
+            }
+        },
         "models.User": {
             "type": "object",
             "properties": {
@@ -1123,6 +2540,9 @@ const docTemplate = `{
                 },
                 "created": {
                     "type": "string"
+                },
+                "curriculumId": {
+                    "type": "integer"
                 },
                 "deleted": {
                     "$ref": "#/definitions/gorm.DeletedAt"
@@ -1162,6 +2582,173 @@ const docTemplate = `{
                 },
                 "updated": {
                     "type": "string"
+                }
+            }
+        },
+        "requestmodels.RefCourse": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "exams": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/requestmodels.RefId"
+                    }
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "modules": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/requestmodels.RefVersioned"
+                    }
+                },
+                "number": {
+                    "type": "string"
+                },
+                "selectedCourses": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/requestmodels.RefSelectedCourse"
+                    }
+                },
+                "teachedBy": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/requestmodels.RefId"
+                    }
+                },
+                "version": {
+                    "type": "integer"
+                }
+            }
+        },
+        "requestmodels.RefCurriculum": {
+            "type": "object",
+            "properties": {
+                "curriculumType": {
+                    "$ref": "#/definitions/requestmodels.RefId"
+                },
+                "description": {
+                    "type": "string",
+                    "example": "Softwareentwicklung"
+                },
+                "endValidity": {
+                    "type": "string",
+                    "example": "02.01.2006"
+                },
+                "focus": {
+                    "$ref": "#/definitions/requestmodels.RefId"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "modules": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/requestmodels.RefVersioned"
+                    }
+                },
+                "startvalidity": {
+                    "type": "string",
+                    "example": "02.01.2006"
+                },
+                "state": {
+                    "$ref": "#/definitions/requestmodels.RefId"
+                }
+            }
+        },
+        "requestmodels.RefId": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "requestmodels.RefModule": {
+            "type": "object",
+            "properties": {
+                "courses": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/requestmodels.RefVersioned"
+                    }
+                },
+                "curriculums": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/requestmodels.RefTimed"
+                    }
+                },
+                "description": {
+                    "type": "string"
+                },
+                "evaluationType": {
+                    "$ref": "#/definitions/requestmodels.RefId"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "number": {
+                    "type": "string"
+                },
+                "state": {
+                    "$ref": "#/definitions/requestmodels.RefId"
+                },
+                "studyStage": {
+                    "$ref": "#/definitions/requestmodels.RefId"
+                },
+                "version": {
+                    "type": "integer"
+                }
+            }
+        },
+        "requestmodels.RefSelectedCourse": {
+            "type": "object",
+            "properties": {
+                "classStartYear": {
+                    "type": "string"
+                },
+                "courseId": {
+                    "type": "integer"
+                },
+                "courseVersion": {
+                    "type": "integer"
+                },
+                "dispensed": {
+                    "type": "boolean"
+                },
+                "userId": {
+                    "type": "integer"
+                }
+            }
+        },
+        "requestmodels.RefTimed": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "startvalidity": {
+                    "type": "string",
+                    "example": "02.01.2006"
+                }
+            }
+        },
+        "requestmodels.RefVersioned": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "version": {
+                    "type": "integer"
                 }
             }
         }

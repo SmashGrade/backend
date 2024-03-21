@@ -17,7 +17,7 @@ func NewCurriculumRepository(provider db.Provider) *CurriculumRepository {
 		BaseRepository: NewBaseRepository(provider, models.Curriculum{}),
 	}
 }
-func (r *CurriculumRepository) GetTimed(id uint, startDate time.Time, entity any) (any, error) {
+func (r *CurriculumRepository) GetTimed(id uint, startDate time.Time) (any, error) {
 	newEntity := r.getInterface()
 
 	result := r.Provider.DB().Preload(clause.Associations).
@@ -29,7 +29,7 @@ func (r *CurriculumRepository) GetTimed(id uint, startDate time.Time, entity any
 	return newEntity, nil
 }
 
-func (r *CurriculumRepository) DeleteTimed(id uint, startDate time.Time, entity any) error {
+func (r *CurriculumRepository) DeleteTimed(id uint, startDate time.Time) error {
 	newEntity := r.getInterface()
 
 	return r.Provider.DB().

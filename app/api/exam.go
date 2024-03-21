@@ -22,17 +22,22 @@ func NewExamController(provider db.Provider) *ExamController {
 	}
 }
 
-//	@Summary		Get all exams
-//	@Description	Get all exams
-//	@Tags			exams
-//	@Produce		json
-//	@Success		200	{array}		models.Exam
-//	@Failure		401	{object}	error.ApiError
-//	@Failure		403	{object}	error.ApiError
-//	@Failure		500	{object}	error.ApiError
-//	@Router			/exams [get]
-//	@Security		Bearer
+// @Summary		Get all exams
+// @Description	Get all exams
+// @Tags			exams
+// @Produce		json
+// @Success		200	{array}		models.Exam
+// @Failure		401	{object}	error.ApiError
+// @Failure		403	{object}	error.ApiError
+// @Failure		500	{object}	error.ApiError
+// @Router			/exams [get]
+// @Security		Bearer
 func (c *ExamController) Exams(ctx echo.Context) error {
+	// Check if the user has any role
+	if authErr := c.CheckUserAnyRole(ctx); authErr != nil {
+		return authErr
+	}
+
 	res, err := c.Dao.GetAll()
 	if err != nil {
 		return err
@@ -40,27 +45,32 @@ func (c *ExamController) Exams(ctx echo.Context) error {
 	return c.Yeet(ctx, res)
 }
 
-//	@Summary		Get a specific exam
-//	@Description	Get a specific exam
-//	@Tags			exams
-//	@Param			id	path	uint	true	"Exam ID"
-//	@Produce		json
-//	@Success		200	{object}	models.Exam
-//	@Failure		401	{object}	error.ApiError
-//	@Failure		403	{object}	error.ApiError
-//	@Failure		500	{object}	error.ApiError
-//	@Router			/exams/{id} [get]
-//	@Security		Bearer
+// @Summary		Get a specific exam
+// @Description	Get a specific exam
+// @Tags			exams
+// @Param			id	path	uint	true	"Exam ID"
+// @Produce		json
+// @Success		200	{object}	models.Exam
+// @Failure		401	{object}	error.ApiError
+// @Failure		403	{object}	error.ApiError
+// @Failure		500	{object}	error.ApiError
+// @Router			/exams/{id} [get]
+// @Security		Bearer
 func (c *ExamController) Exam(ctx echo.Context) error {
+	// Check if the user has any role
+	if authErr := c.CheckUserAnyRole(ctx); authErr != nil {
+		return authErr
+	}
+
 	// Read id parameter from request
-	paramid := c.GetPathParamInt(ctx, "id")
-	if paramid == -1 {
-		return e.ErrorInvalidRequest("exam id")
+	id, err := c.GetPathParamUint(ctx, "id")
+	if err != nil {
+		return e.NewDaoValidationError("id", "uint", c.GetPathParam(ctx, "id"))
 	}
 	// Ask the DAO for the exam
-	res, err := c.Dao.Get(uint(paramid))
-	if err != nil {
-		return err
+	res, daoErr := c.Dao.Get(id)
+	if daoErr != nil {
+		return daoErr
 	}
 	// Return the result to the client
 	return c.Yeet(ctx, res)

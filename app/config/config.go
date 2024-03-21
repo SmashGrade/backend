@@ -16,7 +16,19 @@ import (
 )
 
 // Version of the API
-const VERSION string = "0.5.0"
+const VERSION string = "0.8.1"
+
+const (
+	// Roles
+	ROLE_COURSEADMIN  uint = 1
+	ROLE_FIELDMANAGER uint = 2
+	ROLE_TEACHER      uint = 3
+	ROLE_STUDENT      uint = 4
+	// Grade types
+	GRADETYPE_NONE    uint = 1
+	GRADETYPE_NOTE    uint = 2
+	GRADETYPE_PERCENT uint = 3
+)
 
 // APIConfig is used to define the configuration of the API
 type APIConfig struct {
@@ -26,12 +38,14 @@ type APIConfig struct {
 	AutoMigrate         bool                       `yaml:"autoMigrate"`         // AutoMigrate is a flag to determine if the database should be migrated automatically
 	Connect             bool                       `yaml:"connect"`             // Connect is a flag to determine if the database should be connected automatically
 	DBConnectionStr     string                     `yaml:"dbConnectionStr"`     // DBConnectionStr is the connection string for the database
+	AllowedDomains      []string                   `yaml:"allowedDomains"`      // AllowedDomains is the list of allowed domains for new users
 	ExamTypes           []string                   `yaml:"examTypes"`           // ExamTypes is the list of exam types
 	ExamEvaluationTypes []ExamEvaluationTypeConfig `yaml:"examEvaluationTypes"` // EvalTypes is the list of evaluation types
-	GradeTypes          []string                   `yaml:"gradeTypes"`          // GradeTypes is the list of grade types
+	GradeTypes          []GradeTypeConfig          `yaml:"gradeTypes"`          // GradeTypes is the list of grade types
 	States              []string                   `yaml:"states"`              // States is the list of states
 	CurriculumTypes     []CurriculumTypeConfig     `yaml:"curriculumTypes"`     // CurriculumTypes is the list of curriculum types
 	Roles               []RoleConfig               `yaml:"roles"`               // Roles is the list of roles
+	MockData            bool                       `yaml:"mockData"`            // Add MockData at startup
 	Cors                CorsConfig                 `yaml:"cors"`                // Cors is the configuration for CORS
 	MaxBodySize         string                     `yaml:"maxBodySize"`         // BodySize is the maximum size of the request body
 	RateLimit           RateLimitConfig            `yaml:"rateLimit"`           // RateLimit is the configuration for rate limiting
@@ -47,8 +61,9 @@ type CorsConfig struct {
 
 // Configuration for a role
 type RoleConfig struct {
-	Name    string   `yaml:"name"`    // Name of the role
-	Members []string `yaml:"members"` // Statically assigned members of the role
+	Id        uint   `yaml:"id"`        // Id of the role
+	Name      string `yaml:"name"`      // Name of the role
+	ClaimName string `yaml:"claimName"` // Name of the claim in the JWT
 }
 
 type RateLimitConfig struct {
@@ -75,6 +90,11 @@ type CurriculumTypeConfig struct {
 	DurationYears uint   `yaml:"durationyears"`
 }
 
+type GradeTypeConfig struct {
+	Id          uint   `yaml:"id"`          // Id of the grade type
+	Description string `yaml:"description"` // Description of the grade type
+}
+
 // Returns a new configuration with default values
 // This is used to create the config file if it does not exist
 func NewAPIConfig() *APIConfig {
@@ -88,8 +108,9 @@ func NewAPIConfig() *APIConfig {
 		},
 		AutoMigrate:     true,
 		DBConnectionStr: "sqlite://:memory:",
-		ExamTypes:       []string{"Mündliche oder schriftliche Prüfung ", "Präsentationen", "Lernbericht", "schriftliche Arbeit", "Lernjournal"},
-		GradeTypes:      []string{"Kein Eintrag", "Note (1-6)", "Prozentwert (0-100)"},
+		AllowedDomains:  []string{"hftm.ch", "smashgrade.ch"},
+		ExamTypes:       []string{"Mündliche oder schriftliche Prüfung", "Präsentationen", "Lernbericht", "schriftliche Arbeit", "Lernjournal"},
+		GradeTypes:      []GradeTypeConfig{{Id: 1, Description: "Kein Eintrag"}, {Id: 2, Description: "Note (1-6)"}, {Id: 3, Description: "Prozentwert (0-100)"}},
 		ExamEvaluationTypes: []ExamEvaluationTypeConfig{
 			{Code: "F", Description: "Modul bestanden, wenn jeder Kurs eine genügende Bewertung aufweist. (Art. 29)"},
 			{Code: "M", Description: "Modul bestanden, wenn der Durchschnitt aller Kurse genügend und nicht mehr als ein Kurs im Modul ungenügend ist. (Art. 30)"},
@@ -101,13 +122,14 @@ func NewAPIConfig() *APIConfig {
 			{Description: "Vollzeit", DurationYears: 2}, {Description: "Teilzeit", DurationYears: 3},
 		},
 		Roles: []RoleConfig{
-			{Name: "Kursadministrator", Members: []string{}},
-			{Name: "Fachbereichsleiter", Members: []string{}},
-			{Name: "Dozent", Members: []string{}},
-			{Name: "Student", Members: []string{}},
+			{Id: ROLE_COURSEADMIN, Name: "Kursadministrator", ClaimName: "Kursadministrator"},
+			{Id: ROLE_FIELDMANAGER, Name: "Fachbereichsleiter", ClaimName: "Fachbereichsleiter"},
+			{Id: ROLE_TEACHER, Name: "Dozent", ClaimName: "Dozent"},
+			{Id: ROLE_STUDENT, Name: "Student", ClaimName: "Student"},
 		},
+		MockData: false,
 		Cors: CorsConfig{
-			AllowedOrigins: []string{"https://localhost:9000", "api.smashgrade.ch"},
+			AllowedOrigins: []string{"https://localhost:9000", "http://localhost:5173", "https://localhost:9191", "https://api.smashgrade.ch", "https://smashgrade.ch"},
 			AllowedHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization},
 		},
 		MaxBodySize: "2M",
@@ -224,6 +246,13 @@ func (c *APIConfig) FromEnv() {
 			c.AutoMigrate = v
 		}
 	}
+	if mockData, ok := os.LookupEnv("API_MOCK_DATA"); ok {
+		v, err := strconv.ParseBool(mockData)
+		if err == nil {
+			c.Logger().Debug(fmt.Sprintf("Replacing mock data flag from environment variable: %s", mockData))
+			c.MockData = v
+		}
+	}
 	if authEnabled, ok := os.LookupEnv("API_AUTH_ENABLED"); ok {
 		// Check if the auth enabled flag is a valid boolean and set it
 		v, err := strconv.ParseBool(authEnabled)
@@ -262,11 +291,11 @@ func FromFile(path string) *APIConfig {
 	config := NewAPIConfig()
 	cf, err := os.ReadFile(path)
 	if err == nil {
-		err = yaml.Unmarshal(cf, config)
-		if err != nil {
-			config.Logger().Info(fmt.Sprintf("Configuration loaded from file: %s", path))
+		unmarshalErr := yaml.Unmarshal(cf, config)
+		if unmarshalErr != nil {
+			config.Logger().Error(fmt.Sprintf("Error loading configuration from file: %s: %e", path, err))
 		} else {
-			config.Logger().Error("Error loading configuration from file: %s: %s", path, err)
+			config.Logger().Info(fmt.Sprintf("Configuration loaded from file: %s", path))
 		}
 	} else {
 		config.Logger().Warn(fmt.Sprintf("Error loading configuration from file: %s. File does not exist or is not readable", path))
@@ -284,9 +313,9 @@ func ToFile(path string, config *APIConfig) {
 	if err == nil {
 		err = yaml.NewEncoder(cf).Encode(config)
 		if err != nil {
-			config.Logger().Info(fmt.Sprintf("Configuration saved to file: %s", path))
+			config.Logger().Error(fmt.Sprintf("Error writing configuration to file: %s: %s", path, err))
 		} else {
-			config.Logger().Error("Error writing configuration to file: %s: %s", path, err)
+			config.Logger().Info(fmt.Sprintf("Configuration saved to file: %s", path))
 		}
 	} else {
 		config.Logger().Warn(fmt.Sprintf("Error writing configuration to file: %s. Path does not exist or is not writable", path))

@@ -12,7 +12,7 @@ import (
 func Test_Field_Create(t *testing.T) {
 	repository := NewFieldRepository(db.NewPrefilledMockProvider())
 
-	field_1 := db.Field_1()
+	field_1 := db.Field1
 	field_1.ID = 0
 
 	_, err := repository.Create(&field_1)
@@ -24,7 +24,7 @@ func Test_Field_Update(t *testing.T) {
 	repository := NewFieldRepository(db.NewPrefilledMockProvider())
 
 	// Update Description of Field
-	field := db.Field_1()
+	field := db.Field1
 	field.Description = "edited description Field 1"
 	err := repository.Update(&field)
 
@@ -40,11 +40,11 @@ func Test_Field_Find(t *testing.T) {
 	repository := NewFieldRepository(db.NewPrefilledMockProvider())
 
 	// Find Field
-	result2, err := repository.Find(db.Field_1())
+	result2, err := repository.Find(db.Field1)
 	fields := result2.([]models.Field)
 
 	require.NoError(t, err)
-	require.Nil(t, deep.Equal(db.Field_1().ID, fields[0].ID))
+	require.Nil(t, deep.Equal(db.Field1.ID, fields[0].ID))
 }
 
 func Test_Field_GetAll(t *testing.T) {
@@ -55,19 +55,19 @@ func Test_Field_GetAll(t *testing.T) {
 	fields := result.([]models.Field)
 
 	require.NoError(t, err)
-	require.Nil(t, deep.Equal(db.Field_1().ID, fields[0].ID))
-	require.Nil(t, deep.Equal(db.Field_2().ID, fields[1].ID))
+	require.Nil(t, deep.Equal(db.Field1.ID, fields[0].ID))
+	require.Nil(t, deep.Equal(db.Field2.ID, fields[1].ID))
 }
 
 func Test_Field_GetID(t *testing.T) {
 	repository := NewFieldRepository(db.NewPrefilledMockProvider())
 
 	// Get by ID
-	result, err := repository.GetId(db.Field_1().ID)
+	result, err := repository.GetId(db.Field1.ID)
 	field := result.(*models.Field)
 
 	require.NoError(t, err)
-	require.Nil(t, deep.Equal(field.Description, db.Field_1().Description))
+	require.Nil(t, deep.Equal(field.Description, db.Field1.Description))
 }
 
 func Test_Field_DeleteId(t *testing.T) {
@@ -78,7 +78,7 @@ func Test_Field_DeleteId(t *testing.T) {
 	afterCreateLength := len(result.([]models.Field))
 
 	// Delete field
-	err := repository.DeleteId(db.Field_1().ID)
+	err := repository.DeleteId(db.Field1.ID)
 
 	result2, _ := repository.GetAll()
 	afterDeleteLength := len(result2.([]models.Field))

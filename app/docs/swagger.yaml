@@ -15,6 +15,23 @@ definitions:
         description: Valid is true if Time is not NULL
         type: boolean
     type: object
+  models.Class:
+    properties:
+      classStartYear:
+        type: string
+      courseId:
+        type: integer
+      courseVersion:
+        type: integer
+      examEvaluations:
+        items:
+          $ref: '#/definitions/models.ExamEvaluation'
+        type: array
+      students:
+        items:
+          $ref: '#/definitions/models.User'
+        type: array
+    type: object
   models.Course:
     properties:
       created:
@@ -23,6 +40,10 @@ definitions:
         $ref: '#/definitions/gorm.DeletedAt'
       description:
         type: string
+      exams:
+        items:
+          $ref: '#/definitions/models.Exam'
+        type: array
       id:
         type: integer
       modules:
@@ -122,7 +143,44 @@ definitions:
       updated:
         type: string
       weighting:
-        type: number
+        type: integer
+    type: object
+  models.ExamEvaluation:
+    properties:
+      created:
+        type: string
+      deleted:
+        $ref: '#/definitions/gorm.DeletedAt'
+      entryDate:
+        type: string
+      exam:
+        $ref: '#/definitions/models.Exam'
+      examID:
+        type: integer
+      id:
+        type: integer
+      originalValue:
+        type: string
+      orignialGradeTyp:
+        $ref: '#/definitions/models.Gradetype'
+      orignialGradeTypeID:
+        type: integer
+      registeredBy:
+        $ref: '#/definitions/models.User'
+      registeredByID:
+        type: integer
+      selectedCourse:
+        $ref: '#/definitions/models.SelectedCourse'
+      selectedCourseClassStartyear:
+        type: string
+      selectedCourseCourseID:
+        type: integer
+      selectedCourseCourseVersion:
+        type: integer
+      selectedCourseUserID:
+        type: integer
+      updated:
+        type: string
     type: object
   models.Examtype:
     properties:
@@ -182,6 +240,59 @@ definitions:
       updated:
         type: string
     type: object
+  models.MetaCourse:
+    properties:
+      examtypes:
+        items:
+          $ref: '#/definitions/models.Examtype'
+        type: array
+      modules:
+        items:
+          $ref: '#/definitions/models.Module'
+        type: array
+      teachers:
+        items:
+          $ref: '#/definitions/models.User'
+        type: array
+    type: object
+  models.MetaCurriculums:
+    properties:
+      curriculumtypes:
+        items:
+          $ref: '#/definitions/models.Curriculumtype'
+        type: array
+      fields:
+        items:
+          $ref: '#/definitions/models.Field'
+        type: array
+      focuses:
+        items:
+          $ref: '#/definitions/models.Focus'
+        type: array
+      teachers:
+        items:
+          $ref: '#/definitions/models.User'
+        type: array
+    type: object
+  models.MetaModules:
+    properties:
+      courses:
+        items:
+          $ref: '#/definitions/models.Course'
+        type: array
+      curriculums:
+        items:
+          $ref: '#/definitions/models.Curriculum'
+        type: array
+      curriculumtypes:
+        items:
+          $ref: '#/definitions/models.Curriculumtype'
+        type: array
+      evaluationtype:
+        items:
+          $ref: '#/definitions/models.Evaluationtype'
+        type: array
+    type: object
   models.Module:
     properties:
       courses:
@@ -215,6 +326,8 @@ definitions:
     type: object
   models.Role:
     properties:
+      claim:
+        type: string
       created:
         type: string
       deleted:
@@ -258,6 +371,16 @@ definitions:
       updated:
         type: string
     type: object
+  models.StudentCurriculums:
+    properties:
+      curriculum:
+        allOf:
+        - $ref: '#/definitions/models.Curriculum'
+        description: Curriculumtype Curriculumtype // this is already in the curriculum
+      startYear:
+        description: taken from the user or selectedcourse
+        type: string
+    type: object
   models.StudyStage:
     properties:
       created:
@@ -273,12 +396,25 @@ definitions:
       updated:
         type: string
     type: object
+  models.TeacherCourses:
+    properties:
+      classes:
+        items:
+          $ref: '#/definitions/models.Class'
+        type: array
+      courses:
+        items:
+          $ref: '#/definitions/models.Course'
+        type: array
+    type: object
   models.User:
     properties:
       classStartYear:
         type: string
       created:
         type: string
+      curriculumId:
+        type: integer
       deleted:
         $ref: '#/definitions/gorm.DeletedAt'
       email:
@@ -305,6 +441,117 @@ definitions:
         type: array
       updated:
         type: string
+    type: object
+  requestmodels.RefCourse:
+    properties:
+      description:
+        type: string
+      exams:
+        items:
+          $ref: '#/definitions/requestmodels.RefId'
+        type: array
+      id:
+        type: integer
+      modules:
+        items:
+          $ref: '#/definitions/requestmodels.RefVersioned'
+        type: array
+      number:
+        type: string
+      selectedCourses:
+        items:
+          $ref: '#/definitions/requestmodels.RefSelectedCourse'
+        type: array
+      teachedBy:
+        items:
+          $ref: '#/definitions/requestmodels.RefId'
+        type: array
+      version:
+        type: integer
+    type: object
+  requestmodels.RefCurriculum:
+    properties:
+      curriculumType:
+        $ref: '#/definitions/requestmodels.RefId'
+      description:
+        example: Softwareentwicklung
+        type: string
+      endValidity:
+        example: 02.01.2006
+        type: string
+      focus:
+        $ref: '#/definitions/requestmodels.RefId'
+      id:
+        example: 1
+        type: integer
+      modules:
+        items:
+          $ref: '#/definitions/requestmodels.RefVersioned'
+        type: array
+      startvalidity:
+        example: 02.01.2006
+        type: string
+      state:
+        $ref: '#/definitions/requestmodels.RefId'
+    type: object
+  requestmodels.RefId:
+    properties:
+      id:
+        type: integer
+    type: object
+  requestmodels.RefModule:
+    properties:
+      courses:
+        items:
+          $ref: '#/definitions/requestmodels.RefVersioned'
+        type: array
+      curriculums:
+        items:
+          $ref: '#/definitions/requestmodels.RefTimed'
+        type: array
+      description:
+        type: string
+      evaluationType:
+        $ref: '#/definitions/requestmodels.RefId'
+      id:
+        type: integer
+      number:
+        type: string
+      state:
+        $ref: '#/definitions/requestmodels.RefId'
+      studyStage:
+        $ref: '#/definitions/requestmodels.RefId'
+      version:
+        type: integer
+    type: object
+  requestmodels.RefSelectedCourse:
+    properties:
+      classStartYear:
+        type: string
+      courseId:
+        type: integer
+      courseVersion:
+        type: integer
+      dispensed:
+        type: boolean
+      userId:
+        type: integer
+    type: object
+  requestmodels.RefTimed:
+    properties:
+      id:
+        example: 1
+        type: integer
+      startvalidity:
+        example: 02.01.2006
+        type: string
+    type: object
+  requestmodels.RefVersioned:
+    properties:
+      id:
+        type: integer
+      version:
+        type: integer
     type: object
 host: api.smashgrade.ch
 info:
@@ -349,7 +596,120 @@ paths:
       summary: Get all courses
       tags:
       - courses
+    post:
+      consumes:
+      - application/json
+      description: Create a course
+      parameters:
+      - description: request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/requestmodels.RefCourse'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Course'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.ApiError'
+      security:
+      - Bearer: []
+      summary: Create a course
+      tags:
+      - courses
+  /courses/{id}:
+    post:
+      consumes:
+      - application/json
+      description: Create a new version of a course
+      parameters:
+      - description: request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/requestmodels.RefCourse'
+      - description: Course ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Course'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.ApiError'
+      security:
+      - Bearer: []
+      summary: Create a new version of a course
+      tags:
+      - courses
   /courses/{id}/{version}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a course
+      parameters:
+      - description: Course ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Course Version
+        in: path
+        name: version
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.ApiError'
+      security:
+      - Bearer: []
+      summary: Delete a course
+      tags:
+      - courses
     get:
       description: Get a specific course
       parameters:
@@ -387,6 +747,340 @@ paths:
       summary: Get a specific course
       tags:
       - courses
+    put:
+      consumes:
+      - application/json
+      description: Update a course
+      parameters:
+      - description: request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/requestmodels.RefCourse'
+      - description: Course ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Course Version
+        in: path
+        name: version
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Course'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.ApiError'
+      security:
+      - Bearer: []
+      summary: Update a course
+      tags:
+      - courses
+  /courses/meta:
+    get:
+      description: Get Metadata for Course
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.MetaCourse'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.ApiError'
+      security:
+      - Bearer: []
+      summary: Get Metadata for Course
+      tags:
+      - meta
+      - courses
+  /courses/teacher:
+    get:
+      description: Get Courses as a teacher selected by teached by userinfo from accesstoken
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.TeacherCourses'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.ApiError'
+      security:
+      - Bearer: []
+      summary: Get your Courses as a teacher
+      tags:
+      - meta
+      - courses
+  /curriculums:
+    get:
+      description: Get all curriculums
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Curriculum'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.ApiError'
+      security:
+      - Bearer: []
+      summary: Get all curriculums
+      tags:
+      - curriculums
+    post:
+      consumes:
+      - application/json
+      description: Create a curriculum
+      parameters:
+      - description: request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/requestmodels.RefCurriculum'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Curriculum'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.ApiError'
+      security:
+      - Bearer: []
+      summary: Create a curriculum
+      tags:
+      - curriculums
+  /curriculums/{id}/{date}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a curriculum
+      parameters:
+      - description: Curriculum ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.ApiError'
+      security:
+      - Bearer: []
+      summary: Delete a curriculum
+      tags:
+      - curriculums
+    get:
+      description: Get a specific curriculum
+      parameters:
+      - description: Curriculum ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Curriculum'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.ApiError'
+      security:
+      - Bearer: []
+      summary: Get a specific curriculum
+      tags:
+      - curriculums
+    put:
+      consumes:
+      - application/json
+      description: Update a curriculum
+      parameters:
+      - description: request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/requestmodels.RefCurriculum'
+      - description: Curriculum ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Curriculum'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.ApiError'
+      security:
+      - Bearer: []
+      summary: Update a curriculum
+      tags:
+      - curriculums
+  /curriculums/meta:
+    get:
+      description: Get Metadata for Curriculums
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.MetaCurriculums'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.ApiError'
+      security:
+      - Bearer: []
+      summary: Get Metadata for Curriculums
+      tags:
+      - meta
+      - curriculums
+  /curriculums/student:
+    get:
+      description: Get Curriculums as a student selected by userinfo from accesstoken
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.StudentCurriculums'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.ApiError'
+      security:
+      - Bearer: []
+      summary: Get Curriculums as a student
+      tags:
+      - meta
+      - curriculums
   /curriculumtypes:
     get:
       description: Get all curriculum types
@@ -623,6 +1317,147 @@ paths:
       summary: Get all grade types
       tags:
       - gradetypes
+    post:
+      consumes:
+      - application/json
+      description: Create a gradetype
+      parameters:
+      - description: request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.Gradetype'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Gradetype'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.ApiError'
+      security:
+      - Bearer: []
+      summary: Create a gradetype
+      tags:
+      - gradetype
+  /gradetypes/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a gradetype
+      parameters:
+      - description: GradeType ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.ApiError'
+      security:
+      - Bearer: []
+      summary: Delete a gradetype
+      tags:
+      - gradetypes
+    put:
+      consumes:
+      - application/json
+      description: Update a gradetype
+      parameters:
+      - description: request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.Gradetype'
+      - description: GradeType ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Gradetype'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.ApiError'
+      security:
+      - Bearer: []
+      summary: Update a gradetype
+      tags:
+      - grapetype
+  /gradetypes/{id}/:
+    get:
+      description: Get a specific gradetype
+      parameters:
+      - description: GradeType ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Gradetype'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.ApiError'
+      security:
+      - Bearer: []
+      summary: Get a specific gradetype
+      tags:
+      - gradetype
   /modules:
     get:
       description: Get all modules
@@ -650,6 +1485,82 @@ paths:
       security:
       - Bearer: []
       summary: Get all modules
+      tags:
+      - modules
+    post:
+      consumes:
+      - application/json
+      description: Create a module
+      parameters:
+      - description: request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/requestmodels.RefModule'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Module'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.ApiError'
+      security:
+      - Bearer: []
+      summary: Create a module
+      tags:
+      - modules
+  /modules/{id}:
+    post:
+      consumes:
+      - application/json
+      description: Create a new version of a module
+      parameters:
+      - description: request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/requestmodels.RefModule'
+      - description: Module ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Module'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.ApiError'
+      security:
+      - Bearer: []
+      summary: Create a new version of a module
       tags:
       - modules
   /modules/{id}/{version}:
@@ -690,6 +1601,118 @@ paths:
       summary: Get a specific module
       tags:
       - modules
+    put:
+      consumes:
+      - application/json
+      description: Update a module
+      parameters:
+      - description: request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/requestmodels.RefModule'
+      - description: Module ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Module Version
+        in: path
+        name: version
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Module'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.ApiError'
+      security:
+      - Bearer: []
+      summary: Update a module
+      tags:
+      - modules
+  /modules/meta:
+    get:
+      description: Get Metadata for Module
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.MetaModules'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.ApiError'
+      security:
+      - Bearer: []
+      summary: Get Metadata for Module
+      tags:
+      - meta
+      - modules
+  /onboarding:
+    put:
+      description: Set start year and curriculumId as student by userinfo from accesstoken
+      parameters:
+      - description: Curriculum ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.User'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/error.ApiError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.ApiError'
+      security:
+      - Bearer: []
+      summary: Set start year and curriculumId as student
+      tags:
+      - meta
+      - curriculums
+      - users
   /states:
     get:
       description: Get all states

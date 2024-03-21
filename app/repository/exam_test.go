@@ -12,7 +12,7 @@ import (
 func Test_Exam_Create(t *testing.T) {
 	repository := NewExamRepository(db.NewPrefilledMockProvider())
 
-	exam_1 := db.Exam_1()
+	exam_1 := db.Exam1
 	exam_1.ID = 0
 
 	_, err := repository.Create(&exam_1)
@@ -24,7 +24,7 @@ func Test_Exam_Update(t *testing.T) {
 	repository := NewExamRepository(db.NewPrefilledMockProvider())
 
 	// Update Description of Exam
-	exam := db.Exam_1()
+	exam := db.Exam1
 	exam.Description = "edited description Exam 1"
 	err := repository.Update(&exam)
 
@@ -40,11 +40,11 @@ func Test_Exam_Find(t *testing.T) {
 	repository := NewExamRepository(db.NewPrefilledMockProvider())
 
 	// Find Exam
-	result2, err := repository.Find(db.Exam_1())
+	result2, err := repository.Find(db.Exam1)
 	exams := result2.([]models.Exam)
 
 	require.NoError(t, err)
-	require.Nil(t, deep.Equal(db.Exam_1().ID, exams[0].ID))
+	require.Nil(t, deep.Equal(db.Exam1.ID, exams[0].ID))
 }
 
 func Test_Exam_GetAll(t *testing.T) {
@@ -55,19 +55,19 @@ func Test_Exam_GetAll(t *testing.T) {
 	exams := result.([]models.Exam)
 
 	require.NoError(t, err)
-	require.Nil(t, deep.Equal(db.Exam_1().ID, exams[0].ID))
-	require.Nil(t, deep.Equal(db.Exam_2().ID, exams[1].ID))
+	require.Nil(t, deep.Equal(db.Exam1.ID, exams[0].ID))
+	require.Nil(t, deep.Equal(db.Exam2.ID, exams[1].ID))
 }
 
 func Test_Exam_GetID(t *testing.T) {
 	repository := NewExamRepository(db.NewPrefilledMockProvider())
 
 	// Get by ID
-	result, err := repository.GetId(db.Exam_1().ID)
+	result, err := repository.GetId(db.Exam1.ID)
 	exam := result.(*models.Exam)
 
 	require.NoError(t, err)
-	require.Nil(t, deep.Equal(exam.Description, db.Exam_1().Description))
+	require.Nil(t, deep.Equal(exam.Description, db.Exam1.Description))
 }
 
 func Test_Exam_DeleteId(t *testing.T) {
@@ -78,7 +78,7 @@ func Test_Exam_DeleteId(t *testing.T) {
 	afterCreateLength := len(result.([]models.Exam))
 
 	// Delete exams
-	err := repository.DeleteId(db.Exam_1().ID)
+	err := repository.DeleteId(db.Exam1.ID)
 
 	result2, _ := repository.GetAll()
 	afterDeleteLength := len(result2.([]models.Exam))

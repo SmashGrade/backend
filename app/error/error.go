@@ -3,6 +3,7 @@ package error
 import (
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/labstack/echo/v4"
 )
@@ -58,10 +59,10 @@ func HandleEchoError(err error, c echo.Context) {
 
 }
 
-func NewUnauthorizedError() *ApiError {
+func NewUnauthorizedError(msg string) *ApiError {
 	return &ApiError{
 		Status: 401,
-		Msg:    "Unauthorized. Please use a valid bearer token",
+		Msg:    fmt.Sprintf("Unauthorized: %s", msg),
 	}
 }
 
@@ -72,9 +73,56 @@ func NewDaoUnimplementedError() *ApiError {
 	}
 }
 
+func NewApiUnimplementedError() *ApiError {
+	return &ApiError{
+		Status: 501,
+		Msg:    "This api function is not yet implemented",
+	}
+}
+
 func NewDaoDbError() *ApiError {
 	return &ApiError{
 		Status: 500,
 		Msg:    "Database error",
+	}
+}
+
+func NewDaoValidationError(referenceObjectName, dataExpected, dataGot string) *ApiError {
+	return &ApiError{
+		Status: 404,
+		Msg:    fmt.Sprintf("Object '%v' invalid. Expected '%v' but got '%v'", referenceObjectName, dataExpected, dataGot),
+	}
+}
+
+func NewDaoReferenceError(referenceObjectName, referenceKey string) *ApiError {
+	return &ApiError{
+		Status: 404,
+		Msg:    fmt.Sprintf("Reference object '%v' with key '%v' not found", referenceObjectName, referenceKey),
+	}
+}
+
+func NewDaoReferenceIdError(referenceObjectName string, id uint) *ApiError {
+	return NewDaoReferenceError(referenceObjectName, fmt.Sprintf("id: %v", id))
+}
+
+func NewDaoReferenceVersionedError(referenceObjectName string, id, version uint) *ApiError {
+	return NewDaoReferenceError(referenceObjectName, fmt.Sprintf("id: %v, version: %v", id, version))
+}
+
+func NewDaoReferenceTimedError(referenceObjectName string, id uint, startValidity time.Time) *ApiError {
+	return NewDaoReferenceError(referenceObjectName, fmt.Sprintf("id: %v, startValidty: %v", id, startValidity))
+}
+
+func NewDaoNotExistingError(objectName, referenceKey string) *ApiError {
+	return &ApiError{
+		Status: 404,
+		Msg:    fmt.Sprintf("Object '%v' with key '%v' not found", objectName, referenceKey),
+	}
+}
+
+func NewClaimMissingError(claim string) *ApiError {
+	return &ApiError{
+		Status: 403,
+		Msg:    fmt.Sprintf("Claim '%v' is required to access this", claim),
 	}
 }
